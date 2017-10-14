@@ -17,7 +17,7 @@ void mogo20(int direction) {
 	// drive straight
 	autonDrive(1000, 2000, 127);
 	// wait for a bit
-	wait1Msec(300s);
+	wait1Msec(300);
 	// drive back
 	autonDrive(1000, 2000, -127);
 }
