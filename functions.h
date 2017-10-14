@@ -1,4 +1,16 @@
 /*
+calibrates gyroscope. run in pre-auton.
+*/
+void calibrate() [
+ //Completely clear out any previous sensor readings by setting the port to "sensorNone"
+ SensorType[in5] = sensorNone;
+ wait1Msec(1000);
+ //Reconfigure Analog Port 8 as a Gyro sensor and allow time for ROBOTC to calibrate it
+ SensorType[in5] = sensorGyro;
+ wait1Msec(2000);
+}
+
+/*
 moves robot "target" encoder units forward with motor power "power".
 If the target is not reached in "timeout" ms, stop.
 Needs to be braked with autonBrake().
@@ -24,6 +36,11 @@ void autonBrake(int direction) {
 	moveDrive(-direction * 30, -direction * 30);
 	wait1Msec(30);
 	moveDrive(0, 0);
+}
+
+/*
+rotates x
+void autonRotate(int ticks) {
 }
 
 /*
@@ -99,4 +116,35 @@ void autonConeIntake(int state) {
 	}
 
 	moveConeIntake(0);
+}
+
+/*
+uses gyroscope to rotate
+*/
+void autonRotate(int target, int timeout, int power) {
+	int DECEL_ANGLE = 30;
+	int BRAKE_SPEED = 30;
+	float k = 0.4;
+	int time = 0;
+
+	SensorValue[Gyro] = 0;
+	while (abs(SensorValue[Gyro]) < (target - DECEL_ANGLE) * 10 && time < timeout) {
+		moveDrive(power, -power);
+		wait1Msec(20);
+		time += 20;
+	}
+
+	while (abs(SensorValue[Gyro]) < target * 10 && time < timeout) {
+		moveDrive(k * power, -k * power);
+		wait1Msec(20);
+		time += 20;
+	}
+
+	moveDrive(-sgn(power) * BRAKE_SPEED, sgn(power) * BRAKE_SPEED);
+	wait1Msec(100);
+	moveDrive(0, 0);
+}
+
+void autonStack() {
+	// stacks cone
 }

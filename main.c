@@ -23,6 +23,7 @@
 #include "motor.h"
 #include "functions.h"
 #include "stall.h"
+#include "autons.h"
 #include "Vex_Competition_Includes.c"
 
 void pre_auton() {
