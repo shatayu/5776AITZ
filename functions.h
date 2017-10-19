@@ -1,7 +1,7 @@
 /*
 calibrates gyroscope. run in pre-auton.
 */
-void calibrate() [
+void calibrate() {
  //Completely clear out any previous sensor readings by setting the port to "sensorNone"
  SensorType[in5] = sensorNone;
  wait1Msec(1000);
@@ -146,5 +146,7 @@ void autonRotate(int target, int timeout, int power) {
 }
 
 void autonStack() {
+	// close claw
+	//
 	// stacks cone
 }
