@@ -13,9 +13,9 @@ task holdMainLift() {
 		integral += error;
 
 		if (abs(integral) < integralCap) {
-			power = kp * error + ki * integral;
+			power = (kp * error) + (ki * integral);
 		} else {
-			power = kp * error + sgn(integral) * ki * integralCap;
+			power = (kp * error) + (sgn(integral) * ki * integralCap);
 		}
 
 	 	if (abs(power) < powerCap) {
