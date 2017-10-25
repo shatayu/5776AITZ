@@ -35,7 +35,7 @@ void autoStackHelper(int topLiftAngle, int mainLiftMaxHeight, int mainLiftScoreH
 
 /* brings lift down to neutral position */
 void reset() {
-	autoStackHelper(69, 69, 69);
+	autoStackHelper(0, 0, 0); // adjust values
 	stopAllTasks();
 }
 
