@@ -20,7 +20,7 @@ void autonDrive(int target, int timeout, int power) {
 	SensorValue[REncoder] = 0;
 
 	int timer = 0;
-	while (abs(SensorValue[LEncoder]) < target && timer < timeout) {
+	while (abs(SensorValue[LEncoder] + SensorValue[REncoder])/2 < target && timer < timeout) {
 		moveDrive(power, power);
 		wait1Msec(20);
 		timer += 20;
@@ -38,84 +38,44 @@ void autonBrake(int direction) {
 	moveDrive(0, 0);
 }
 
-/*
-rotates x
-void autonRotate(int ticks) {
-}
-
-/*
-moves lift to specific position.
-*/
-void autonMainLift(int target, int timeout, int power) {
-	// stopTask(holdMainLift);
-	int timer = 0;
-	if (SensorValue[LiftPot] < target && power > 0) { 	// lift is below target
-		while (SensorValue[LiftPot] < target && timer < timeout) {
-			moveMainLift(power);
-			wait1Msec(20);
-			timer += 20;
-		}
-	} else if (SensorValue[LiftPot] > target && power < 0) { // lift is above target
-		while (SensorValue[LiftPot] > target && timer < timeout) {
-			moveMainLift(power);
-			wait1Msec(20);
-			timer += 20;
-		}
-	}
-
-	moveMainLift(0);
-	// startTask(holdMainLift);
-}
-
-/*
-moves mogo to specific position.
-*/
-void autonMogo(int state) {
-	int timeout = 5000; // amount of time claw is allowed to reach its state
-	int power = 127;
-
-	// greater sensor value := mogo intake more withdrawn
-	int timer = 0;
-	if (SensorValue[MogoPot] < state) { 	// extend intake
-		while (SensorValue[MogoPot] < state && timer < timeout) {
-			moveMogoIntake(-127);
-			wait1Msec(20);
-			timer += 20;
-		}
-	} else if (SensorValue[LiftPot] > state) { // extend intake
-		while (SensorValue[MogoPot] > state && timer < timeout) {
-			moveMogoIntake(127);
-			wait1Msec(20);
-			timer += 20;
-		}
-	}
-
-	moveMogoIntake(0);
-}
 
 // higher sensor value := open
-void autonConeIntake(int state) {
+bool coneIntakeState; // true; open the cone, false; close the cone
+bool OPEN = true;
+bool CLOSED = false;
+
+task autonConeIntake() {
 	clawStall(false);
-	int timeout = 500; // amount of time claw is allowed to reach its state
-	int power = 127;
-
-	int timer = 0;
-	if (SensorValue[ConePot] < state) { 	// open claw
-		while (SensorValue[MogoPot] < state && timer < timeout) {
-			moveConeIntake(-power);
-			wait1Msec(20);
-			timer += 20;
-		}
-	} else if (SensorValue[LiftPot] > state) { // close claw
-		while (SensorValue[MogoPot] > state && timer < timeout) {
-			moveConeIntake(power);
-			wait1Msec(20);
-			timer += 20;
-		}
-		clawStall(true);
+	if (coneIntakeState) {
+		moveConeIntake(-50);
+	} else {
+		moveConeIntake(50);
 	}
-
+	wait1Msec(500); // time for claw to move
 	moveConeIntake(0);
+
+
+	//int openValue;
+	//int closedValue;
+	//int timeout = 500; // amount of time claw is allowed to reach its state
+	//int power = 127;
+
+	//int timer = 0;
+	//if (coneIntakeState) { 	// open claw
+	//	while (SensorValue[ConePot] < openValue && timer < timeout) {
+	//		moveConeIntake(-power);
+	//		wait1Msec(20);
+	//		timer += 20;
+	//	}
+	//} else if (SensorValue[ConePot] > closedValue) { // close claw
+	//	while (SensorValue[ConePot] > closedValue && timer < timeout) {
+	//		moveConeIntake(power);
+	//		wait1Msec(20);
+	//		timer += 20;
+	//	}
+	//}
+
+	//moveConeIntake(0);
 }
 
 /*
@@ -143,10 +103,4 @@ void autonRotate(int target, int timeout, int power) {
 	moveDrive(-sgn(power) * BRAKE_SPEED, sgn(power) * BRAKE_SPEED);
 	wait1Msec(100);
 	moveDrive(0, 0);
-}
-
-void autonStack() {
-	// close claw
-	//
-	// stacks cone
 }

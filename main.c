@@ -1,8 +1,9 @@
-#pragma config(Sensor, in1,    ConePot,        sensorPotentiometer)
+#pragma config(Sensor, in1,    MainLiftPot,    sensorPotentiometer)
 #pragma config(Sensor, in2,    MogoPot,        sensorPotentiometer)
-#pragma config(Sensor, in3,    LiftPot,        sensorPotentiometer)
-#pragma config(Sensor, in4,    FourBarPot,     sensorPotentiometer)
+#pragma config(Sensor, in3,    TopLiftPot,     sensorPotentiometer)
+#pragma config(Sensor, in4,    ConePotA,       sensorPotentiometer)
 #pragma config(Sensor, in5,    Gyro,           sensorGyro)
+#pragma config(Sensor, in6,    ConePot,        sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  LEncoder,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  REncoder,       sensorQuadEncoder)
 #pragma config(Motor,  port2,           LDrive,        tmotorVex393_MC29, openLoop)
@@ -21,9 +22,11 @@
 #pragma competitionControl(Competition)
 
 #include "motor.h"
-#include "functions.h"
 #include "stall.h"
-#include "autons.h"
+#include "functions.h"
+#include "liftFunctions.h"
+#include "autostack.h"
+//#include "autons.h"
 
 #include "Vex_Competition_Includes.c"
 
@@ -32,10 +35,12 @@ void pre_auton() {
 }
 
 task autonomous() {
-
+	autoStack(2);
+	//autoStackReset();
 }
 
 task usercontrol() {
+	stopTask(holdMainLift);
   while (true) {
   	// drive code
   	moveDrive(vexRT[Ch3] - vexRT[Ch1], vexRT[Ch3] + vexRT[Ch1]);
@@ -58,6 +63,8 @@ task usercontrol() {
   		moveMainLift(-127);
   	} else if (vexRT[Btn7L]) {
   		moveMainLift(40); // MAIN LIFT PID WILL GO HERE VELA TUNE THIS VALUE TO WHAT YOU NEED (should be somewhere from 15-50)
+  	} else {
+  		moveMainLift(0);
   	}
 
   	// mogo intake code
@@ -69,11 +76,11 @@ task usercontrol() {
   		moveMogoIntake(0);
   	}
 
-  	// cone intake code
+  	// cone intake (claw) code
   	if (vexRT[Btn8U]) {
-  		moveConeIntake(127);
+  		moveConeIntake(60);
   	} else if (vexRT[Btn8D]) {
-  		moveConeIntake(-127);
+  		moveConeIntake(-60);
   	} else if (vexRT[Btn8L]) {
   		clawStall(true);
   	} else {
