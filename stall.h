@@ -2,7 +2,7 @@
 PI loop to hold the main lift steady
 */
 task holdMainLift() {
-	float kp = 0.5; float ki = 0.1
+	float kp = 0.2; float ki = 0.1
 	int error; int integral = 0;
 	int integralCap = 10;	int powerCap = 50;
 	int target = SensorValue[MainLiftPot];

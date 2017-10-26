@@ -44,38 +44,16 @@ bool coneIntakeState; // true; open the cone, false; close the cone
 bool OPEN = true;
 bool CLOSED = false;
 
-task autonConeIntake() {
-	clawStall(false);
-	if (coneIntakeState) {
+void autonConeIntake(bool position) {
+	if (position) {
 		moveConeIntake(-50);
+		wait1Msec(200);
+		moveConeIntake(0);
 	} else {
 		moveConeIntake(50);
+		wait1Msec(200);
+		moveConeIntake(0);
 	}
-	wait1Msec(500); // time for claw to move
-	moveConeIntake(0);
-
-
-	//int openValue;
-	//int closedValue;
-	//int timeout = 500; // amount of time claw is allowed to reach its state
-	//int power = 127;
-
-	//int timer = 0;
-	//if (coneIntakeState) { 	// open claw
-	//	while (SensorValue[ConePot] < openValue && timer < timeout) {
-	//		moveConeIntake(-power);
-	//		wait1Msec(20);
-	//		timer += 20;
-	//	}
-	//} else if (SensorValue[ConePot] > closedValue) { // close claw
-	//	while (SensorValue[ConePot] > closedValue && timer < timeout) {
-	//		moveConeIntake(power);
-	//		wait1Msec(20);
-	//		timer += 20;
-	//	}
-	//}
-
-	//moveConeIntake(0);
 }
 
 /*

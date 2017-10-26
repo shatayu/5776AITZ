@@ -24,7 +24,7 @@ void moveConeIntake(int power) {
 void clawStall(bool on) {
 	// if on then stall
 	if (on) {
-		moveConeIntake(30);
+		moveConeIntake(50);
 	} else {
 		moveConeIntake(0);
 	}

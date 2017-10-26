@@ -5,11 +5,10 @@ all the way down with mogo in 1485
 all the way down 1230
 */
 
-int topLiftTarget;
-task autonTopLift() {
+void autonTopLift(int topLiftTarget) {
 	stopTask(holdTopLift);
 	int timeout = 5000;
-	int power = 127;
+	int power = 70;
 
 	int timer = 0;
 	if (SensorValue[TopLiftPot] < topLiftTarget) { 	// lift is below target
@@ -28,7 +27,6 @@ task autonTopLift() {
 
 	moveTopLift(0);
 	startTask(holdTopLift);
-	stopTask(autonTopLift);
 }
 
 /*
@@ -68,8 +66,8 @@ moves lift to specific position.
 220 all the way down
 1320 all the way up
 */
-int mainLiftTarget;
-task autonMainLift() {
+
+void autonMainLift(int mainLiftTarget) {
 	int timeout = 4000;
 	int power = 127;
 

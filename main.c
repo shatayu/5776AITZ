@@ -1,7 +1,6 @@
 #pragma config(Sensor, in1,    MainLiftPot,    sensorPotentiometer)
 #pragma config(Sensor, in2,    MogoPot,        sensorPotentiometer)
 #pragma config(Sensor, in3,    TopLiftPot,     sensorPotentiometer)
-#pragma config(Sensor, in4,    ConePotA,       sensorPotentiometer)
 #pragma config(Sensor, in5,    Gyro,           sensorGyro)
 #pragma config(Sensor, in6,    ConePot,        sensorPotentiometer)
 #pragma config(Sensor, dgtl1,  LEncoder,       sensorQuadEncoder)
@@ -35,12 +34,11 @@ void pre_auton() {
 }
 
 task autonomous() {
-	autoStack(2);
-	//autoStackReset();
+ autoStack(11);
 }
 
 task usercontrol() {
-	stopTask(holdMainLift);
+	int conesOnMogo = 0;
   while (true) {
   	// drive code
   	moveDrive(vexRT[Ch3] - vexRT[Ch1], vexRT[Ch3] + vexRT[Ch1]);
@@ -50,8 +48,6 @@ task usercontrol() {
   		moveTopLift(127);
   	} else if (vexRT[Btn6D]) {
   		moveTopLift(-127);
-  	} else if (vexRT[Btn7R]) {
-  		moveTopLift(30); // VERTIBAR PID WILL GO HERE VELA TUNE THIS VALUE TO WHAT YOU NEED (should be somewhere from 15-40)
   	} else {
   		moveTopLift(0);
   	}
@@ -61,8 +57,6 @@ task usercontrol() {
   		moveMainLift(127);
   	} else if (vexRT[Btn5D]) {
   		moveMainLift(-127);
-  	} else if (vexRT[Btn7L]) {
-  		moveMainLift(40); // MAIN LIFT PID WILL GO HERE VELA TUNE THIS VALUE TO WHAT YOU NEED (should be somewhere from 15-50)
   	} else {
   		moveMainLift(0);
   	}
@@ -85,6 +79,12 @@ task usercontrol() {
   		clawStall(true);
   	} else {
   		clawStall(false);
+  	}
+
+  	// autostack code
+  	if (vexRT[Btn8R]) {
+  		autoStack(conesOnMogo);
+  		conesOnMogo++;
   	}
 
   	wait1Msec(20);
