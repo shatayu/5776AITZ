@@ -16,11 +16,12 @@ If the target is not reached in "timeout" ms, stop.
 Needs to be braked with autonBrake().
 */
 void autonDrive(int target, int timeout, int power) {
+	int tolerance = 50;
 	SensorValue[LEncoder] = 0;
 	SensorValue[REncoder] = 0;
 
 	int timer = 0;
-	while (abs(SensorValue[LEncoder] + SensorValue[REncoder])/2 < target && timer < timeout) {
+	while (abs(SensorValue[LEncoder]) < target && timer < timeout) {
 		moveDrive(power, power);
 		wait1Msec(20);
 		timer += 20;
@@ -50,11 +51,11 @@ bool CLOSED = false;
 void autonConeIntake(bool position) {
 	if (position) {
 		moveConeIntake(-50);
-		wait1Msec(200);
+		wait1Msec(400);
 		moveConeIntake(0);
 	} else {
 		moveConeIntake(50);
-		wait1Msec(200);
+		wait1Msec(400);
 		moveConeIntake(0);
 	}
 }
@@ -62,26 +63,19 @@ void autonConeIntake(bool position) {
 /*
 uses gyroscope to rotate
 */
-void autonRotate(int target, int timeout, int power) {
+void autonRotate(int target, int timeout, int power, int direction) {
 	int DECEL_ANGLE = 30;
 	int BRAKE_SPEED = 30;
+	int tolerance = 20;
 	float k = 0.4;
 	int time = 0;
 
 	SensorValue[Gyro] = 0;
-	while (abs(SensorValue[Gyro]) < (target - DECEL_ANGLE) * 10 && time < timeout) {
-		moveDrive(power, -power);
-		wait1Msec(20);
-		time += 20;
+	while (abs(target - SensorValue[Gyro]) > tolerance) {
+		moveDrive(direction * power, -direction * power);
 	}
 
-	while (abs(SensorValue[Gyro]) < target * 10 && time < timeout) {
-		moveDrive(k * power, -k * power);
-		wait1Msec(20);
-		time += 20;
-	}
-
-	moveDrive(-sgn(power) * BRAKE_SPEED, sgn(power) * BRAKE_SPEED);
+	moveDrive(-direction * BRAKE_SPEED, direction * BRAKE_SPEED);
 	wait1Msec(100);
 	moveDrive(0, 0);
 }

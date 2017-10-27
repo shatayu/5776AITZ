@@ -30,11 +30,20 @@
 #include "Vex_Competition_Includes.c"
 
 void pre_auton() {
+	//calibrate();
   bStopTasksBetweenModes = true;
 }
 
+/*
+-5532 775 = 6307
+767 -5677 = 6444
+-5069 -7892 = 2820
+-6452 -4295 = -2157
+*/
+
 task autonomous() {
-  autoStack(11);
+	mogo20(1);
+
 }
 
 task usercontrol() {
@@ -42,12 +51,11 @@ task usercontrol() {
   while (true) {
   	// drive code
   	moveDrive(vexRT[Ch3] - vexRT[Ch1], vexRT[Ch3] + vexRT[Ch1]);
-  	moveDrive(vexRT[Ch3Xmtr2] - vexRT[Ch1Xmtr2], vexRT[Ch3Xmtr2] + vexRT[Ch1Xmtr2]);
 
   	// top lift (4-bar) code
-  	if (vexRt[Btn6U] || vexRT[Btn6UXmtr2]) {
+  	if (vexRT[Btn8U]) {
   		moveTopLift(127);
-  	} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
+  	} else if (vexRT[Btn8D]) {
   		moveTopLift(-127);
   	} else {
   		moveTopLift(0);
@@ -63,37 +71,39 @@ task usercontrol() {
   	}
 
   	// mogo intake code
-  	if (vexRT[Btn7L] || vexRT[Btn7LXmtr2]) {
+  	if (vexRT[Btn7U]) {
   		moveMogoIntake(127);
-  	} else if (vexRT[Btn7R] || vexRT[Btn7RXmtr2]) {
+  	} else if (vexRT[Btn7D]) {
   		moveMogoIntake(-127);
   	} else {
   		moveMogoIntake(0);
   	}
 
   	// cone intake (claw) code
-  	if (vexRT[Btn7U] || vexRT[Btn7UXmtr2]) {
+  	if (vexRT[Btn6U]) {
   		moveConeIntake(60);
-  	} else if (vexRT[Btn7D] || vexRT[Btn7DXmtr2]) {
+  	} else if (vexRT[Btn6D]) {
   		moveConeIntake(-60);
+  	} else if (vexRT[Btn8L]) {
+  		clawStall(true);
   	} else {
-  		moveConeIntake(0);
+  		clawStall(false);
   	}
 
   	// autostack code
   	if (vexRT[Btn8R]) {
   		autoStack(conesOnMogo);
   		conesOnMogo++;
+  		stopTask(holdTopLift);
+  		stopTask(holdMainLift);
+  		reset();
+  		stopTask(holdMainLift);
+  	} else if (vexRT[Btn7L]) {
+  		conesOnMogo = 0;
+  	} else if (vexRT[Btn7R]) {
+  		stopTask(holdTopLift);
   	}
 
-  	// autostack count control
-  	if (vexRT[Btn8UXmtr2]) {
-  		conesOnMogo++;
-  	} else if (vexRT[Btn8DXmtr2]) {
-  		conesOnMogo--;
-  	} else if (vexRT[Btn8RXmtr2]) {
-  		conesOnMogo = 0;
-  	}
 
   	wait1Msec(20);
   }

@@ -8,14 +8,17 @@ void autoStackHelper(int topLiftAngle, int mainLiftMaxHeight) {
 	// bring top lift to middle angle
 	autonTopLift(middleTopLiftAngle, 127);
 
+	//mogoTarget = 1670;
+	//startTask(autonMogo);
 	// bring main lift to necessary height
 	autonMainLift(mainLiftMaxHeight);
 
 	// bring vertibar to scoring angle
-	autonTopLift(topLiftAngle - 400, 80);
 	autonTopLift(topLiftAngle, 60);
 
 	autonConeIntake(OPEN);
+	//mogoTarget = 1450;
+	//startTask(autonMogo);
 }
 
 void reset() {
@@ -23,8 +26,6 @@ void reset() {
 	int tolerance = 70;
 	//// bring top lift back to middle height
 	stopTask(holdTopLift);
-	moveTopLift(-127);
-	wait1Msec(20000);
 	autonTopLift(middleTopLiftAngle, 127);
 
 	//// bring main lift down to base height
@@ -32,7 +33,7 @@ void reset() {
 	autonMainLift(1460);
 
 	//// being top lift back to base height
-	autonTopLift(1200, 127);
+	autonTopLift(1550, 127);
 }
 
 /* brings lift down to neutral position */
@@ -59,6 +60,5 @@ void autoStack(int conesOnMogo) {
 		autoStackHelper(3750, 2300);
 	} else if (conesOnMogo >= 11 && conesOnMogo <= 14) {
 		autoStackHelper(3750, 2700);
-		reset();
 	}
 }
