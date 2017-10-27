@@ -23,4 +23,26 @@ void mogo20(int direction) {
 	wait1Msec(300);
 	// drive back
 	autonDrive(1000, 2000, -127);
+	
+
 }
+
+// assumes that you are at the 20 point mark
+//drives backward for you
+void scoreOn20(){
+	
+	//puts the mogo claw all the way out
+	moveMogoIntake(127);
+	wait1Msec(2500);
+
+	//drives backward without moving the mogo
+	autonDrive(1000,2000,-80);
+
+	//pulls the mogo claw back up
+	moveMogoIntake(-127);
+	wait1Msec(500);
+
+	moveMogoIntake(0);
+}
+
+
