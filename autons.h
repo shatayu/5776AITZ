@@ -47,7 +47,7 @@ void scoreOn20(){
 	bool OPEN = true;
 	bool CLOSED = false;
 
-void skillsMatchLoads(int cones){
+void skillsMatchLoads(int cones, int direction){
 	for(int i = 0; i<cones;i++){
 	//open claw up
 	autonConeIntake(OPEN);
@@ -69,7 +69,7 @@ void skillsMatchLoads(int cones){
 	reset();
 }
 	//run mogo20 code
-	mogo20(1);
+	mogo20(direction);
 
 }
 //assumes the bot is ready to pick up cone
