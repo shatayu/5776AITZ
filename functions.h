@@ -31,7 +31,10 @@ void autonDrive(int target, int timeout, int power) {
 
 /*
 brakes after moving. Use if robot needs to stop
+direction: direction the robot is moving in
 */
+#define FORWARD = 1;
+#define BACKWARDS = -1;
 void autonBrake(int direction) {
 	moveDrive(-direction * 30, -direction * 30);
 	wait1Msec(30);

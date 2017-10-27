@@ -5,10 +5,9 @@ all the way down with mogo in 1485
 all the way down 1230
 */
 
-void autonTopLift(int topLiftTarget) {
+void autonTopLift(int topLiftTarget, int power) {
 	stopTask(holdTopLift);
 	int timeout = 5000;
-	int power = 70;
 
 	int timer = 0;
 	if (SensorValue[TopLiftPot] < topLiftTarget) { 	// lift is below target

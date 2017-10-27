@@ -1,13 +1,16 @@
 void mogo20(int direction) {
 	// START RED TILE
 	// deploy mogo intake
-	autonMogo(500);
+	mogoTarget = 3190;
+	startTask(autonMogo);
 	// drive straight into mogo
 	autonDrive(2000, 3000, 127);
+	autonBrake(true);
 	// score preload cone on mogo
-	autonStack();
+	autoStack(0);
 	// drive back
 	autonDrive(2000, 3000, -127);
+	autonBrake(false);
 	// rotate 45 degrees clockwise
 	autonRotate(90, 2000, 80);
 	// back up into alignment with 20pt zone
