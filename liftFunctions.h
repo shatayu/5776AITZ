@@ -66,9 +66,8 @@ moves lift to specific position.
 1320 all the way up
 */
 
-void autonMainLift(int mainLiftTarget) {
+void autonMainLift(int mainLiftTarget, int power) {
 	int timeout = 4000;
-	int power = 127;
 
 	stopTask(holdMainLift);
 	int timer = 0;
