@@ -1,23 +1,23 @@
 void autoStackHelper(int topLiftAngle, int mainLiftMaxHeight, int mogoAngle) {
 	int middleTopLiftAngle = 1910; // adjust value
-	int tolerance = 50;
+	int tolerance = 20;
 
 	// claw stall
 	clawStall(true);
 
 	// bring top lift to middle angle
-	autonTopLift(middleTopLiftAngle, 127);
+	autonTopLift(middleTopLiftAngle, 80);
 
-	if (mogoAngle != 1) {
-		mogoTarget = mogoAngle;
-		startTask(autonMogo);
-	}
+	//if (mogoAngle != 1) {
+	//	mogoTarget = mogoAngle;
+	//	startTask(autonMogo);
+	//}
 	// bring main lift to necessary height
 	autonMainLift(mainLiftMaxHeight, 127);
 
 	// bring vertibar to scoring angle
-	autonTopLift(topLiftAngle, 127);
-
+	autonTopLift(topLiftAngle, 80);
+	wait1Msec(500);
 	autonConeIntake(OPEN);
 }
 
@@ -25,38 +25,37 @@ void reset() {
 	int middleTopLiftAngle = 1910; // adjust value
 	int tolerance = 70;
 	//// bring top lift back to middle height
-	stopTask(holdTopLift);
 	autonTopLift(middleTopLiftAngle, 127);
+	startTask(holdTopLift);
 
 	//// bring main lift down to base height
 	//int baseMainLiftHeight = 1460;
-	autonMainLift(1440, 127);
-	mogoTarget = 1380;
-	startTask(autonMogo);
+	autonMainLift(1496, 60);
+	//mogoTarget = 1380;
+	//startTask(autonMogo);
 
 	//// being top lift back to base height
 	autonTopLift(1720, 50);
-	stopTask(holdTopLift);
 }
 
 /* brings lift down to neutral position */
 void autoStack(int conesOnMogo) {
 	if (conesOnMogo == 0) {
-		autoStackHelper(3790, 1580, 1400);
+		autoStackHelper(2850, 1480, 1400);
 	} else if (conesOnMogo == 1) {
-		autoStackHelper(3790, 1580, 1400);
+		autoStackHelper(2850, 1580, 1400);
 	} else if (conesOnMogo == 2) {
-		autoStackHelper(3350, 1660, 1400);
+		autoStackHelper(2850, 1660, 1400);
 	} else if (conesOnMogo == 3) {
-		autoStackHelper(3790, 1750, 1500);
+		autoStackHelper(2850, 1730, 1500);
 	} else if (conesOnMogo == 4) {
-		autoStackHelper(3790, 1810, 1500);
+		autoStackHelper(2850, 1800, 1500);
 	} else if (conesOnMogo == 5) {
-		autoStackHelper(3690, 1870, 1400);
+		autoStackHelper(2950, 1800, 1400);
 	} else if (conesOnMogo == 6) {
-		autoStackHelper(3750, 1980, 1500);
+		autoStackHelper(3750, 1930, 1500);
 	} else if (conesOnMogo == 7) {
-		autoStackHelper(3750, 2080, 1500);
+		autoStackHelper(3750, 1990, 1500);
 	} else if (conesOnMogo == 8) {
 		autoStackHelper(3750, 2160, 1);
 	} else if (conesOnMogo == 9) {

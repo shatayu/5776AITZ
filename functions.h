@@ -38,7 +38,7 @@ direction: direction the robot is moving in
 #define BACKWARDS = -1;
 void autonBrake(int direction) {
 	moveDrive(-direction * 30, -direction * 30);
-	wait1Msec(30);
+	wait1Msec(50);
 	moveDrive(0, 0);
 }
 
