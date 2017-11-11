@@ -20,12 +20,3 @@ void moveMogoIntake(int power) {
 void moveConeIntake(int power) {
 	motor[ConeIntake] = power;
 }
-
-void clawStall(bool on) {
-	// if on then stall
-	if (on) {
-		moveConeIntake(50);
-	} else {
-		moveConeIntake(0);
-	}
-}

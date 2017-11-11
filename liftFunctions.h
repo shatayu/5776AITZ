@@ -5,8 +5,14 @@ all the way down with mogo in 1485
 all the way down 1230
 */
 
+int topLiftTarget;
+int topLiftPower;
+
+task autonTopLiftHelper() {
+}
+
 void autonTopLift(int topLiftTarget, int power) {
-	stopTask(holdTopLift);
+	stopTask(topLiftPI);
 	int timeout = 5000;
 
 	int timer = 0;
@@ -25,7 +31,7 @@ void autonTopLift(int topLiftTarget, int power) {
 	}
 
 	moveTopLift(0);
-	startTask(holdTopLift);
+	startTask(topLiftPI);
 }
 
 /*
@@ -35,7 +41,6 @@ all the way in 1485
 */
 int mogoTarget;
 task autonMogo() {
-	stopTask(holdMogo);
 	int timeout = 5000; // amount of time claw is allowed to reach its state
 	int power = 70;
 
@@ -56,8 +61,6 @@ task autonMogo() {
 	}
 
 	moveMogoIntake(0);
-	startTask(holdMogo);
-	stopTask(autonMogo);
 }
 
 /*
@@ -66,19 +69,18 @@ moves lift to specific position.
 1320 all the way up
 */
 
-void autonMainLift(int mainLiftTarget, int power) {
-	int timeout = 4000;
-
-	stopTask(holdMainLift);
+void autonMainLift(int target, int timeout, int power) {
+	stopTask(mainLiftPI);
 	int timer = 0;
-	if (SensorValue[MainLiftPot] < mainLiftTarget) { 	// lift is below target
-		while (SensorValue[MainLiftPot] < mainLiftTarget && timer < timeout) {
+
+	if (SensorValue[MainLiftPot] < target) { 	// lift is below target
+		while (SensorValue[MainLiftPot] < target && timer < timeout) {
 			moveMainLift(power);
 			wait1Msec(20);
 			timer += 20;
 		}
-	} else if (SensorValue[MainLiftPot] > mainLiftTarget) { // lift is above target
-		while (SensorValue[MainLiftPot] > mainLiftTarget && timer < timeout) {
+	} else if (SensorValue[MainLiftPot] > target) { // lift is above target
+		while (SensorValue[MainLiftPot] > target && timer < timeout) {
 			moveMainLift(-power);
 			wait1Msec(20);
 			timer += 20;
@@ -86,5 +88,5 @@ void autonMainLift(int mainLiftTarget, int power) {
 	}
 
 	moveMainLift(0);
-	startTask(holdMainLift);
+	startTask(mainLiftPI);
 }
