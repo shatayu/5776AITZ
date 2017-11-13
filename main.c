@@ -25,7 +25,7 @@
 #include "functions.h"
 #include "liftFunctions.h"
 #include "autostack.h"
-//#include "autons.h"
+#include "autons.h"
 
 #include "Vex_Competition_Includes.c"
 
@@ -36,6 +36,7 @@ void pre_auton() {
 }
 
 task autonomous() {
+stationaryGoal();
 
 }
 
@@ -101,7 +102,8 @@ task usercontrol() {
   	// cone counter management
   	if (vexRT[Btn7L]) {
   		waitUntil(!vexRT[Btn7L]):
-  		conesOnMogo--;
+  		if (conesOnMogo > 0)
+  			conesOnMogo--;
   	}
 
   	// cone counter management

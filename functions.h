@@ -17,11 +17,11 @@ Needs to be braked with autonBrake().
 */
 void autonDrive(int target, int timeout, int power) {
 	int tolerance = 50;
-	SensorValue[LEncoder] = 0;
+	//SensorValue[LEncoder] = 0;
 	SensorValue[REncoder] = 0;
 
 	int timer = 0;
-	while (abs(SensorValue[LEncoder]) < target && timer < timeout) {
+	while (abs(SensorValue[REncoder]) < target && timer < timeout) {
 		moveDrive(power, power);
 		wait1Msec(20);
 		timer += 20;
@@ -85,7 +85,7 @@ void autonRotate(int target, int timeout, int power, int direction) {
 	int time = 0;
 
 	SensorValue[Gyro] = 0;
-	while (abs(target - SensorValue[Gyro]) > tolerance) {
+	while (target - abs(SensorValue[Gyro]) > tolerance) {
 		moveDrive(direction * power, -direction * power);
 	}
 
