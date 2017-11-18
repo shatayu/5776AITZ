@@ -36,7 +36,7 @@ void pre_auton() {
 }
 
 task autonomous() {
-stationaryGoal();
+mogoAuton(1);
 
 }
 

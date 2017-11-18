@@ -46,12 +46,14 @@ void mogoAuton(int direction){
 	autonRotate(450,2000,127,1);
 	autonDrive(2700,2000,-127);
 	autonRotate(860,2000,127,1);
-	scoreOn20();
+	//scoreOn20();
 
 }
 
 // untested
 void stationaryGoal(int direction){
+	// 2 point
+	// line up
 	moveConeIntake(30);
 	autonDrive(900,2000,127);
 	autonBrake(1);
@@ -60,18 +62,19 @@ void stationaryGoal(int direction){
 	autonBrake(1);
 	autonRotate(900,2000,127,-1);
 
+	// score
 	autonTopLift(2235,127);
 	autonMainLift(2200,2000,127);
 	autonConeIntake(OPEN);
 
 	// 4 point
 	autonDrive(500, 2000, -127);
-	rotate(900, CLOCKWISE * direction);
+	autonRotate(900, 2000, 127, 1 * direction);
 	autonDrive(1000, 2000, 127);
-	autonConeIntake(CLOSE);
-	autonMainLift(2400);
+	autonConeIntake(-1);
+	autonMainLift(2400, 2000, 127);
 	autonDrive(1000, 2000, -127);
-	rotate(900, COUNTERCLOCKWISE * direction);
+	autonRotate(900, 2000, 127, -1 * direction);
 	autonDrive(500, 2000, 127);
 	autonConeIntake(OPEN);
 }
