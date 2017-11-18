@@ -6,14 +6,17 @@ void autoStackHelper(int topLiftAngle, int mainLiftMaxHeight, bool matchLoad) {
 	// claw stall
 	moveConeIntake(30);
 
-	if (!matchload)
+	// move top lift to middle angle
+	if (!matchload) {
 		autonTopLift(middleTopLiftAngle, 127);
+	}
 
 	// bring main lift to necessary height
 	if (SensorValue[MainLiftPot] < mainLiftMaxHeight)
 		autonMainLift(mainLiftMaxHeight, 3000, 127);
 
 	// bring vertibar to scoring angle
+	// insert deceleration curve here
 	stopTask(topLiftPI);
 	autonTopLift(topLiftAngle, 127);
 	stopTask(topLiftPI);
