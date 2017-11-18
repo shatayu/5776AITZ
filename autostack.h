@@ -44,7 +44,7 @@ void autoStack(int conesOnMogo, bool matchLoad) {
 	if (conesOnMogo == 0) {
 		autoStackHelper(3000, 1350, matchLoad); //no lift
 	} else if (conesOnMogo == 1) {
-		autoStackHelper(3000, 1500, matchLoad);
+		autoStackHelper(3000, 1600, matchLoad);
 	} else if (conesOnMogo == 2) {
 		autoStackHelper(3000, 1730, matchLoad);
 	} else if (conesOnMogo == 3) {

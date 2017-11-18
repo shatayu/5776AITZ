@@ -46,7 +46,7 @@ void mogoAuton(int direction){
 	autonRotate(450,2000,127,1);
 	autonDrive(2700,2000,-127);
 	autonRotate(860,2000,127,1);
-
+	scoreOn20();
 
 }
 
