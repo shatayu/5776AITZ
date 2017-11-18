@@ -89,11 +89,11 @@ task usercontrol() {
   	if (vexRT[Btn8R]) {
   		stopTask(topLiftPI);
   		stopTask(mainLiftPI);
-  		autoStack(conesOnMogo, false):
+  		autoStack(conesOnMogo, false);
   		reset();
   		conesOnMogo++;
   		moveTopLift(-127);
-	  	wait1Msec(200):
+	  	wait1Msec(200);
 	  	moveTopLift(0);
   		startTask(topLiftPI);
   		startTask(mainLiftPI);
@@ -101,7 +101,7 @@ task usercontrol() {
 
   	// cone counter management
   	if (vexRT[Btn7L]) {
-  		waitUntil(!vexRT[Btn7L]):
+  		waitUntil(!vexRT[Btn7L]);
   		if (conesOnMogo > 0)
   			conesOnMogo--;
   	}
@@ -116,11 +116,15 @@ task usercontrol() {
   	if (vexRT[Btn8UXmtr2]) {
   		stopTask(topLiftPI);
   		stopTask(mainLiftPI);
-  		autoStack(conesOnMogo, true):
+  		autoStack(conesOnMogo, true);
   		matchLoadReset();
   		conesOnMogo++;
   		startTask(topLiftPI);
   		startTask(mainLiftPI);
+  	}
+
+  	if (vexRT[Btn8RXmtr2]) {
+			autonMainLift_SWAG(2000, 10000);
   	}
 
   	wait1Msec(20);

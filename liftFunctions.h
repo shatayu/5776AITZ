@@ -34,6 +34,36 @@ void autonTopLift(int topLiftTarget, int power) {
 	startTask(topLiftPI);
 }
 
+
+int PAUSE_TIME = 250;
+void autoDecelTopLift(int topLiftTarget) {
+	stopTask(topLiftPI);
+	int timeout = 5000;
+
+
+	int timer = 0;
+	if (SensorValue[TopLiftPot] < topLiftTarget) { 	// lift is below target
+		while (SensorValue[TopLiftPot] < topLiftTarget && timer < timeout) {
+			moveTopLift(127);
+			wait1Msec(20);
+			timer += 20;
+		}
+		wait1Msec(PAUSE_TIME);
+	} else if (SensorValue[TopLiftPot] > topLiftTarget) { // lift is above target
+		while (SensorValue[TopLiftPot] > topLiftTarget && timer < timeout) {
+			moveTopLift(-127);
+			wait1Msec(20);
+			timer += 20;
+		}
+		wait1Msec(PAUSE_TIME);
+	}
+
+	moveTopLift(0);
+	startTask(topLiftPI);
+}
+
+
+
 /*
 moves mogo to specific position.
 all the way out 3190
@@ -68,6 +98,40 @@ moves lift to specific position.
 220 all the way down
 1320 all the way up
 */
+
+float integral = 0;
+
+float ki = 0.0007;
+int base = 75;
+void autonMainLift_SWAG(int target, int timeout) {
+	stopTask(mainLiftPI);
+	int timer = 0;
+
+
+
+	int kstable = 200;
+
+	integral = 0;
+	int integralCap = 90;
+
+	int error = target - SensorValue[MainLiftPot];
+
+
+	int stableTime = 0;
+	while (SensorValue[MainLiftPot] < target-150 && timer < timeout) { //momentum offset 150
+		error = target - SensorValue[MainLiftPot];
+		float percent = error*1.0/target;
+		percent = percent * percent * percent;
+		moveMainLift(base+(127-base)*percent);
+		wait1Msec(20);
+		timer += 20;
+	}
+
+	moveMainLift(-20);
+	wait1Msec(80);
+
+	startTask(mainLiftPI);
+}
 
 void autonMainLift(int target, int timeout, int power) {
 	stopTask(mainLiftPI);
