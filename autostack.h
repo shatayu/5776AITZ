@@ -24,8 +24,6 @@ void autoStackHelper(int topLiftAngle, int mainLiftMaxHeight, bool matchLoad) {
 	autoDecelTopLift(topLiftAngle);
 	//autonTopLift(topLiftAngle, 127);
 	stopTask(topLiftPI);
-
-	autonConeIntake(OPEN);
 }
 
 void reset() {
@@ -46,17 +44,17 @@ void autoStack(int conesOnMogo, bool matchLoad) {
 	} else if (conesOnMogo == 1) {
 		autoStackHelper(3000, 1600, matchLoad);
 	} else if (conesOnMogo == 2) {
-		autoStackHelper(3000, 1730, matchLoad);
+		autoStackHelper(3000, 1780, matchLoad);
 	} else if (conesOnMogo == 3) {
 		autoStackHelper(3000, 1870, matchLoad);
 	} else if (conesOnMogo == 4) {
-		autoStackHelper(3000, 1930, matchLoad); // works
+		autoStackHelper(3000, 1980, matchLoad);
 	} else if (conesOnMogo == 5) {
-		autoStackHelper(3000, 2080, matchLoad);
+		autoStackHelper(3000, 2110, matchLoad);
 	} else if (conesOnMogo == 6) {
-		autoStackHelper(3000, 2180, matchLoad);
+		autoStackHelper(3000, 2200, matchLoad);
 	} else if (conesOnMogo == 7) {
-		autoStackHelper(3000, 2360, matchLoad); // works
+		autoStackHelper(3000, 2390, matchLoad);
 	} else if (conesOnMogo == 8) {
 		autoStackHelper(3000, 2470, matchLoad);
 	} else if (conesOnMogo == 9) {
@@ -71,6 +69,7 @@ void autoStack(int conesOnMogo, bool matchLoad) {
 }
 
 void matchLoadReset() {
+autonConeIntake(OPEN);
 		// bring top lift back to middle height
 	autonTopLift(2150, 127);
 	// bring main lift down to base height

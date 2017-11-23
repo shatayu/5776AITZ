@@ -28,16 +28,15 @@
 #include "autons.h"
 
 #include "Vex_Competition_Includes.c"
-
+int i = 1;
 void pre_auton() {
 	bLCDBacklight = true;
-	calibrate();
+//	calibrate();
   bStopTasksBetweenModes = true;
 }
 
 task autonomous() {
-mogoAuton(1);
-
+	startTask(topLiftPI);
 }
 
 // drive code
@@ -51,19 +50,28 @@ task driveControl() {
 }
 
 int conesOnMogo = 0;
+int autostackAction = 0;
 task usercontrol() {
 	// initialize drive code for top lift
-	startTask(topLiftPI);
 
 	// initialize drive code for main lift
-	startTask(mainLiftPI);
+	//startTask(mainLiftPI);
 
 	// initialize drive code for drive
 	startTask(driveControl);
-
+	int clawStall = -15;
   while (true) {
   	// LCD code
   	displayLCDNumber(0, 8, conesOnMogo);
+
+  	// main lift code
+  	if (vexRT[Btn5U]) {
+  		moveMainLift(127);
+  	} else if (vexRT[Btn5D]) {
+  		moveMainLift(-127);
+  	} else {
+  		moveMainLift(0);
+  	}
 
   	// mogo intake code
   	if (vexRT[Btn7U]) {
@@ -76,27 +84,36 @@ task usercontrol() {
 
   	// cone intake (claw) code
   	if (vexRT[Btn6U] && vexRT[Btn6D]) {
-  		moveConeIntake(30); // stall torque
+  		moveConeIntake(15); // stall torque
   	} else if (vexRT[Btn6U]) {
   		moveConeIntake(70); // close cone intake
+  		clawStall = 10;
   	} else if (vexRT[Btn6D]) {
   		moveConeIntake(-70); // open cone intake
+  		clawStall = -15;
   	} else {
-  		moveConeIntake(0); // power claw off
+  		moveConeIntake(clawStall); // power claw off
   	}
 
   	// autostack
   	if (vexRT[Btn8R]) {
   		stopTask(topLiftPI);
   		stopTask(mainLiftPI);
-  		autoStack(conesOnMogo, false);
-  		reset();
-  		conesOnMogo++;
-  		moveTopLift(-127);
-	  	wait1Msec(200);
-	  	moveTopLift(0);
-  		startTask(topLiftPI);
+  		autostackAction++;
+
+  		if (autostackAction % 2 == 0) {
+  				autoStack(conesOnMogo, false);
+  		} else if (autostackAction % 2 == 1) {
+  			autonConeIntake(OPEN);
+  			reset();
+  			conesOnMogo++;
+  			moveTopLift(-127);
+	  		wait1Msec(200);
+	  		moveTopLift(0);
+  		}
+  		 startTask(topLiftPI);
   		startTask(mainLiftPI);
+
   	}
 
   	// cone counter management
@@ -113,7 +130,7 @@ task usercontrol() {
   	}
 
 
-  	if (vexRT[Btn8UXmtr2]) {
+  	if (vexRT[Btn8L]) {
   		stopTask(topLiftPI);
   		stopTask(mainLiftPI);
   		autoStack(conesOnMogo, true);

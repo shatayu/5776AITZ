@@ -1,53 +1,70 @@
+void deploy() {
+	autonTopLift(2000, 127);
+	moveConeIntake(127);
+	wait1Msec(200);
+	moveConeIntake(30);
+}
+
 void scoreOn20(){
-
+	autonMainLift(1800, 3000, 127):
+	moveDrive(127, 127);
+	wait1Msec(1300);
+	moveDrive(0, 0);
 	//puts the mogo claw all the way out
-	moveMogoIntake(127);
-	wait1Msec(2500);
-
+	moveMogoIntake(-127);
+	wait1Msec(1050);
+	moveMogoIntake(0);
 	//drives backward without moving the mogo
-		moveDrive(-127, -127);
-	wait1Msec(1500);
 	moveDrive(0, 0);
 
-	//pulls the mogo claw back up
-	moveMogoIntake(-127);
-	wait1Msec(500);
+	moveDrive(-127, -127);
+	wait1Msec(300);
+	moveDrive(0, 0);
 
+		moveMogoIntake(127);
+	wait1Msec(1050);
 	moveMogoIntake(0);
+	//pulls the mogo intake back up
+	autonDrive(1500,2000,-127);
+
 }
 
 void mogoAuton(int direction){
 	//set up
-	moveConeIntake(30);
-	autonMainLift(1500,2000,127);
-
+	autonMainLift(1450, 3000, 127);
 	moveMogoIntake(-127);
-	wait1Msec(1150);
+	wait1Msec(1050);
 	moveMogoIntake(0);
 
-	autonDrive(5100,2000,127);
+	autonDrive(5600,2000,127);
 	autonBrake(1);
 	moveMogoIntake(127);
 	wait1Msec(1150);
 	moveMogoIntake(0);
 	autonBrake(-1);
-	autoStack(0,true);
+
+	autonTopLift(3000, 127);
+	autonConeIntake(true);
 	reset();
 
-	autonDrive(700,2000,70);
-	autonBrake(1);
-	wait1Msec(200);
-	autonConeIntake(CLOSED);
-	autoStack(1,false);
-	reset();
+	//moveConeIntake(-127);
+	//wait1Msec(200);
+	//moveConeIntake(-30);
+	//autonDrive(700,2000,70);
+	//autonBrake(1);
+	//wait1Msec(200);
+	//autonConeIntake(CLOSED);
+	//autoStack(1,false);
+	//reset();
 
-	autonDrive(5900,2000,-127);
+	autonDrive(5450,2000,-127);
 	autonBrake(-1);
-	autonRotate(450,2000,127,1);
-	autonDrive(2700,2000,-127);
-	autonRotate(860,2000,127,1);
+	autonRotate(450,2000,127,direction);
+	autonDrive(2000,2000,-127);
+	autonRotate(820,2000,127,1 *direction);
 	//scoreOn20();
-
+	autonTopLift(2000,127);
+	scoreOn20();
 }
 
 // untested
