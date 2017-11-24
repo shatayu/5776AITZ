@@ -45,28 +45,15 @@ void autonBrake(int direction) {
 
 // higher sensor value := open
 // true; open the cone, false; close the cone
-bool OPEN = true;
+bool OPEN = false;
 bool CLOSED = false;
 
 void autonConeIntake(bool position) {
-	int time = 0;
 	if (position) {
-		//while (SensorValue[ConePot] < 3000 && time < 1200) {
-		//	moveConeIntake(-127);
-		//	wait1Msec(20);
-
-		//	if (SensorValue[ConePot] < 500) break;
-		//}
 		moveConeIntake(-127);
 		wait1Msec(300);
 		moveConeIntake(0);
 	} else {
-		//while (SensorValue[ConePot] > 2000 && time < 1200) {
-		//	moveConeIntake(127);
-		//	wait1Msec(20);
-
-		//	if (SensorValue[ConePot] < 500) break;
-		//}
 		moveConeIntake(127);
 		wait1Msec(300);
 		moveConeIntake(0);

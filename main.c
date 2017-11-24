@@ -20,30 +20,41 @@
 // Select Download method as "competition"
 #pragma competitionControl(Competition)
 
-#include "motor.h"
-#include "stall.h"
-#include "functions.h"
-#include "liftFunctions.h"
-#include "autostack.h"
-#include "autons.h"
+#include "lift/lift.h"
+#include "intake/intake.h"
+#include "drive/drive.h"
+#include "programs/autostack.h"
+
+#include "lift/lift.c"
+#include "intake/intake.c"
+#include "drive/drive.c"
+#include "programs/autostack.c"
 
 #include "Vex_Competition_Includes.c"
-int i = 1;
 void pre_auton() {
 	bLCDBacklight = true;
-//	calibrate();
+  //calibrate();
   bStopTasksBetweenModes = true;
 }
 
 task autonomous() {
-	startTask(topLiftPI);
+	a.maxHeight = 1240;
+	a.scoringHeight = 1240;
+	startTask(autostackUp);
+	while (a.stacked == false)
+		wait1Msec(20);
+	abortAutostack();
+	startTask(fieldReset);
 }
 
 // drive code
 task driveControl() {
 	while (true) {
+		// dead zone
   	int leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
   	int rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+
+  	// apply power
   	moveDrive(leftPower, rightPower);
   	wait1Msec(20);
 	}
@@ -52,13 +63,10 @@ task driveControl() {
 int conesOnMogo = 0;
 int autostackAction = 0;
 task usercontrol() {
-	// initialize drive code for top lift
-
-	// initialize drive code for main lift
-	//startTask(mainLiftPI);
 
 	// initialize drive code for drive
 	startTask(driveControl);
+
 	int clawStall = -15;
   while (true) {
   	// LCD code
@@ -71,6 +79,15 @@ task usercontrol() {
   		moveMainLift(-127);
   	} else {
   		moveMainLift(0);
+  	}
+
+  	// top lift code
+  	if (vexRT[Btn8U]) {
+  		moveTopLift(127);
+  	} else if (vexRT[Btn8D]) {
+  		moveTopLift(-127);
+  	} else {
+  		moveTopLift(0);
   	}
 
   	// mogo intake code
@@ -92,56 +109,7 @@ task usercontrol() {
   		moveConeIntake(-70); // open cone intake
   		clawStall = -15;
   	} else {
-  		moveConeIntake(clawStall); // power claw off
-  	}
-
-  	// autostack
-  	if (vexRT[Btn8R]) {
-  		stopTask(topLiftPI);
-  		stopTask(mainLiftPI);
-  		autostackAction++;
-
-  		if (autostackAction % 2 == 0) {
-  				autoStack(conesOnMogo, false);
-  		} else if (autostackAction % 2 == 1) {
-  			autonConeIntake(OPEN);
-  			reset();
-  			conesOnMogo++;
-  			moveTopLift(-127);
-	  		wait1Msec(200);
-	  		moveTopLift(0);
-  		}
-  		 startTask(topLiftPI);
-  		startTask(mainLiftPI);
-
-  	}
-
-  	// cone counter management
-  	if (vexRT[Btn7L]) {
-  		waitUntil(!vexRT[Btn7L]);
-  		if (conesOnMogo > 0)
-  			conesOnMogo--;
-  	}
-
-  	// cone counter management
-  	if (vexRT[Btn7R]) {
-  		waitUntil(!vexRT[Btn7R]);
-  		conesOnMogo++;
-  	}
-
-
-  	if (vexRT[Btn8L]) {
-  		stopTask(topLiftPI);
-  		stopTask(mainLiftPI);
-  		autoStack(conesOnMogo, true);
-  		matchLoadReset();
-  		conesOnMogo++;
-  		startTask(topLiftPI);
-  		startTask(mainLiftPI);
-  	}
-
-  	if (vexRT[Btn8RXmtr2]) {
-			autonMainLift_SWAG(2000, 10000);
+  		moveConeIntake(clawStall); // stall cone intake in the right direction
   	}
 
   	wait1Msec(20);
