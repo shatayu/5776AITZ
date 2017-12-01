@@ -1,9 +1,9 @@
-bool OPEN = true;
-bool CLOSED = false;
+int OPEN = 1;
+int CLOSED = 0;
 
 typedef struct {
 	int power;
-	bool state;
+	int state;
 	int timeout;
 } Intake;
 

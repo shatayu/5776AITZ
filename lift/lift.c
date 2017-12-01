@@ -6,13 +6,25 @@ void moveMainLift(int power) {
 task autonMainLift() {
 	int error = mainLift.target - SensorValue[MainLiftPot];
 	int timer = 0;
-	while (abs(error) > 30 && timer < mainLift.timeout) {
-		moveMainLift(sgn(error) * mainLift.power);
-		wait1Msec(20);
-		timer += 20;
-		error = mainLift.target - SensorValue[MainLiftPot];
-		wait1Msec(20);
+
+	if (error > 0) {
+		while (error > 0 && timer < mainLift.timeout) {
+			moveMainLift(mainLift.power);
+			timer += 20;
+			wait1Msec(20);
+			error = mainLift.target - SensorValue[MainLiftPot];
+		}
+	} else if (error < 0) {
+		while (error < 0 && timer < mainLift.timeout) {
+			moveMainLift(-mainLift.power);
+			timer += 20;
+			wait1Msec(20);
+			error = mainLift.target - SensorValue[MainLiftPot];
+		}
 	}
+
+	moveMainLift(-sgn(error) * 30);
+	wait1Msec(50);
 	moveMainLift(0);
 	stopTask(autonMainLift);
 }
@@ -31,12 +43,12 @@ task mainLiftPI() {
 
 		int PIpower = kp * error + ki * integralPower;
 
-		if (abs(error) < 60) {
+		if (abs(error) < 30) {
 			mainLift.power = 0;
 		} else if (abs(error) < 500 && sgn(PIpower) == -1) {
 			mainLift.power = sgn(PIpower) * 30;
-		} else if (abs(error) < 360 && sgn(PIpower) == 1) {
-			mainLift.power = sgn(PIpower) * 40;
+		} else if (abs(error) < 200 && sgn(PIpower) == 1) {
+			mainLift.power = sgn(PIpower) * 30;
 		} else if (abs(PIpower) > powerCap) {
 			mainLift.power = sgn(PIpower) * powerCap;
 		} else {
@@ -55,23 +67,38 @@ void moveTopLift(int power) {
 task autonTopLift() {
 	int error = topLift.target - SensorValue[TopLiftPot];
 	int timer = 0;
-	while (sgn(error) == sgn(topLift.target - SensorValue[TopLiftPot]) && timer < topLift.timeout) {
-		moveTopLift(sgn(error) * 127);
-		wait1Msec(20);
-		timer += 20;
-		error = topLift.target - SensorValue[TopLiftPot];
-		wait1Msec(20);
+	//while (sgn(error) == sgn(topLift.target - SensorValue[TopLiftPot]) && timer < topLift.timeout) {
+	//	moveTopLift(sgn(error) * 127);
+	//	wait1Msec(20);
+	//	timer += 20;
+	//	error = topLift.target - SensorValue[TopLiftPot];
+	//	wait1Msec(20);
+	//}
+	if (error > 0) {
+		while (error > 0 && timer < topLift.timeout) {
+			moveTopLift(topLift.power);
+			wait1Msec(20);
+			timer += 20;
+			error = topLift.target - SensorValue[TopLiftPot];
+		}
+	} else {
+		while (error < 0 && timer < topLift.timeout) {
+				moveTopLift(-topLift.power);
+				wait1Msec(20);
+				timer += 20;
+				error = topLift.target - SensorValue[TopLiftPot];
+			}
 	}
 
 	if (topLift.target == 2750) {
-		moveTopLift(50);
+		moveTopLift(20);
 	} else {
 		moveTopLift(0);
 	}
 }
 
 task topLiftPI() {
-	float kp = 0.12; float ki = 0;
+	float kp = 0.18; float ki = 0.08;
 	int error; int integral = 0;
 	int integralCap = 15;	int powerCap = 127;
 
@@ -83,12 +110,10 @@ task topLiftPI() {
 
 		int PIpower = kp * error + ki * integralPower;
 
-		if (abs(error) < 70) {
+		if (abs(error) < 20) {
 			topLift.power = 0;
-		} else if (abs(error) < 150) {
-			topLift.power = sgn(PIpower) * 35;
-		} else if (abs(PIpower) < 35) {
-			topLift.power = sgn(PIpower) * 35;
+		} else if (abs(PIpower) > 5 && abs(PIpower) < 20) {
+			topLift.power = sgn(PIpower) * 20;
 		} else if (abs(PIpower) > powerCap) {
 			topLift.power = sgn(PIpower) * powerCap;
 		} else {

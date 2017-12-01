@@ -45,7 +45,7 @@ void autonBrake(int direction) {
 
 // higher sensor value := open
 // true; open the cone, false; close the cone
-bool OPEN = false;
+bool OPEN = true;
 bool CLOSED = false;
 
 void autonConeIntake(bool position) {

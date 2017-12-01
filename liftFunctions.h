@@ -93,11 +93,6 @@ task autonMogo() {
 	moveMogoIntake(0);
 }
 
-/*
-moves lift to specific position.
-220 all the way down
-1320 all the way up
-*/
 
 float integral = 0;
 

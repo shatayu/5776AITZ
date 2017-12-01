@@ -19,19 +19,26 @@ void moveMogoIntake(int power) {
 	motor[RMogoIntake] = power;
 }
 
+// 720 all the way out
+// 2720 all the way in
+// 1270 release mogo
 task autonMogoIntake() {
-	int OPEN_ANGLE = 1;
-	int CLOSED_ANGLE = 2;
-
 	int timer = 0;
-	int target = (mogoIntake.state) ? OPEN_ANGLE : CLOSED_ANGLE;
-	int error = target - SensorValue[MogoPot];
+	int target = mogoIntake.state;
 
-	while (abs(error) > 20 && timer < mogoIntake.timeout) {
-		moveMogoIntake(-sgn(error) * mogoIntake.power);
-		wait1Msec(20);
-		timer += 20;
-		error = target - SensorValue[MogoPot];
+	if (mogoIntake.state > SensorValue[MogoPot]) {
+		while (mogoIntake.state > SensorValue[MogoPot] && timer < mogoIntake.timeout) {
+			moveMogoIntake(mogoIntake.power);
+			wait1Msec(20);
+			timer += 20;
+		}
+	} else {
+		while (mogoIntake.state < SensorValue[MogoPot] && timer < mogoIntake.timeout) {
+			moveMogoIntake(-mogoIntake.power);
+			wait1Msec(20);
+			timer += 20;
+		}
 	}
 	moveMogoIntake(0);
+	stopTask(autonMogoIntake);
 }
