@@ -1,6 +1,6 @@
 void autostackOpenClaw() {
 	coneIntake.state = OPEN;
-	wait1Msec(250);
+	wait1Msec(500);
 	startTask(autonConeIntake);
 	wait1Msec(250);
 }
@@ -24,7 +24,7 @@ task autostackUp() {
 	topLift.timeout = 4000;
 	topLift.power = 127;
 	startTask(autonTopLift);
-	while (SensorValue[TopLiftPot] < 1000)
+	while (SensorValue[TopLiftPot] < 1300)
 		wait1Msec(20);
 
 	stopTask(autonTopLift);
@@ -36,14 +36,14 @@ task autostackUp() {
 	mainLift.target = a.maxHeight;
 	mainLift.power = 70;
 	mainLift.timeout = 4000;
-	if (mainLift.target > 1660) {
+	if (mainLift.target > 1660) { // if small height PI too slow so autonMainLift used
 		startTask(mainLiftPI);
 	} else {
 		startTask(autonMainLift);
 	}
 
-	// after the lift has risen a certain amount begin raising top lift to max height
 
+	// after the lift has risen a certain amount begin raising top lift to max height
 	while (SensorValue[MainLiftPot] < a.maxHeight - 400)
 		wait1Msec(20);
 
@@ -56,7 +56,7 @@ task autostackUp() {
 	while (SensorValue[TopLiftPot] < 2750)
 		wait1Msec(20);
 	stopTask(autonTopLift);
-	moveTopLift(50);
+	moveTopLift(20);
 
 	// open claw at the end
 	autostackOpenClaw();
@@ -85,11 +85,13 @@ task fieldReset() {
 	while (SensorValue[TopLiftPot] > 1530)
 		wait1Msec(20);
 
+	stopTask(topLiftPI);
+	moveTopLift(-10);
 	mainLift.target = 1300;
 	mainLift.power = 70;
 	mainLift.timeout = 1500;
 	startTask(autonMainLift);
-	if (SensorValue[MainLiftPot] > 1500);
+	if (SensorValue[MainLiftPot] > 1700);
 		wait1Msec(300);
 	mainLift.power = 127;
 
@@ -114,7 +116,7 @@ task matchReset() {
 	while (SensorValue[TopLiftPot] > topLift.target)
 		wait1Msec(20);
 
-	mainLift.target = 2050;
+	mainLift.target = 1570;
 	mainLift.power = 127;
 	mainLift.timeout = 3000;
 	startTask(mainLiftPI);
@@ -164,9 +166,9 @@ void autostack(int conesOnMogo, bool reset) {
 	} else if (conesOnMogo == 2) {
 		a.maxHeight = 1550;
 	} else if (conesOnMogo == 3) { // works
-		a.maxHeight = 1720;
+		a.maxHeight = 1670;
 	} else if (conesOnMogo == 4) {
-		a.maxHeight = 1930;
+		a.maxHeight = 1890;
 	} else if (conesOnMogo == 5) { // works
 		a.maxHeight = 2070;
 	} else if (conesOnMogo == 6) {

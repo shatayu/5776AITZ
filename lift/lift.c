@@ -91,7 +91,7 @@ task autonTopLift() {
 	}
 
 	if (topLift.target == 2750) {
-		moveTopLift(20);
+		moveTopLift(35);
 	} else {
 		moveTopLift(0);
 	}

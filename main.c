@@ -34,70 +34,78 @@
 
 #include "Vex_Competition_Includes.c"
 
-int autonNumber = 0;
-int direction = 1;
+int selectedAuton = 0;
 
-task selector(){
-	const int autoCount = 3;
-	bLCDBacklight = true;
-	clearLCDLine(0);
-	displayLCDCenteredString(0, "Select Auton");
-  string autoNames[autoCount] = {"No Auton", "Mogo", "Sationary"};
-  while(nLCDButtons != 5){ //While left and right not pressed
-    if(nLCDButtons == 0){ //No button pressed
-      wait1Msec(10); //Do nothing
-    	writeDebugStreamLine("waiting for click");
-  }else{ //Some button was pressed
-      if((nLCDButtons == 1)&&(autonNumber > 0)){
-        autonNumber--; //Decrement if left press
-        writeDebugStreamLine("left click");
-      }
-      else if((nLCDButtons == 4)&&(autonNumber < autoCount)){
-        autonNumber++; //Increment if right press
-        writeDebugStreamLine("right click");
-      }else if (nLCDButtons == 2){
-      	direction *= -1;
-      	writeDebugStreamLine("smthing was clicked but condition was not met");
-    }
+task selector() {
+	int NUM_AUTONS = 4;
+	string autonNames[] = {"ONLY DEPLOY", "2PT STAGO", "24PT MOGO", "PSKILLS", "22PT MOGO"};
 
+	while (!bIfiAutonomousMode) {
+		// change autons by using buttons; left and right cycle through autons, center inverts direction
+		if (nLCDButtons == 1) {
+			waitUntil(nLCDButtons == 0);
+			selectedAuton--;
+		} else if (nLCDButtons == 2) {
+			waitUntil(nLCDButtons == 0);
+			selectedAuton *= -1;
+		} else if (nLCDButtons == 4) {
+			waitUntil(nLCDButtons == 0);
+			selectedAuton++;
+		}
 
-      //Update display
-      clearLCDLine(0);
-      clearLCDLine(1);
-      displayLCDCenteredString(0, autoNames[autonNumber]);
-      if(direction > 0){
-     		displayLCDCenteredString(1, "Right side");
-    	}else if (direction < 0){
-    		displayLCDCenteredString(1, "Left side");
-    	}
+		// loop over to the other end of the list if no more autons to go through
+		if (abs(selectedAuton) > NUM_AUTONS) {
+			selectedAuton = -sgn(selectedAuton) * NUM_AUTONS;
+		}
 
-      while(nLCDButtons != 0){//Wait for release
-        wait1Msec(10); //Wait for multitasking.
-        writeDebugStreamLine("waiting for de-click");
-      }
-    }
-    wait1Msec(20);
-  }
+		// display auton name
+		displayLCDCenteredString(0, autonNames[abs(selectedAuton)]);
+
+		// display auton side
+		if (sgn(selectedAuton) == 1) {
+			displayLCDCenteredString(1, "RIGHT");
+		} else if (sgn(selectedAuton) == -1) {
+			displayLCDCenteredString(1, "LEFT");
+		} else {
+			displayLCDCenteredString(1, "N/A");
+		}
+	}
 }
 
 void pre_auton() {
-	//startTask(selector);
+	startTask(selector);
 	//calibrate();
 	bStopTasksBetweenModes = true;
 	bLCDBacklight = true;
 }
 
 task autonomous() {
-	topLift.target = 1530;
-	startTask(topLiftPI);
+	selectedAuton = 3;
+	if (selectedAuton == 0) {
+		// deploy
+		moveTopLift(127);
+		wait1Msec(1200);
+		moveTopLift(0);
+	} else if (selectedAuton == 1) {
+		stationaryGoal(sgn(selectedAuton));
+	} else if (selectedAuton == 2) {
+		mogo24(sgn(selectedAuton));
+	} else if (selectedAuton == 3) {
+		displayLCDCenteredString(0, "PSKILLS");
+		pskills(sgn(selectedAuton));
+	} else if (selectedAuton == 4){
+		mogo22(sgn(selectedAuton));
+	}
 }
 
 // drive code
+int leftPower;
+int rightPower;
 task driveControl() {
 	while (true) {
 		// dead zone
-		int leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
-		int rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+		leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
+		rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
 
 		// apply power
 		moveDrive(leftPower, rightPower);
@@ -115,7 +123,7 @@ task autostackControl() {
 }
 
 int conesOnMogo = 0;
-int autostackAction = 0;
+
 task usercontrol() {
 	startTask(selector);
 	// initialize drive code for drive
@@ -127,12 +135,12 @@ task usercontrol() {
 	int clawStall = -15;
 	while (true) {
 		// LCD code
-		displayLCDNumber(0, 8, conesOnMogo);
+		//displayLCDNumber(0, 8, conesOnMogo);
 
 		// main lift code
-		if (vexRT[Btn5U]) {
+		if (vexRT[Btn7U]) {
 			moveMainLift(127);
-			} else if (vexRT[Btn5D]) {
+			} else if (vexRT[Btn7D]) {
 			moveMainLift(-127);
 			} else {
 			moveMainLift(0);
@@ -148,10 +156,10 @@ task usercontrol() {
 		}
 
 		// mogo intake code
-		if (vexRT[Btn7U]) {
-			moveMogoIntake(-127); // withdraw mogo intake
-			} else if (vexRT[Btn7D]) {
-			moveMogoIntake(127); // extend mogo intake
+		if (vexRT[Btn5U]) {
+			moveMogoIntake(127); // withdraw mogo intake
+			} else if (vexRT[Btn5D]) {
+			moveMogoIntake(-127); // extend mogo intake
 			} else {
 			moveMogoIntake(0); // power mogo intake off
 		}
@@ -166,12 +174,12 @@ task usercontrol() {
 			moveConeIntake(-70); // open cone intake
 			clawStall = -15;
 			} else {
-			moveConeIntake(clawstall); // stall cone intake in the right direction
+			moveConeIntake(clawStall); // stall cone intake in the right direction
 		}
 
 		// autostack
 		if (vexRT[Btn8R]) {
-			autostack(conesOnMogo, MATCH);
+			autostack(conesOnMogo, FIELD);
 			conesOnMogo++;
 		}
 
