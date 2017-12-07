@@ -339,9 +339,9 @@ void pskills(int direction) {
 	SensorValue[Gyro] = 0;
 	while (abs(SensorValue[Gyro]) < 430) {
 		if (direction == 1) {
-			moveDrive(127, 0);
+			moveDrive(80, 0);
 		} else {
-			moveDrive(0, 127);
+			moveDrive(0, 80);
 		}
 	}
 
@@ -361,7 +361,7 @@ void pskills(int direction) {
 	autonBrake(-1);
 	//rotates 90 degrees, bring lift down
 	startTask(autonReset);
-	autonRotate(900, 3500, 80, 1 * direction);
+	autonRotate(900, 2000, 80, 1 * direction);
 
 	//scores into the 20 point zone and backs out
 	stopTask(autonReset);
@@ -382,7 +382,7 @@ void pskills(int direction) {
 	// move forward to line up, extend mobile goal to prepare to collect mobile goal
 	mogoIntake.state = 740;
 	startTask(autonMogoIntake);
-	autonDrive(600, 2000, 127);
+	autonDrive(700, 2000, 127);
 	autonBrake(1);
 
 	// turn 90 degrees, now facing mobile goal
@@ -408,7 +408,7 @@ void pskills(int direction) {
 		wait1Msec(20);
 	stopTask(autonMogoIntake);
 	moveMogoIntake(30); // stall torque to keep mogo up
-	autonDrive(3300, 3000, 127);
+	autonDrive(3500, 3000, 127);
 	autonBrake(1);
 
 	//drive out of scoring zone
@@ -416,18 +416,22 @@ void pskills(int direction) {
 	autonBrake(-1);
 	moveMogoIntake(0);
 
+	/*
+	THIRD mogo
+	*/
+
 	//rotate counter clockwise towards next mogo
 	autonRotate(900, 2000, 70, -1 * direction);
 
 	//drive diagonal
-	autonDrive(3300, 2000, 127);//tune distance
+	autonDrive(3200, 2000, 127);//tune distance
 	autonBrake(1);
 
 	//take out mogo intake
 	mogoIntake.state = 740;
 	startTask(autonMogoIntake);
 
-	//rotate towards second mogo
+	//rotate towards third mogo
 	autonRotate(900, 2000, 70, -1);
 
 	//drive forward to get mogo
@@ -440,7 +444,9 @@ void pskills(int direction) {
 	while (SensorValue[MogoPot] < mogoIntake.state)
 		wait1Msec(20);
 	stopTask(autonMogoIntake);
-	autonRotate(1860, 5000, 127, 1 * direction);
+	autonDrive(700, 3000, -127);
+	autonBrake(-1);
+	autonRotate(1840, 10000, 80, 1 * direction);
 
 	//take out mogo and move forward to score
 	mogoIntake.state = 1270;
@@ -451,7 +457,7 @@ void pskills(int direction) {
 	moveMogoIntake(30); // stall torque to keep mogo up
 
 	//score on 10
-	autonDrive(4100, 3000, 127);
+	autonDrive(2400, 3000, 127);
 	autonBrake(1);
 
 	//move out of 10 point zone
@@ -459,22 +465,81 @@ void pskills(int direction) {
 	autonBrake(-1);
 
 	//rotate 180 towards next mogo
-	autonRotate(1770, 2000, 70, -1 * direction);
+	autonRotate(1800, 2000, 80, -1 * direction);
 
-	// drive forward to collect fourth mogo, move mogo intake down
-	//mogoIntake.state = 750;
-	//startTask(autonMogoIntake);
-	//autonDrive(8400, 3000, 127);
-	//autonBrake(1);
+	/*
+	FOURTH MOGO
+	*/
 
-	//// turn counterclockwise, line up to score the mogo in the 20
-	//autonRotate(900, 2000, 70, -1 * direction);
-	//autonDrive(500, 2000, 127);
-	//autonBrake(1);
+	//take out mogointake
+	mogoIntake.state = 740;
+	startTask(autonMogoIntake);
 
-	//// rotate counterclockwise, prepare to score in 20
-	//autonRotate(90, 2000, 70, 1 * direction);
+	//drive forward
+	autonDrive(6400,2000,127);
+	autonBrake(1);
+	// gather mogo
+	mogoIntake.state = 2650;
+	startTask(autonMogoIntake);
+	while (SensorValue[MogoPot] < mogoIntake.state)
+		wait1Msec(20);
+	stopTask(autonMogoIntake);
 
-	//// score the mogo in the 20 point zone
-	//scoreOn20();
+	// continue driving forward second distance
+	autonDrive(3100, 2000, 127);
+
+	//take a 90 degree turn counterclockwise
+	autonRotate(900, 5000, 127, -1 * direction);
+
+	//drive forward a little (tune this distance) 1200
+	autonDrive(1200, 2000, 127);
+
+	//take a 90 degree turn clockwise
+	autonRotate(900, 5000, 127, 1 * direction);
+
+	//score on 20
+	scoreOn20();
+
+	/*
+	FIFTH MOGO
+	*/
+
+	autonRotate(900, 2000, 80, -1* direction);
+
+	//align with 5th mogo, bring mogo out
+	mogoIntake.state = 740;
+	startTask(autonMogoIntake);
+	autonDrive(600, 2000, 127);
+	autonBrake(1);
+
+	// turn 90 degrees, now facing mobile goal
+	autonRotate(900, 2000, 80, -1 * direction);
+	stopTask(autonMogoIntake);
+
+	// collect mobile goal
+	autonDrive(2700, 2000, 127);
+	autonBrake(1);
+
+	// begin withdrawing mobile goal intake to scoring height, rotate to face backwards
+	mogoIntake.state = 2650;
+	startTask(autonMogoIntake);
+	while (SensorValue[MogoPot] < mogoIntake.state)
+		wait1Msec(20);
+	stopTask(autonMogoIntake);
+	autonRotate(1810, 6000, 85, -1 * direction);
+
+	// score mogo in 10
+	mogoIntake.state = 1270;
+	startTask(autonMogoIntake);
+	while (SensorValue[MogoPot] > mogoIntake.state)
+		wait1Msec(20);
+	stopTask(autonMogoIntake);
+	moveMogoIntake(30); // stall torque to keep mogo up
+	autonDrive(2600, 3000, 127);
+	autonBrake(1);
+
+	//drive out of scoring zone
+	autonDrive(500, 3000, -127);
+	autonBrake(-1);
+	moveMogoIntake(0);
 }

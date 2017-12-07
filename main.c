@@ -74,7 +74,7 @@ task selector() {
 
 void pre_auton() {
 	startTask(selector);
-	//calibrate();
+	calibrate();
 	bStopTasksBetweenModes = true;
 	bLCDBacklight = true;
 }
@@ -115,8 +115,14 @@ task driveControl() {
 
 task autostackControl() {
 	while (true) {
-		if (vexRT[Btn8L])
+		if (vexRT[Btn8L] || vexRT[Btn8LXmtr2])
 			abortAutostack();
+
+		if (vexRT[Btn8RXmtr2]) {
+			startTask(matchReset);
+			waitUntil(SensorValue[MainLiftPot] < 1500);
+			abortAutostack();
+		}
 
 		wait1Msec(20);
 	}
@@ -139,38 +145,50 @@ task usercontrol() {
 
 		// main lift code
 		if (vexRT[Btn7U]) {
+			stopTask(mainLiftPI);
 			moveMainLift(127);
-			} else if (vexRT[Btn7D]) {
+		} else if (vexRT[Btn7D]) {
+			stopTask(mainLiftPI);
 			moveMainLift(-127);
-			} else {
-			moveMainLift(0);
+		} else {
+			int mainLiftPower = (abs(vexRT[Ch3Xmtr2]) > 10) ? vexRT[Ch3Xmtr2] : 0;
+			if (mainLiftPower != 0)
+				stopTask(mainLiftPI);
+			moveMainLift(mainLiftPower);
 		}
 
 		// top lift code
 		if (vexRT[Btn8U]) {
+			stopTask(topLiftPI);
 			moveTopLift(127);
 			} else if (vexRT[Btn8D]) {
+			stopTask(topLiftPI);
 			moveTopLift(-127);
 			} else {
-			moveTopLift(0);
+			int topLiftPower = (abs(vexRT[Ch2Xmtr2]) > 10) ? vexRT[Ch2Xmtr2] : 0;
+			if (topLiftPower != 0) {
+				stopTask(topLiftPI);
+			}
+			moveTopLift(topLiftPower);
 		}
 
 		// mogo intake code
-		if (vexRT[Btn5U]) {
-			moveMogoIntake(127); // withdraw mogo intake
-			} else if (vexRT[Btn5D]) {
-			moveMogoIntake(-127); // extend mogo intake
+		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) {
+				moveMogoIntake(127); // withdraw mogo intake
+			} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) {
+				moveMogoIntake(-127); // extend mogo intake
 			} else {
-			moveMogoIntake(0); // power mogo intake off
-		}
+				moveMogoIntake(0);
+			}
+
 
 		// cone intake (claw) code
 		if (vexRT[Btn6U] && vexRT[Btn6D]) {
 			moveConeIntake(15); // stall torque
-			} else if (vexRT[Btn6U]) {
+			} else if (vexRT[Btn6U] || vexRT[Btn6UXmtr2]) {
 			moveConeIntake(70); // close cone intake
 			clawStall = 10;
-			} else if (vexRT[Btn6D]) {
+			} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
 			moveConeIntake(-70); // open cone intake
 			clawStall = -15;
 			} else {
@@ -178,18 +196,37 @@ task usercontrol() {
 		}
 
 		// autostack
-		if (vexRT[Btn8R]) {
+		if (vexRT[Btn8R] || vexRT[Btn8R]) {
 			autostack(conesOnMogo, FIELD);
 			conesOnMogo++;
 		}
 
-		if (vexRT[Btn7L] && conesOnMogo > 0) {
-			waitUntil(!vexRT[Btn7L]);
+		// counter control
+		if ((vexRT[Btn7L] || vexRT[Btn7LXmtr2]) && conesOnMogo > 0) {
+			waitUntil(!vexRT[Btn7L] || vexRT[Btn7LXmtr2]);
 			conesOnMogo--;
-			} else if (vexRT[Btn7R]) {
-			waitUntil(!vexRT[Btn7R] && conesOnMogo < 13);
+		} else if (vexRT[Btn7R] || vexRT[Btn7RXmtr2]) {
+			waitUntil(!(vexRT[Btn7R] || vexRT[Btn7RXmtr2]));
 			conesOnMogo++;
 		}
+
+		/*
+		PARTNER STICK EXTRAS
+		*/
+
+		if (vexRT[Btn8UXmtr2]) {
+			autostack(conesOnMogo, MATCH);
+			conesOnMogo++;
+		}
+
+		if (vexRT[Btn8DXmtr2]) {
+			conesOnMogo = 0;
+		}
+
+		if (vexRT[Btn8LXmtr2]) {
+			abortAutostack();
+		}
+
 		wait1Msec(20);
 	}
 }

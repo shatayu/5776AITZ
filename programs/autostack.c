@@ -1,10 +1,3 @@
-void autostackOpenClaw() {
-	coneIntake.state = OPEN;
-	wait1Msec(500);
-	startTask(autonConeIntake);
-	wait1Msec(250);
-}
-
 // main autostack logic
 task autostackUp() {
 	a.stacked = false;
@@ -59,8 +52,18 @@ task autostackUp() {
 	moveTopLift(20);
 
 	// open claw at the end
-	autostackOpenClaw();
-
+	stopTask(mainLiftPI);
+	stopTask(autonMainLift);
+	moveConeIntake(50);
+	coneIntake.state = OPEN;
+	moveMainLift(-127);
+	wait1Msec(200);
+	moveMainLift(0);
+	startTask(autonConeIntake);
+	wait1Msec(100);
+	moveMainLift(127);
+	waitUntil(SensorValue[MainLiftPot] > a.maxHeight);
+	moveMainLift(0);
 	// flag that cone is stacked
 	a.stacked = true;
 }
@@ -168,7 +171,7 @@ void autostack(int conesOnMogo, bool reset) {
 	} else if (conesOnMogo == 3) { // works
 		a.maxHeight = 1670;
 	} else if (conesOnMogo == 4) {
-		a.maxHeight = 1890;
+		a.maxHeight = 1920;
 	} else if (conesOnMogo == 5) { // works
 		a.maxHeight = 2070;
 	} else if (conesOnMogo == 6) {
@@ -183,7 +186,7 @@ void autostack(int conesOnMogo, bool reset) {
 		a.maxHeight = 2640;
 	} else if (conesOnMogo == 11) {
 		a.maxHeight = 2900;
-	} else if (conesOnMogo == 12) {
+	} else if (conesOnMogo <= 12) {
 		a.maxHeight = 3050;
 	}
 
@@ -200,8 +203,6 @@ void autostack(int conesOnMogo, bool reset) {
 		startTask(fieldReset);
 		while (a.stacked == true)
 			wait1Msec(20);
-	// ensure no task carries over to drive
-	abortAutostack();
 	} else {
 		startTask(matchReset);
 	}
