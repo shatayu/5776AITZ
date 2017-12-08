@@ -24,13 +24,17 @@
 #include "intake/intake.h"
 #include "drive/drive.h"
 #include "programs/autostack.h"
+#include "Autons/autons.h"
 
 #include "lift/lift.c"
 #include "intake/intake.c"
 #include "drive/drive.c"
 #include "programs/autostack.c"
-
-#include "autons.h"
+#include "Autons/Mogo22.c"
+#include "Autons/Mogo24.c"
+#include "Autons/ProgramingSkills.c"
+#include "Autons/ScoreOn20.c"
+#include "Autons/StationaryGoal.c"
 
 #include "Vex_Competition_Includes.c"
 
