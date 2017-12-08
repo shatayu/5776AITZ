@@ -316,6 +316,7 @@ void pskills(int direction) {
 	//takes mogo back in
 	mogoIntake.power = 127;
 	mogoIntake.timeout = 3000;
+	mogoIntake.state = 2520;
 	startTask(autonMogoIntake);
 	// checks and waits until the mogo value is at a set value
 	while(SensorValue[MogoPot] < 2470){
