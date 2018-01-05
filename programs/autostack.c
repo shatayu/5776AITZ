@@ -1,4 +1,3 @@
-// main autostack logic
 task autostackUp() {
 	a.stacked = false;
 
@@ -56,9 +55,15 @@ task autostackUp() {
 	stopTask(autonMainLift);
 	moveConeIntake(50);
 	coneIntake.state = OPEN;
-	moveMainLift(-127);
-	wait1Msec(200);
-	moveMainLift(0);
+	if (SensorValue[MainLiftPot] > 1500) {
+		moveMainLift(-127);
+		wait1Msec(200);
+		moveMainLift(0);
+	}
+
+	if (a.maxHeight == 1320) {
+		wait1Msec(350);
+	}
 	startTask(autonConeIntake);
 	wait1Msec(100);
 	moveMainLift(127);

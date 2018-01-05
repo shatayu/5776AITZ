@@ -13,6 +13,9 @@ task autonMainLift() {
 			timer += 20;
 			wait1Msec(20);
 			error = mainLift.target - SensorValue[MainLiftPot];
+
+			if (SensorValue[MainLiftPot] < 1350 && sgn(mainLift.power) == -1)
+				break;
 		}
 	} else if (error < 0) {
 		while (error < 0 && timer < mainLift.timeout) {
@@ -20,6 +23,9 @@ task autonMainLift() {
 			timer += 20;
 			wait1Msec(20);
 			error = mainLift.target - SensorValue[MainLiftPot];
+
+			if (SensorValue[MainLiftPot] < 1350 && sgn(mainLift.power) == -1)
+				break;
 		}
 	}
 
