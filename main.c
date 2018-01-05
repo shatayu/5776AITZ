@@ -20,23 +20,33 @@
 // Select Download method as "competition"
 #pragma competitionControl(Competition)
 
-#include "lift/lift.h"
-#include "intake/intake.h"
-#include "drive/drive.h"
 #include "programs/autostack.h"
+#include "PID/PID.h"
+#include "basic/b_functions.h"
+#include "auton/blocking/bl_drive.h"
+#include "auton/nonblocking/settings.h"
+#include "auton/nonblocking/nb_lift.h"
+#include "auton/nonblocking/nb_vbar.h"
+#include "auton/nonblocking/nb_intake.h"
 
-#include "lift/lift.c"
-#include "intake/intake.c"
-#include "drive/drive.c"
+#include "PID/PID.c"
+#include "basic/b_functions.c"
+#include "auton/blocking/bl_drive.c"
+#include "auton/blocking/bl_sensors.c"
+#include "auton/nonblocking/nb_lift.c"
+#include "auton/nonblocking/nb_vbar.c"
+#include "auton/nonblocking/nb_intake.c"
 #include "programs/autostack.c"
 
-#include "autons.h"
 
 #include "Vex_Competition_Includes.c"
+
 
 int selectedAuton = 0;
 
 task selector() {
+	b_drive(0,0);
+
 	int NUM_AUTONS = 4;
 	string autonNames[] = {"ONLY DEPLOY", "2PT STAGO", "24PT MOGO", "PSKILLS", "22PT MOGO"};
 
@@ -74,28 +84,13 @@ task selector() {
 
 void pre_auton() {
 	startTask(selector);
-	calibrate();
+	bl_calibrate_gyro();
 	bStopTasksBetweenModes = true;
 	bLCDBacklight = true;
 }
 
 task autonomous() {
-	selectedAuton = 3;
-	if (selectedAuton == 0) {
-		// deploy
-		moveTopLift(127);
-		wait1Msec(1200);
-		moveTopLift(0);
-	} else if (selectedAuton == 1) {
-		stationaryGoal(sgn(selectedAuton));
-	} else if (selectedAuton == 2) {
-		mogo24(sgn(selectedAuton));
-	} else if (selectedAuton == 3) {
-		displayLCDCenteredString(0, "PSKILLS");
-		pskills(sgn(selectedAuton));
-	} else if (selectedAuton == 4){
-		mogo22(sgn(selectedAuton));
-	}
+
 }
 
 // drive code
@@ -108,7 +103,7 @@ task driveControl() {
 		rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
 
 		// apply power
-		moveDrive(leftPower, rightPower);
+		b_drive(leftPower, rightPower);
 		wait1Msec(20);
 	}
 }
@@ -145,54 +140,54 @@ task usercontrol() {
 
 		// main lift code
 		if (vexRT[Btn7U]) {
-			stopTask(mainLiftPI);
-			moveMainLift(127);
+			stopTask(nb_lift_PID_task);
+			b_lift(127);
 		} else if (vexRT[Btn7D]) {
-			stopTask(mainLiftPI);
-			moveMainLift(-127);
+			stopTask(nb_lift_PID_task);
+			b_lift(-127);
 		} else {
 			int mainLiftPower = (abs(vexRT[Ch3Xmtr2]) > 10) ? vexRT[Ch3Xmtr2] : 0;
 			if (mainLiftPower != 0)
-				stopTask(mainLiftPI);
-			moveMainLift(mainLiftPower);
+				stopTask(nb_lift_PID_task);
+			b_lift(mainLiftPower);
 		}
 
 		// top lift code
 		if (vexRT[Btn8U]) {
-			stopTask(topLiftPI);
-			moveTopLift(127);
-			} else if (vexRT[Btn8D]) {
-			stopTask(topLiftPI);
-			moveTopLift(-127);
-			} else {
+			stopTask(nb_vbar_PID_task);
+			b_vbar(127);
+		} else if (vexRT[Btn8D]) {
+			stopTask(nb_vbar_PID_task);
+			b_vbar(-127);
+		} else {
 			int topLiftPower = (abs(vexRT[Ch2Xmtr2]) > 10) ? vexRT[Ch2Xmtr2] : 0;
 			if (topLiftPower != 0) {
-				stopTask(topLiftPI);
+				stopTask(nb_vbar_PID_task);
 			}
-			moveTopLift(topLiftPower);
+			b_vbar(topLiftPower);
 		}
 
 		// mogo intake code
 		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) {
-				moveMogoIntake(127); // withdraw mogo intake
+				b_mogo_intake(127); // withdraw mogo intake
 			} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) {
-				moveMogoIntake(-127); // extend mogo intake
+				b_mogo_intake(-127); // extend mogo intake
 			} else {
-				moveMogoIntake(0);
+				b_mogo_intake(0);
 			}
 
 
 		// cone intake (claw) code
 		if (vexRT[Btn6U] && vexRT[Btn6D]) {
-			moveConeIntake(15); // stall torque
+			b_cone_intake(15); // stall torque
 			} else if (vexRT[Btn6U] || vexRT[Btn6UXmtr2]) {
-			moveConeIntake(70); // close cone intake
+			b_cone_intake(70); // close cone intake
 			clawStall = 10;
 			} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
-			moveConeIntake(-70); // open cone intake
+			b_cone_intake(-70); // open cone intake
 			clawStall = -15;
 			} else {
-			moveConeIntake(clawStall); // stall cone intake in the right direction
+			b_cone_intake(clawStall); // stall cone intake in the right direction
 		}
 
 		// autostack

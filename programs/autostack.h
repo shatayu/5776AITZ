@@ -4,4 +4,4 @@ typedef struct {
 	bool stacked;
 } Autostack;
 
-Autostack a;
+Autostack autostack_state;

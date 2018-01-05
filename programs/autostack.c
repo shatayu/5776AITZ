@@ -1,133 +1,111 @@
 // main autostack logic
 task autostackUp() {
-	a.stacked = false;
+	autostack_state.stacked = false;
 
 	// stop any prior lift tasks
-	stopTask(autonTopLift);
-	stopTask(topLiftPI);
-	stopTask(autonMainLift);
-	stopTask(mainLiftPI);
+	stopTask(nb_vbar_task);
+	stopTask(nb_vbar_PID_task);
+	stopTask(nb_lift_task);
+	stopTask(nb_lift_PID_task);
 
 	// claw stall
-	moveConeIntake(30);
+	b_cone_intake(20);
 
 	// bring top lift to intermediary height
 	// start by powering max
-	topLift.target = 1300;
-	topLift.timeout = 4000;
-	topLift.power = 127;
-	startTask(autonTopLift);
-	while (SensorValue[TopLiftPot] < 1300)
-		wait1Msec(20);
+	nb_vbar(1300, 127, 4000);
 
-	stopTask(autonTopLift);
 	// then PI to exact intermediary height
-	topLift.target = 1500;
-	startTask(topLiftPI);
+	nb_vbar_PID(1500,127,4000);
 
 	// lift to desired height
-	mainLift.target = a.maxHeight;
-	mainLift.power = 70;
-	mainLift.timeout = 4000;
-	if (mainLift.target > 1660) { // if small height PI too slow so autonMainLift used
-		startTask(mainLiftPI);
+	lift.target = autostack_state.maxHeight;
+	lift.power = 70;
+	lift.timeout = 4000;
+	//*
+	if (lift.target > 1660) { // if small height PI too slow so autonMainLift used
+		nb_lift_PID(autostack_state.maxHeight, 70, 4000);
 	} else {
-		startTask(autonMainLift);
+		nb_lift(autostack_state.maxHeight, 70, 4000);
 	}
 
 
-	// after the lift has risen a certain amount begin raising top lift to max height
-	while (SensorValue[MainLiftPot] < a.maxHeight - 400)
-		wait1Msec(20);
+	// after the lift has risen a certain amount begin raising vbar to max height
+	waitUntil(SensorValue[MainLiftPot] < autostack_state.maxHeight - 400);
 
-	stopTask(autonTopLift);
-	stopTask(topLiftPI);
+	stopTask(nb_vbar_task);
+	stopTask(nb_vbar_task);
 
-	topLift.power = 127;
-	topLift.target = 2750;
-	startTask(autonTopLift);
+
+	nb_vbar(2750, 127, 4000);
 	while (SensorValue[TopLiftPot] < 2750)
 		wait1Msec(20);
-	stopTask(autonTopLift);
-	moveTopLift(20);
+	b_lift(20);
 
 	// open claw at the end
-	stopTask(mainLiftPI);
-	stopTask(autonMainLift);
-	moveConeIntake(50);
-	coneIntake.state = OPEN;
-	moveMainLift(-127);
+	stopTask(nb_vbar_task);
+	stopTask(nb_vbar_PID_task);
+	b_cone_intake(50);
+	coneIntake.target = OPEN;
+	b_lift(-127);
 	wait1Msec(200);
-	moveMainLift(0);
-	startTask(autonConeIntake);
+	b_lift(0);
+	nb_cone_intake(OPEN);
 	wait1Msec(100);
-	moveMainLift(127);
-	waitUntil(SensorValue[MainLiftPot] > a.maxHeight);
-	moveMainLift(0);
+	b_lift(127);
+	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight);
+	b_lift(0);
 	// flag that cone is stacked
-	a.stacked = true;
+	autostack_state.stacked = true;
 }
 
 
 
 task fieldReset() {
-	moveConeIntake(-15);
+	b_cone_intake(-15);
 
 	// bring top lift down
-	topLift.power = 127;
-	topLift.timeout = 1000;
-	topLift.target = 1530;
-	if (a.maxHeight > 1500) {
-		startTask(topLiftPI);
+	if (autostack_state.maxHeight > 1500) {
+		nb_vbar_PID(1530, 127, 1000);
 	} else {
-		startTask(autonTopLift);
+		nb_vbar(1530, 127, 1000);
 	}
 
 
 	// bring main lift down when top lift is sufficiently far
-	while (SensorValue[TopLiftPot] > 1530)
-		wait1Msec(20);
+	waitUntil(SensorValue[TopLiftPot] > 1530);
 
-	stopTask(topLiftPI);
-	moveTopLift(-10);
-	mainLift.target = 1300;
-	mainLift.power = 70;
-	mainLift.timeout = 1500;
-	startTask(autonMainLift);
-	if (SensorValue[MainLiftPot] > 1700);
+	stopTask(nb_vbar_PID_task);
+	nb_lift(1300, 70, 1500);
+	if (SensorValue[MainLiftPot] > 1700)
 		wait1Msec(300);
-	mainLift.power = 127;
+	lift.power = 127;
 
 	// bring top lift in when main lift is sufficiently far down
-	while (SensorValue[MainLiftPot] > mainLift.target + 400)
+	while (SensorValue[MainLiftPot] > lift.target + 400)
 		wait1Msec(20);
 
-	stopTask(topLiftPI);
-	moveTopLift(-127);
+	stopTask(nb_vbar_PID_task);
+	b_vbar(-127);
 	wait1Msec(500);
-	a.stacked = false;
+	autostack_state.stacked = false;
 }
 
 task matchReset() {
-	moveConeIntake(-15);
+	b_cone_intake(-15);
 
-	// bring top lift down
-	topLift.target = 1530;
-	startTask(topLiftPI);
+	// bring vbar down
+	nb_vbar(1530, 127, 1000)
 
 	// bring main lift down when top lift is sufficiently far
-	while (SensorValue[TopLiftPot] > topLift.target)
-		wait1Msec(20);
+	waitUntil (SensorValue[TopLiftPot] > vbar.target);
 
-	mainLift.target = 1570;
-	mainLift.power = 127;
-	mainLift.timeout = 3000;
-	startTask(mainLiftPI);
+	nb_lift(1570, 127, 3000);
 
-	while (SensorValue[MainLiftPot] > mainLift.target)
-		wait1Msec(20);
 
-	a.stacked = false;
+	waitUntil (SensorValue[MainLiftPot] > lift.target);
+
+	autostack_state.stacked = false;
 }
 
 void autostackTaskReset() {
@@ -135,16 +113,16 @@ void autostackTaskReset() {
 	stopTask(autostackUp);
 	stopTask(fieldReset);
 	stopTask(matchReset);
-	stopTask(autonMainLift);
-	stopTask(mainLiftPI);
-	stopTask(autonTopLift);
-	stopTask(topLiftPI);
-	stopTask(autonConeIntake);
+	stopTask(nb_lift_task);
+	stopTask(nb_lift_task);
+	stopTask(nb_vbar_task);
+	stopTask(nb_vbar_PID_task);
+	stopTask(nb_cone_intake_task);
 
 	// ensure no motors are moving
-	moveMainLift(0);
-	moveTopLift(0);
-	moveConeIntake(-15);
+	b_lift(0);
+	b_vbar(0);
+	b_cone_intake(-15);
 }
 
 void abortAutostack() {
@@ -152,9 +130,9 @@ void abortAutostack() {
 	autostackTaskReset();
 
 	// stops waits
-	a.stacked = true;
+	autostack_state.stacked = true;
 	wait1Msec(100);
-	a.stacked = false;
+	autostack_state.stacked = false;
 }
 
 bool FIELD = true;
@@ -162,37 +140,52 @@ bool MATCH = false;
 
 void autostack(int conesOnMogo, bool reset) {
 	// set height to stack cone
-	if (conesOnMogo == 0) {
-		a.maxHeight = 1320;
-	} else if (conesOnMogo == 1) {
-		a.maxHeight = 1420;
-	} else if (conesOnMogo == 2) {
-		a.maxHeight = 1550;
-	} else if (conesOnMogo == 3) { // works
-		a.maxHeight = 1670;
-	} else if (conesOnMogo == 4) {
-		a.maxHeight = 1920;
-	} else if (conesOnMogo == 5) { // works
-		a.maxHeight = 2070;
-	} else if (conesOnMogo == 6) {
-		a.maxHeight = 2140;
-	} else if (conesOnMogo == 7) {
-		a.maxHeight = 2280;
-	} else if (conesOnMogo == 8) {
-		a.maxHeight = 2410;
-	} else if (conesOnMogo == 9) {
-		a.maxHeight = 2510;
-	} else if (conesOnMogo == 10) {
-		a.maxHeight = 2640;
-	} else if (conesOnMogo == 11) {
-		a.maxHeight = 2900;
-	} else if (conesOnMogo <= 12) {
-		a.maxHeight = 3050;
+	switch(conesOnMogo) {
+		case 0:
+			autostack_state.maxHeight = 1320;
+			break;
+		case 1:
+			autostack_state.maxHeight = 1420;
+			break;
+		case 2:
+			autostack_state.maxHeight = 1550;
+			break;
+		case 3:
+			autostack_state.maxHeight = 1670;
+			break;
+		case 4:
+			autostack_state.maxHeight = 1920;
+			break;
+		case 5:
+			autostack_state.maxHeight = 2070;
+			break;
+		case 6:
+			autostack_state.maxHeight = 2140;
+			break;
+		case 7:
+			autostack_state.maxHeight = 2280;
+			break;
+		case 8:
+			autostack_state.maxHeight = 2410;
+			break;
+		case 9:
+			autostack_state.maxHeight = 2510;
+			break;
+		case 10:
+			autostack_state.maxHeight = 2640;
+			break;
+		case 11:
+			autostack_state.maxHeight = 2900;
+			break;
+		case 12:
+			autostack_state.maxHeight = 3050;
+			break;
+		default:
+			autostack_state.maxHeight = 3050;
 	}
-
 	// autostack
 	startTask(autostackUp);
-	while (a.stacked == false)
+	while (autostack_state.stacked == false)
 		wait1Msec(20);
 	wait1Msec(100);
 
@@ -201,7 +194,7 @@ void autostack(int conesOnMogo, bool reset) {
 	// reset
 	if (reset == FIELD) {
 		startTask(fieldReset);
-		while (a.stacked == true)
+		while (autostack_state.stacked == true)
 			wait1Msec(20);
 	} else {
 		startTask(matchReset);
@@ -210,10 +203,10 @@ void autostack(int conesOnMogo, bool reset) {
 
 task autonStack() {
 	// autostack up
-	a.maxHeight = 1450;
+	autostack_state.maxHeight = 1450;
 
 	startTask(autostackUp);
-	while (a.stacked == false)
+	while (autostack_state.stacked == false)
 		wait1Msec(20);
 	//autostackTaskReset();
 }
@@ -223,7 +216,7 @@ task autonReset() {
 	startTask(fieldReset);
 
 	// wait
-	while (a.stacked == true)
+	while (autostack_state.stacked == true)
 		wait1Msec(20);
 
 	// ensure no task carries over to drive
