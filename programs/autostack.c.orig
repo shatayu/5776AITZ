@@ -1,4 +1,3 @@
-// main autostack logic
 task autostackUp() {
 	autostack_state.stacked = false;
 
@@ -15,7 +14,6 @@ task autostackUp() {
 	// start by powering max
 	nb_vbar(1300, 127, 4000);
 
-	stopTask(autonTopLift);
 	// then PI to exact intermediary height
 	nb_vbar_PID(1500,127,4000);
 
@@ -44,14 +42,31 @@ task autostackUp() {
 	b_lift(20);
 
 	// open claw at the end
+<<<<<<< HEAD
+	stopTask(nb_vbar_task);
+	stopTask(nb_vbar_PID_task);
+	b_cone_intake(50);
+	coneIntake.target = OPEN;
+	b_lift(-127);
+	wait1Msec(200);
+	b_lift(0);
+	nb_cone_intake(OPEN);
+=======
 	stopTask(mainLiftPI);
 	stopTask(autonMainLift);
 	moveConeIntake(50);
 	coneIntake.state = OPEN;
-	moveMainLift(-127);
-	wait1Msec(200);
-	moveMainLift(0);
+	if (SensorValue[MainLiftPot] > 1500) {
+		moveMainLift(-127);
+		wait1Msec(200);
+		moveMainLift(0);
+	}
+
+	if (a.maxHeight == 1320) {
+		wait1Msec(350);
+	}
 	startTask(autonConeIntake);
+>>>>>>> ac05fd548da3e177ae481cff3779b8fb3711cab7
 	wait1Msec(100);
 	b_lift(127);
 	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight);
@@ -102,7 +117,6 @@ task matchReset() {
 	waitUntil (SensorValue[TopLiftPot] > vbar.target);
 
 	nb_lift(1570, 127, 3000);
-
 
 
 	waitUntil (SensorValue[MainLiftPot] > lift.target);
@@ -185,7 +199,6 @@ void autostack(int conesOnMogo, bool reset) {
 		default:
 			autostack_state.maxHeight = 3050;
 	}
-
 	// autostack
 	startTask(autostackUp);
 	while (autostack_state.stacked == false)

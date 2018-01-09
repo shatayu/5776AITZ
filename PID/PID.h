@@ -11,6 +11,8 @@ typedef struct {
 	int integralCap;
 
 	int lastError;
+
+	long lastTime;
 } PID;
 
 int calc_PID(PID pid, int currentPoint);
