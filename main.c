@@ -49,7 +49,7 @@ pink zipties := other
 #include "auton/nonblocking/nb_lift.c"
 #include "auton/nonblocking/nb_vbar.c"
 #include "auton/nonblocking/nb_intake.c"
-//#include "programs/autostack.c"
+#include "programs/autostack.c"
 
 
 
@@ -104,7 +104,10 @@ void pre_auton() {
 
 int sign;
 task autonomous() {
-
+	autostack_state.maxHeight = 1900;
+	startTask(autostackUp);
+	waitUntil(autostack_state.stacked);
+	startTask(fieldReset);
 }
 
 // drive code
@@ -189,24 +192,21 @@ task usercontrol() {
 
 		//vbar PID test code
 		if (vexRT[Btn8R]) {
-			nb_vbar_PID(1080,127, 15000);
+			nb_vbar_PID(1080, 127, 15000);
 			wait1Msec(150);
 		} else if(vexRT[Btn8L]) {
 			stopTask(nb_vbar_PID_task);
 			b_vbar(0);
 		}
 
-
-
-
 		// mogo intake code
 		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) {
-				b_mogo_intake(127); // withdraw mogo intake
-			} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) {
-				b_mogo_intake(-127); // extend mogo intake
-			} else {
-				b_mogo_intake(0);
-			}
+			b_mogo_intake(127); // withdraw mogo intake
+		} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) {
+			b_mogo_intake(-127); // extend mogo intake
+		} else {
+			b_mogo_intake(0);
+		}
 
 
 		// cone intake (claw) code
@@ -214,12 +214,10 @@ task usercontrol() {
 			b_cone_intake(15); // stall torque
 			} else if (vexRT[Btn6U] || vexRT[Btn6UXmtr2]) {
 			b_cone_intake(70); // close cone intake
-			clawStall = 10;
 			} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
 			b_cone_intake(-70); // open cone intake
-			clawStall = -15;
 			} else {
-			b_cone_intake(clawStall); // stall cone intake in the right direction
+			b_cone_intake(0); // stall cone intake in the right direction
 		}
 
 		/*

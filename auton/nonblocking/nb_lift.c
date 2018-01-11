@@ -1,4 +1,3 @@
-
 void nb_set_lift_settings(int target, int power, int timeout) {
 	lift.target = target;
 	lift.power = power;
