@@ -32,8 +32,8 @@ task autostackUp() {
 
 task fieldReset() {
 	// bring the vertibar to an intermediary angle
-	int resetHeight = 1800;
-	nb_vbar_PID(resetHeight, 127, 5000);
+	int resetHeight = 500;
+	nb_vbar(resetHeight, 127, 5000);
 
 	// reset lift all the way
 	waitUntil(SensorValue[TopLiftPot] < resetHeight + 600);
