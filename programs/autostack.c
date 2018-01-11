@@ -2,112 +2,48 @@
 task autostackUp() {
 	autostack_state.stacked = false;
 
-	// stop any prior lift tasks
-	stopTask(nb_vbar_task);
+	// stall torque to grip cone with (change to -30 later, 0 for testing right now)
+	b_cone_intake(0);
+
+	// raise vertibar to height farthest away from robot
+	int middleHeight = 1080;
+	nb_vbar_PID(middleHeight, 127, 15000);
+	waitUntil(SensorValue[TopLiftPot] > middleHeight - 100);
+
+	// begin raising lift to target height
+	nb_lift(autostack_state.maxHeight, 127, 5000);
+	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 100);
+
+	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
-	stopTask(nb_lift_task);
-	stopTask(nb_lift_PID_task);
-
-	// claw stall
-	b_cone_intake(20);
-
-	// bring top lift to intermediary height
-	// start by powering max
-	nb_vbar(1300, 127, 4000);
-
-	stopTask(autonTopLift);
-	// then PI to exact intermediary height
-	nb_vbar_PID(1500,127,4000);
-
-	// lift to desired height
-	lift.target = autostack_state.maxHeight;
-	lift.power = 70;
-	lift.timeout = 4000;
-	//*
-	if (lift.target > 1660) { // if small height PI too slow so autonMainLift used
-		nb_lift_PID(autostack_state.maxHeight, 70, 4000);
-	} else {
-		nb_lift(autostack_state.maxHeight, 70, 4000);
-	}
-
-
-	// after the lift has risen a certain amount begin raising vbar to max height
-	waitUntil(SensorValue[MainLiftPot] < autostack_state.maxHeight - 400);
-
-	stopTask(nb_vbar_task);
+	nb_vbar(3000, 127, 5000);
+	waitUntil(SensorValue[TopLiftPot] > 3000);
 	stopTask(nb_vbar_task);
 
+	b_vbar(20);
 
-	nb_vbar(2750, 127, 4000);
-	while (SensorValue[TopLiftPot] < 2750)
-		wait1Msec(20);
+	// once the lift is at the top come down on the stack
+	b_lift(-127);
+	wait1Msec(200);
 	b_lift(20);
 
-	// open claw at the end
-	stopTask(mainLiftPI);
-	stopTask(autonMainLift);
-	moveConeIntake(50);
-	coneIntake.state = OPEN;
-	moveMainLift(-127);
-	wait1Msec(200);
-	moveMainLift(0);
-	startTask(autonConeIntake);
-	wait1Msec(100);
-	b_lift(127);
-	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight);
-	b_lift(0);
-	// flag that cone is stacked
 	autostack_state.stacked = true;
 }
 
-
-
 task fieldReset() {
-	b_cone_intake(-15);
+	// bring the vertibar to an intermediary angle
+	int resetHeight = 1800;
+	nb_vbar_PID(resetHeight, 127, 5000);
 
-	// bring top lift down
-	if (autostack_state.maxHeight > 1500) {
-		nb_vbar_PID(1530, 127, 1000);
-	} else {
-		nb_vbar(1530, 127, 1000);
-	}
+	// reset lift all the way
+	waitUntil(SensorValue[TopLiftPot] < resetHeight + 600);
+	nb_lift(1350, 127, 5000);
 
-
-	// bring main lift down when top lift is sufficiently far
-	waitUntil(SensorValue[TopLiftPot] > 1530);
-
-	stopTask(nb_vbar_PID_task);
-	nb_lift(1300, 70, 1500);
-	if (SensorValue[MainLiftPot] > 1700)
-		wait1Msec(300);
-	lift.power = 127;
-
-	// bring top lift in when main lift is sufficiently far down
-	while (SensorValue[MainLiftPot] > lift.target + 400)
-		wait1Msec(20);
-
-	stopTask(nb_vbar_PID_task);
-	b_vbar(-127);
-	wait1Msec(500);
 	autostack_state.stacked = false;
 }
 
 task matchReset() {
-	b_cone_intake(-15);
 
-	// bring vbar down
-	nb_vbar(1530, 127, 1000)
-
-	// bring main lift down when top lift is sufficiently far
-	waitUntil (SensorValue[TopLiftPot] > vbar.target);
-
-	nb_lift(1570, 127, 3000);
-
-
-
-	waitUntil (SensorValue[MainLiftPot] > lift.target);
-
-	autostack_state.stacked = false;
 }
 
 void autostackTaskReset() {
@@ -124,7 +60,7 @@ void autostackTaskReset() {
 	// ensure no motors are moving
 	b_lift(0);
 	b_vbar(0);
-	b_cone_intake(-15);
+	b_cone_intake(0);
 }
 
 void abortAutostack() {
