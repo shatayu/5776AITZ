@@ -159,6 +159,8 @@ task usercontrol() {
 		// LCD code
 		//displayLCDNumber(0, 8, conesOnMogo);
 
+
+		/*
 		// main lift code
 		if (vexRT[Btn7U]) {
 			stopTask(nb_lift_PID_task);
@@ -172,6 +174,7 @@ task usercontrol() {
 				stopTask(nb_lift_PID_task);
 			b_lift(mainLiftPower);
 		}
+		*/
 		/*
 		// top lift code
 		if (vexRT[Btn8U]) {
@@ -198,6 +201,16 @@ task usercontrol() {
 			stopTask(nb_vbar_PID_task);
 			b_vbar(0);
 		}
+
+		//lift PID test code
+		if (vexRT[Btn7L]) {
+			nb_lift_PID(1900, 127, 15000);
+			wait1Msec(150);
+		} else if(vexRT[Btn7R]) {
+			stopTask(nb_lift_PID_task);
+			b_lift(0);
+		}
+
 
 		// mogo intake code
 		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) {

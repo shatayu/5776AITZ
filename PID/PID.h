@@ -5,10 +5,15 @@ typedef struct {
 	float ki;
 	float kd;
 
-	int totalCap;
+	int bias;
+
+	int powerMax;
+	int powerMin;
 
 	float integral;
-	int integralCap;
+
+	int integralMin;
+	int integralMax;
 
 	int lastError;
 

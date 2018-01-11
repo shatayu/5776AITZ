@@ -32,19 +32,21 @@ task nb_vbar_task() {
 	b_vbar(0);
 }
 
-bool already_init = false;
-void init() {
+void nb_vbar_PID_init() {
+	static bool already_init = false;
 	if(already_init) return;
 	vbarPID.kp = 0.165;
 	vbarPID.ki = 0.002;
 	vbarPID.kd = 0.0006;
-	vbarPID.totalCap = 127;
-	vbarPID.integralCap = 40;
+	vbarPID.powerMax = 127;
+	vbarPID.powerMin = -127;
+	vbarPID.integralMax = 40;
+	vbarPID.integralMin = -40;
 	already_init = true;
 }
 
 task nb_vbar_PID_task() {
-	init();
+	nb_vbar_PID_init();
 	vbarPID.integral = 0;
 	vbarPID.setPoint = vbar.target;
 
@@ -58,10 +60,12 @@ task nb_vbar_PID_task() {
 	while (timer < vbar.timeout) {
 		int power = calc_PID(vbarPID, SensorValue[TopLiftPot]);
 		int error = vbar.target - SensorValue[TopLiftPot];
+		/*
 		datalogDataGroupStart();
 		datalogAddValue(1,power);
 		datalogAddValue(2,error);
 		datalogDataGroupEnd();
+		*/
 		b_vbar(power);
 
 		/*

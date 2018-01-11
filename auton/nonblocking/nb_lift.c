@@ -31,14 +31,24 @@ task nb_lift_task() {
 	b_lift(0);
 }
 
+void nb_lift_PID_init() {
+	static bool already_init = false;
+	if(already_init) return;
+	liftPID.kp = 0.25;
+	liftPID.ki = 0.01;
+	liftPID.kd = 0.4;
+	liftPID.bias = 45;
+	liftPID.powerMax = 127;
+	liftPID.powerMin = -80;
+	liftPID.integralMax = 25;
+	liftPID.integralMin = -50;
+	already_init = true;
+}
+
 task nb_lift_PID_task() {
-	liftPID.kp = 0;
-	liftPID.ki = 0.001;
-	liftPID.kd = 0;
+	nb_lift_PID_init();
 
-	liftPID.totalCap = 127;
-	liftPID.integralCap = 30;
-
+	liftPID.integral = 0;
 	liftPID.setPoint = lift.target;
 
 	const int stable_zone = 50;
@@ -48,16 +58,24 @@ task nb_lift_PID_task() {
 
 	int timer = 0;
 	while (timer < lift.timeout) {
-		b_lift(calc_PID(liftPID, SensorValue[MainLiftPot]));
-
+		int power = calc_PID(liftPID, SensorValue[MainLiftPot]);
 		int error = lift.target - SensorValue[MainLiftPot];
+
+		b_lift(power);
+
+		datalogDataGroupStart();
+		datalogAddValue(1,power);
+		datalogAddValue(2,error);
+		datalogDataGroupEnd();
+		/*
+		disable epoch stability test for testing
 		if(abs(error) <= stable_zone) {
 			consequtive_stable_epochs++;
 		} else {
 			consequtive_stable_epochs = 0;
 		}
 		if(consequtive_stable_epochs >= necessary_stable_epochs) break;
-
+		*/
 
 		timer += 20;
 		wait1Msec(20);
