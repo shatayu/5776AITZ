@@ -159,13 +159,13 @@ task usercontrol() {
 		// LCD code
 		//displayLCDNumber(0, 8, conesOnMogo);
 
-
-		/*
 		// main lift code
-		if (vexRT[Btn7U]) {
+
+		// replace 9999 with the max value of the lift potentiometer
+		if (vexRT[Btn7U] && SensorValue[MainLiftPot] < 9999) {
 			stopTask(nb_lift_PID_task);
 			b_lift(127);
-		} else if (vexRT[Btn7D]) {
+		} else if (vexRT[Btn7D] && SensorValue[MainLiftPot] > -9999) { // replace -9999 with min value
 			stopTask(nb_lift_PID_task);
 			b_lift(-127);
 		} else {
@@ -174,13 +174,13 @@ task usercontrol() {
 				stopTask(nb_lift_PID_task);
 			b_lift(mainLiftPower);
 		}
-		*/
-		/*
+
 		// top lift code
-		if (vexRT[Btn8U]) {
+		// replace 9999 with the max value of the vbar potentiometer
+		if (vexRT[Btn8U] && SensorValue[TopLiftPot] < 9999) {
 			stopTask(nb_vbar_PID_task);
 			b_vbar(127);
-		} else if (vexRT[Btn8D]) {
+		} else if (vexRT[Btn8D] && SensorValue[TopLiftPot] > -9999) { 		// replace -9999 with the min value of the vbar potentiometer
 			stopTask(nb_vbar_PID_task);
 			b_vbar(-127);
 		} else {
@@ -191,31 +191,29 @@ task usercontrol() {
 			b_vbar(topLiftPower);
 		}
 
-		*/
+		////vbar PID test code
+		//if (vexRT[Btn8R]) {
+		//	nb_vbar_PID(1080, 127, 15000);
+		//	wait1Msec(150);
+		//} else if(vexRT[Btn8L]) {
+		//	stopTask(nb_vbar_PID_task);
+		//	b_vbar(0);
+		//}
 
-		//vbar PID test code
-		if (vexRT[Btn8R]) {
-			nb_vbar_PID(1080, 127, 15000);
-			wait1Msec(150);
-		} else if(vexRT[Btn8L]) {
-			stopTask(nb_vbar_PID_task);
-			b_vbar(0);
-		}
-
-		//lift PID test code
-		if (vexRT[Btn7L]) {
-			nb_lift_PID(1900, 127, 15000);
-			wait1Msec(150);
-		} else if(vexRT[Btn7R]) {
-			stopTask(nb_lift_PID_task);
-			b_lift(0);
-		}
+		////lift PID test code
+		//if (vexRT[Btn7L]) {
+		//	nb_lift_PID(1900, 127, 15000);
+		//	wait1Msec(150);
+		//} else if(vexRT[Btn7R]) {
+		//	stopTask(nb_lift_PID_task);
+		//	b_lift(0);
+		//}
 
 
-		// mogo intake code
-		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) {
+		// mogo intake code (update values accordingly)
+		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) { // replace 2690 with current max
 			b_mogo_intake(127); // withdraw mogo intake
-		} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) {
+		} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) { // replace 750 with current min
 			b_mogo_intake(-127); // extend mogo intake
 		} else {
 			b_mogo_intake(0);
@@ -224,12 +222,12 @@ task usercontrol() {
 
 		// cone intake (claw) code
 		if (vexRT[Btn6U] && vexRT[Btn6D]) {
-			b_cone_intake(15); // stall torque
-			} else if (vexRT[Btn6U] || vexRT[Btn6UXmtr2]) {
+			b_cone_intake(-20); // stall torque
+		} else if (vexRT[Btn6U] || vexRT[Btn6UXmtr2]) {
 			b_cone_intake(70); // close cone intake
-			} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
+		} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
 			b_cone_intake(-70); // open cone intake
-			} else {
+		} else {
 			b_cone_intake(0); // stall cone intake in the right direction
 		}
 
