@@ -96,18 +96,21 @@ task selector() {
 }
 
 void pre_auton() {
-	startTask(selector);
-	bl_calibrate_gyro();
-	bStopTasksBetweenModes = true;
-	bLCDBacklight = true;
+	//startTask(selector);
+	////bl_calibrate_gyro();
+	//bStopTasksBetweenModes = true;
+	//bLCDBacklight = true;
 }
 
 int sign;
 task autonomous() {
-	autostack_state.maxHeight = 1900;
-	startTask(autostackUp);
-	waitUntil(autostack_state.stacked);
-	startTask(fieldReset);
+		int number = 10;
+
+		b_cone_intake(-127);
+		wait1Msec(250);
+		b_cone_intake(0);
+		autostack(number, MATCH);
+		wait1Msec(2000);
 }
 
 // drive code
@@ -116,156 +119,136 @@ int rightPower;
 task driveControl() {
 	while (true) {
 		// dead zone
-		leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
-		rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+		leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+		rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
 
 		// apply power
 		b_drive(leftPower, rightPower);
 		wait1Msec(20);
 	}
 }
-/*
-task autostackControl() {
+
+task liftControl() {
 	while (true) {
-		if (vexRT[Btn8L] || vexRT[Btn8LXmtr2])
-			abortAutostack();
-
-		if (vexRT[Btn8RXmtr2]) {
-			startTask(matchReset);
-			waitUntil(SensorValue[MainLiftPot] < 1500);
-			abortAutostack();
-		}
-
-		if (SensorValue[MainLiftPot] < 1350) {
-			autostack_state.stacked = false;
+			// main lift code
+		// replace 9999 with the max value of the lift potentiometer
+		if (vexRT[Btn7U] && SensorValue[MainLiftPot] < 3140) {
+			stopTask(nb_lift_PID_task);
+			b_lift(127);
+		} else if (vexRT[Btn7D] && SensorValue[MainLiftPot] > 1140) { // replace -9999 with min value
+			stopTask(nb_lift_PID_task);
+			b_lift(-127);
+		} else {
+			b_lift(-20);
 		}
 		wait1Msec(20);
 	}
 }
-*/
+
+task vbarControl() {
+	while (true) {
+				// top lift code
+		// replace 9999 with the max value of the vbar potentiometer
+		if (vexRT[Btn8U] && SensorValue[TopLiftPot] < 3000) {
+			stopTask(nb_vbar_PID_task);
+			b_vbar(127);
+		} else if (vexRT[Btn8D] && SensorValue[TopLiftPot] > 480) { 		// replace -9999 with the min value of the vbar potentiometer
+			stopTask(nb_vbar_PID_task);
+			b_vbar(-127);
+		} else {
+			if (vexRT[Btn8U]) {
+				b_vbar(20);
+			} else {
+				b_vbar(0);
+			}
+		}
+		wait1Msec(20);
+	}
+}
+
+task clawControl() {
+	while (true) {
+				// cone intake (claw) code
+		if (vexRT[Btn6U] && vexRT[Btn6D]) {
+			b_cone_intake(-30); // stall torque
+		} else if (vexRT[Btn6U] && SensorValue[ClawPot] > 1100) {
+			b_cone_intake(127); // close cone intake
+		} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
+			b_cone_intake(-127); // open cone intake
+		} else {
+			b_cone_intake(0); // stall cone intake in the right direction
+		}
+		wait1Msec(20);
+	}
+}
+
 
 int conesOnMogo = 0;
+task autostackControl() {
+	while (true) {
+		if (vexRT[Btn8R]) {
+			stopTask(liftControl);
+			stopTask(vbarControl);
+			stopTask(clawControl);
+			b_cone_intake(-127);
+			wait1Msec(250);
+			autostack(conesOnMogo, FIELD);
+			startTask(clawControl);
+			startTask(vbarControl);
+			startTask(liftControl);
+			conesOnMogo++;
+		} else if (vexRT[Btn7L]) {
+			waitUntil(!vexRT[Btn7L]);
+			if (conesOnMogo > 0)
+				conesOnMogo--;
+		} else if (vexRT[Btn7R]) {
+			waitUntil(!vexRT[Btn7R]);
+			if (conesOnMogo < 16)
+				conesOnMogo++;
+		}
+
+		wait1Msec(20);
+	}
+}
 
 task usercontrol() {
 	startTask(selector);
 	// initialize drive code for drive
 	startTask(driveControl);
 
-	// initialize autostack stopping code
-	//startTask(autostackControl);
+	// initialize lift code
+	startTask(liftControl);
 
-	int clawStall = 15;
+	// initialize vertibar code
+	startTask(vbarControl);
+
+	// initialize claw code
+	startTask(clawControl);
+
+	// initialize autostack code
+	startTask(autostackControl);
+
 	while (true) {
 		// LCD code
 		//displayLCDNumber(0, 8, conesOnMogo);
 
-		// main lift code
-
-		// replace 9999 with the max value of the lift potentiometer
-		if (vexRT[Btn7U] && SensorValue[MainLiftPot] < 9999) {
-			stopTask(nb_lift_PID_task);
-			b_lift(127);
-		} else if (vexRT[Btn7D] && SensorValue[MainLiftPot] > -9999) { // replace -9999 with min value
-			stopTask(nb_lift_PID_task);
-			b_lift(-127);
-		} else {
-			int mainLiftPower = (abs(vexRT[Ch3Xmtr2]) > 10) ? vexRT[Ch3Xmtr2] : 0;
-			if (mainLiftPower != 0)
-				stopTask(nb_lift_PID_task);
-			b_lift(mainLiftPower);
+		if (vexRT[Btn8L]) {
+			abortAutostack();
+			autostack_state.stacked = false;
+			startTask(vbarControl);
+			startTask(clawControl);
+			startTask(liftControl);
+			startTask(autostackControl);
 		}
-
-		// top lift code
-		// replace 9999 with the max value of the vbar potentiometer
-		if (vexRT[Btn8U] && SensorValue[TopLiftPot] < 9999) {
-			stopTask(nb_vbar_PID_task);
-			b_vbar(127);
-		} else if (vexRT[Btn8D] && SensorValue[TopLiftPot] > -9999) { 		// replace -9999 with the min value of the vbar potentiometer
-			stopTask(nb_vbar_PID_task);
-			b_vbar(-127);
-		} else {
-			int topLiftPower = (abs(vexRT[Ch2Xmtr2]) > 10) ? vexRT[Ch2Xmtr2] : 0;
-			if (topLiftPower != 0) {
-				stopTask(nb_vbar_PID_task);
-			}
-			b_vbar(topLiftPower);
-		}
-
-		////vbar PID test code
-		//if (vexRT[Btn8R]) {
-		//	nb_vbar_PID(1080, 127, 15000);
-		//	wait1Msec(150);
-		//} else if(vexRT[Btn8L]) {
-		//	stopTask(nb_vbar_PID_task);
-		//	b_vbar(0);
-		//}
-
-		////lift PID test code
-		//if (vexRT[Btn7L]) {
-		//	nb_lift_PID(1900, 127, 15000);
-		//	wait1Msec(150);
-		//} else if(vexRT[Btn7R]) {
-		//	stopTask(nb_lift_PID_task);
-		//	b_lift(0);
-		//}
-
 
 		// mogo intake code (update values accordingly)
-		if ((vexRT[Btn5U] || vexRT[Btn7UXmtr2]) && SensorValue[MogoPot] < 2690) { // replace 2690 with current max
+		if (vexRT[Btn5U] && SensorValue[MogoPot] < 2700) { // replace 2690 with current max
 			b_mogo_intake(127); // withdraw mogo intake
-		} else if ((vexRT[Btn5D] || vexRT[Btn7DXmtr2]) && SensorValue[MogoPot] > 750) { // replace 750 with current min
+		} else if (vexRT[Btn5D] && SensorValue[MogoPot] > 600) { // replace 750 with current min
 			b_mogo_intake(-127); // extend mogo intake
 		} else {
 			b_mogo_intake(0);
 		}
-
-
-		// cone intake (claw) code
-		if (vexRT[Btn6U] && vexRT[Btn6D]) {
-			b_cone_intake(-20); // stall torque
-		} else if (vexRT[Btn6U] || vexRT[Btn6UXmtr2]) {
-			b_cone_intake(70); // close cone intake
-		} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
-			b_cone_intake(-70); // open cone intake
-		} else {
-			b_cone_intake(0); // stall cone intake in the right direction
-		}
-
-		/*
-
-		// autostack
-		if (vexRT[Btn8R] || vexRT[Btn8R]) {
-			autostack(conesOnMogo, FIELD);
-			conesOnMogo++;
-		}
-
-		// counter control
-		if ((vexRT[Btn7L] || vexRT[Btn7LXmtr2]) && conesOnMogo > 0) {
-			waitUntil(!vexRT[Btn7L] || vexRT[Btn7LXmtr2]);
-			conesOnMogo--;
-		} else if (vexRT[Btn7R] || vexRT[Btn7RXmtr2]) {
-			waitUntil(!(vexRT[Btn7R] || vexRT[Btn7RXmtr2]));
-			conesOnMogo++;
-		}
-
-		/*
-		PARTNER STICK EXTRAS
-
-
-		if (vexRT[Btn8UXmtr2]) {
-			autostack(conesOnMogo, MATCH);
-			conesOnMogo++;
-		}
-
-		if (vexRT[Btn8DXmtr2]) {
-			conesOnMogo = 0;
-		}
-
-		if (vexRT[Btn8LXmtr2]) {
-			abortAutostack();
-		}
-		*/
-
 
 		wait1Msec(20);
 	}

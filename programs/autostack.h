@@ -1,7 +1,8 @@
 typedef struct {
 	int maxHeight;
-	int scoringHeight;
+	int vbarHeight;
 	bool stacked;
+	bool matchLoading;
 } Autostack;
 
 Autostack autostack_state;

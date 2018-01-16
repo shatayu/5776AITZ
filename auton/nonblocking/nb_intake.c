@@ -3,7 +3,6 @@ void nb_cone_intake(int state) {
 	coneIntake.power = 127;
 	coneIntake.timeout = 250;
 
-
 	startTask(nb_cone_intake_task);
 }
 

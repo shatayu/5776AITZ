@@ -83,3 +83,15 @@ task nb_lift_PID_task() {
 
 	b_lift(0);
 }
+
+// finds velocity lift is moving with in ticks/second
+task nb_lift_velocity() {
+
+	int a, b;
+	while (true) {
+		int a = SensorValue[MainLiftPot];
+		wait1Msec(50);
+		int b = SensorValue[MainLiftPot];
+		lift.velocity = (b - a)/0.1;
+	}
+}
