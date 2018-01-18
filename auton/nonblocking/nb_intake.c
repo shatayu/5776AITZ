@@ -1,21 +1,37 @@
-void nb_cone_intake(int state) {
-	coneIntake.target = state;
-	coneIntake.power = 127;
-	coneIntake.timeout = 250;
+void nb_cone_intake(bool state) {
+	int error;
+	int openTarget = 1240;
+	float kp = 0.05;
+	if (state == OPEN) {
+		// open at 1200
+		while (SensorValue[ClawPot] > openTarget) {
+			error = SensorValue[ClawPot] - openTarget;
+			b_cone_intake(error * kp);
 
-	startTask(nb_cone_intake_task);
-}
-
-
-task nb_cone_intake_task() {
-	if (coneIntake.target == OPEN) {
-		b_cone_intake(-coneIntake.power);
+			// too little power to matter; close enough to threshold
+			if (error * kp < 10) {
+				break;
+			}
+			wait1Msec(20);
+		}
+		b_cone_intake(0);
 	} else {
-		b_cone_intake(coneIntake.power);
+		b_cone_intake(-127);
+		wait1Msec(150);
+		b_cone_intake(-20);
 	}
-	wait1Msec(coneIntake.timeout);
-	b_cone_intake(0);
 }
+
+
+//task nb_cone_intake_task() {
+//	if (coneIntake.target == OPEN) {
+//		b_cone_intake(-coneIntake.power);
+//	} else {
+//		b_cone_intake(coneIntake.power);
+//	}
+//	wait1Msec(coneIntake.timeout);
+//	b_cone_intake(0);
+//}
 
 
 void nb_mogo_intake(int target, int power, int timeout) {
@@ -31,20 +47,13 @@ void nb_mogo_intake(int target, int power, int timeout) {
 // 2720 all the way in
 // 1270 release mogo
 task nb_mogo_intake_task() {
-	int timer = 0;
-
+	clearTimer(T2);
 	if (mogoIntake.target > SensorValue[MogoPot]) {
-		while (mogoIntake.target > SensorValue[MogoPot] && timer < mogoIntake.timeout) {
-			b_mogo_intake(mogoIntake.power);
-			wait1Msec(20);
-			timer += 20;
-		}
+		b_mogo_intake(-abs(mogoIntake.power));
+		waitUntil(mogoIntake.target < SensorValue[MogoPot]);
 	} else {
-		while (mogoIntake.target < SensorValue[MogoPot] && timer < mogoIntake.timeout) {
-			b_mogo_intake(-mogoIntake.power);
-			wait1Msec(20);
-			timer += 20;
-		}
+		b_mogo_intake(abs(mogoIntake.power));
+		waitUntil(mogoIntake.target > SensorValue[MogoPot]);
 	}
 	b_mogo_intake(0);
 }

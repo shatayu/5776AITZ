@@ -16,17 +16,24 @@ void nb_lift_PID(int target, int power, int timeout) {
 
 task nb_lift_task() {
 	int error = lift.target - SensorValue[MainLiftPot];
-	int original_error = error;
 	int timer = 0;
 
-	while (sgn(error) == sgn(original_error) && timer < lift.timeout) {
-		error = lift.target - SensorValue[MainLiftPot];
-		b_lift(lift.power * sgn(error));
-		timer += 20;
-		wait1Msec(20);
+
+	if (SensorValue[MainLiftPot] < lift.target) {
+		while (SensorValue[MainLiftPot] < lift.target && timer < lift.timeout) {
+			b_lift(abs(lift.power));
+			timer += 20;
+			wait1Msec(20);
+		}
+	} else {
+		while (SensorValue[MainLiftPot] > lift.target && timer < lift.timeout) {
+			b_lift(-abs(lift.power));
+			timer += 20;
+			wait1Msec(20);
+		}
 	}
 
-	b_lift(-sgn(error) * BRAKE_POWER);
+	b_lift(-sgn(error) * 30);
 	wait1Msec(50);
 	b_lift(0);
 }

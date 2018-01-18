@@ -68,7 +68,7 @@ task matchReset() {
 
 	// reset lift all the way
 	waitUntil(SensorValue[TopLiftPot] < resetHeight + 1600);
-	nb_lift_PID(1670, 127, 5000);
+	nb_lift(1670, 127, 5000);
 
 	autostack_state.stacked = false;
 }

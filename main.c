@@ -51,6 +51,8 @@ pink zipties := other
 #include "auton/nonblocking/nb_intake.c"
 #include "programs/autostack.c"
 
+#include "autonomous_programs/scoreOn20.c"
+#include "autonomous_programs/auton28.c"
 
 
 #include "Vex_Competition_Includes.c"
@@ -97,20 +99,14 @@ task selector() {
 
 void pre_auton() {
 	//startTask(selector);
-	////bl_calibrate_gyro();
+	bl_calibrate_gyro();
 	//bStopTasksBetweenModes = true;
 	//bLCDBacklight = true;
 }
 
 int sign;
 task autonomous() {
-		int number = 10;
-
-		b_cone_intake(-127);
-		wait1Msec(250);
-		b_cone_intake(0);
-		autostack(number, MATCH);
-		wait1Msec(2000);
+	nb_cone_intake(true):
 }
 
 // drive code
@@ -132,56 +128,54 @@ task liftControl() {
 	while (true) {
 			// main lift code
 		// replace 9999 with the max value of the lift potentiometer
-		if (vexRT[Btn7U] && SensorValue[MainLiftPot] < 3140) {
+		if (vexRT[Btn7U] && vexRT[Btn7D]) {
+			b_lift(0);
+		} else if (vexRT[Btn7U] && SensorValue[MainLiftPot] < 3140) {
 			stopTask(nb_lift_PID_task);
 			b_lift(127);
+			waitUntil(!vexRT[Btn7U]);
+			b_lift(0);
 		} else if (vexRT[Btn7D] && SensorValue[MainLiftPot] > 1140) { // replace -9999 with min value
 			stopTask(nb_lift_PID_task);
 			b_lift(-127);
-		} else {
-			b_lift(-20);
+			waitUntil(!vexRT[Btn7D]);
+			b_lift(-10);
 		}
 		wait1Msec(20);
 	}
 }
 
 task vbarControl() {
+	bool vbarUp = false; // how will these things be at the end of auton? update with correct data
+	bool clawOpen = true;
 	while (true) {
-				// top lift code
-		// replace 9999 with the max value of the vbar potentiometer
-		if (vexRT[Btn8U] && SensorValue[TopLiftPot] < 3000) {
-			stopTask(nb_vbar_PID_task);
-			b_vbar(127);
-		} else if (vexRT[Btn8D] && SensorValue[TopLiftPot] > 480) { 		// replace -9999 with the min value of the vbar potentiometer
-			stopTask(nb_vbar_PID_task);
-			b_vbar(-127);
-		} else {
-			if (vexRT[Btn8U]) {
-				b_vbar(20);
+
+		// vertibar code
+		if (vexRT[Btn6U]) {
+			waitUntil(!vexRT[Btn6U]);
+			if (vbarUp) {
+				stopTask(nb_vbar_PID_task);
+				nb_vbar(550, 127, 5000);
 			} else {
-				b_vbar(0);
+				stopTask(nb_vbar_PID_task);
+				nb_vbar_PID(2400, 127, 120000);
 			}
+			vbarUp = !vbarUp;
+		}
+
+		// cone intake (claw) code
+		if (vexRT[Btn6D]) {
+			waitUntil(!vexRT[Btn6D]);
+			if (clawOpen) {
+				nb_cone_intake(false);
+			} else {
+				nb_cone_intake(true);
+			}
+			clawOpen = !clawOpen;
 		}
 		wait1Msec(20);
 	}
 }
-
-task clawControl() {
-	while (true) {
-				// cone intake (claw) code
-		if (vexRT[Btn6U] && vexRT[Btn6D]) {
-			b_cone_intake(-30); // stall torque
-		} else if (vexRT[Btn6U] && SensorValue[ClawPot] > 1100) {
-			b_cone_intake(127); // close cone intake
-		} else if (vexRT[Btn6D] || vexRT[Btn6DXmtr2]) {
-			b_cone_intake(-127); // open cone intake
-		} else {
-			b_cone_intake(0); // stall cone intake in the right direction
-		}
-		wait1Msec(20);
-	}
-}
-
 
 int conesOnMogo = 0;
 task autostackControl() {
@@ -189,11 +183,9 @@ task autostackControl() {
 		if (vexRT[Btn8R]) {
 			stopTask(liftControl);
 			stopTask(vbarControl);
-			stopTask(clawControl);
 			b_cone_intake(-127);
 			wait1Msec(250);
 			autostack(conesOnMogo, FIELD);
-			startTask(clawControl);
 			startTask(vbarControl);
 			startTask(liftControl);
 			conesOnMogo++;
@@ -220,10 +212,7 @@ task usercontrol() {
 	startTask(liftControl);
 
 	// initialize vertibar code
-	startTask(vbarControl);
-
-	// initialize claw code
-	startTask(clawControl);
+	//startTask(vbarControl); disable for testing
 
 	// initialize autostack code
 	startTask(autostackControl);
@@ -236,10 +225,10 @@ task usercontrol() {
 			abortAutostack();
 			autostack_state.stacked = false;
 			startTask(vbarControl);
-			startTask(clawControl);
 			startTask(liftControl);
 			startTask(autostackControl);
 		}
+
 
 		// mogo intake code (update values accordingly)
 		if (vexRT[Btn5U] && SensorValue[MogoPot] < 2700) { // replace 2690 with current max
@@ -248,6 +237,14 @@ task usercontrol() {
 			b_mogo_intake(-127); // extend mogo intake
 		} else {
 			b_mogo_intake(0);
+		}
+
+		//vbar PID testing
+		if(vexRT[Btn7L]) {
+			nb_vbar_PID(1500,127, 10000);
+		}else if(vexRT[Btn7R]) {
+			stopTask(nb_vbar_PID_task);
+			b_vbar(0);
 		}
 
 		wait1Msec(20);

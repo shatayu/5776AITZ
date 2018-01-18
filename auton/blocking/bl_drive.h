@@ -3,7 +3,7 @@
 
 //power's sign determines direction
 //target given in encoder ticks
-void bl_drive(int target, int timeout, int power);
+void bl_drive(int target, int timeout, int power, bool brake = true);
 //target given in tenths of a degree
 void bl_drive_rotate(int target, int timeout, int power);
 
