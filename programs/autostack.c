@@ -1,5 +1,6 @@
 // main autostack logic
 task autostackUp() {
+	stopTask(nb_lift_PID_task);
 	// open claw position = 1350
 	autostack_state.stacked = false;
 
@@ -51,12 +52,31 @@ task autostackUp() {
 
 task fieldReset() {
 	// bring the vertibar to an intermediary angle
-	int resetHeight = 2400;
-	nb_vbar_PID(resetHeight, 127, 125000);
+	int resetVbarHeight = 550;
+	int resetLiftHeight = 1540;
+	nb_vbar(resetVbarHeight, 127, 125000);
 
 	// reset lift all the way
-	waitUntil(SensorValue[TopLiftPot] < resetHeight + 100);
-	nb_lift(1330, 127, 5000);
+		writeDebugStreamLine("Praise allah");
+	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 100);
+	writeDebugStreamLine("Praise allah2");
+
+	// bring lift to reset height
+	int height = SensorValue[MainLiftPot];
+
+	//if (resetLiftHeight > height) {
+	//	b_lift(127);
+	//	waitUntil(SensorValue[MainLiftPot] > resetLiftHeight);
+	//} else {
+	//	b_lift(-127);
+	//	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight);
+	//}
+
+	//// brake lift
+	//b_lift(-sgn(resetLiftHeight - height) * 40);
+	//wait1Msec(50);
+	//b_lift(0);
+	nb_lift_PID(resetLiftHeight, 127, 1250000);
 
 	autostack_state.stacked = false;
 }
@@ -136,28 +156,28 @@ void autostack(int conesOnMogo, bool reset) {
 			break;
 		case 10:
 			autostack_state.maxHeight = 2330; // works 1/15
-			autostack_state.vbarHeight = 2400;
+			autostack_state.vbarHeight = 2200;
 			break;
 		case 11:
 			autostack_state.maxHeight = 2450; // works 1/15
-			autostack_state.vbarHeight = 2400;
+			autostack_state.vbarHeight = 2200;
 			break;
 		case 12:
 			autostack_state.maxHeight = 2730; // works 1/15
-			autostack_state.vbarHeight = 2400;
+			autostack_state.vbarHeight = 2200;
 			break;
 		case 13:
 			autostack_state.maxHeight = 2880; // works 1/15
-			autostack_state.vbarHeight = 2400;
+			autostack_state.vbarHeight = 2200;
 			break;
 		case 14:
 			autostack_state.maxHeight = 2915; // working
-			autostack_state.vbarHeight = 2400;
+			autostack_state.vbarHeight = 2200;
 			break;
 
 		default:
 			autostack_state.maxHeight = 3140;
-			autostack_state.vbarHeight = 2400;
+			autostack_state.vbarHeight = 2200;
 	}
 
 	startTask(autostackUp);

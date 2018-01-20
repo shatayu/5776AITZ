@@ -2,7 +2,7 @@ void auton2(int direction) {
 	b_cone_intake(-20);
 
 	bl_drive(20, 3000, 127);
-	bl_drive_rotate(900, 5000, 70);
+	bl_drive_rotate(900, 5000, 70 * direction);
 
 	// raise lift up
 	nb_lift(2100, 127, 5000);

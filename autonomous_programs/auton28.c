@@ -8,11 +8,15 @@ task autonManager() {
 	b_lift(20);
 }
 
-bool LEFT = true;
-bool RIGHT = false;
-bool stagoAlign(bool side) {
+int LEFT = 1;
+int RIGHT = 0;
+bool stagoAlign(int side) {
 	writeDebugStreamLine("%d", SensorValue[LUltrasonic]);
-	return (SensorValue[LUltrasonic] > 0 && SensorValue[LUltrasonic] < 50);
+	if (side == LEFT) {
+		return (SensorValue[LUltrasonic] > 0 && SensorValue[LUltrasonic] < 50);
+	} else if (side == RIGHT) {
+		return (SensorValue[RUltrasonic] > 0 && SensorValue[RUltrasonic] < 50);
+	}
 }
 
 void lineAlign(bool firstSide) {
@@ -66,7 +70,7 @@ void auton28(int direction) {
 
 	// align the robot with the 20pt zone using the stago
 	b_drive(-70, -70);
-	waitUntil(stagoAlign(LEFT));
+	waitUntil(stagoAlign(direction));
 	bl_drive(10, 1000, 70);
 	stopTask(nb_vbar_PID_task);
 	bl_drive_rotate(900, 5000, -127);
