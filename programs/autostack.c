@@ -51,12 +51,12 @@ task autostackUp() {
 
 task fieldReset() {
 	// bring the vertibar to an intermediary angle
-	int resetHeight = 550;
-	nb_vbar(resetHeight, 127, 5000);
+	int resetHeight = 2400;
+	nb_vbar_PID(resetHeight, 127, 125000);
 
 	// reset lift all the way
-	waitUntil(SensorValue[TopLiftPot] < resetHeight + 1600);
-	nb_lift(1350, 127, 5000);
+	waitUntil(SensorValue[TopLiftPot] < resetHeight + 100);
+	nb_lift(1330, 127, 5000);
 
 	autostack_state.stacked = false;
 }
@@ -140,19 +140,19 @@ void autostack(int conesOnMogo, bool reset) {
 			break;
 		case 11:
 			autostack_state.maxHeight = 2450; // works 1/15
-			autostack_state.vbarHeight = 2010;
+			autostack_state.vbarHeight = 2400;
 			break;
 		case 12:
-			autostack_state.maxHeight = 2630; // works 1/15
-			autostack_state.vbarHeight = 2010;
+			autostack_state.maxHeight = 2730; // works 1/15
+			autostack_state.vbarHeight = 2400;
 			break;
 		case 13:
-			autostack_state.maxHeight = 2830; // works 1/15
-			autostack_state.vbarHeight = 2010;
+			autostack_state.maxHeight = 2880; // works 1/15
+			autostack_state.vbarHeight = 2400;
 			break;
 		case 14:
 			autostack_state.maxHeight = 2915; // working
-			autostack_state.vbarHeight = 2010;
+			autostack_state.vbarHeight = 2400;
 			break;
 
 		default:

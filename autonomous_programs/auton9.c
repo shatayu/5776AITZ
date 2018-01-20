@@ -1,25 +1,4 @@
-task autonManager() {
-	nb_lift(1600, 127, 5000);
-	nb_vbar_PID(2600, 127, 10000);
-  wait1Msec(500);
-	b_mogo_intake(127);
-	wait1Msec(1200);
-	b_mogo_intake(20);
-	b_lift(20);
-}
-
-bool LEFT = true;
-bool RIGHT = false;
-bool stagoAlign(bool side) {
-	writeDebugStreamLine("%d", SensorValue[LUltrasonic]);
-	return (SensorValue[LUltrasonic] > 0 && SensorValue[LUltrasonic] < 50);
-}
-
-void lineAlign(bool firstSide) {
-
-}
-
-void auton28(int direction) {
+void auton9(int direction) {
 	b_cone_intake(-20);
 
 	// drive up to mogo
@@ -59,19 +38,20 @@ void auton28(int direction) {
 	startTask(autostackUp);
 
 	// drive back, rotate
-	bl_drive(635, 3000, -127);
+	bl_drive(575, 3000, -127);
 	abortAutostack();
 	nb_vbar_PID(2600, 127, 5000);
-	bl_drive_rotate(450, 3000, -127 * direction);
+	bl_drive_rotate(1800, 3000, 127 * direction);
+	nb_cone_intake(OPEN);
 
-	// align the robot with the 20pt zone using the stago
-	b_drive(-70, -70);
-	waitUntil(stagoAlign(LEFT));
-	bl_drive(10, 1000, 70);
-	stopTask(nb_vbar_PID_task);
-	bl_drive_rotate(900, 5000, -127);
-	stopTask(autonManager);
-	b_cone_intake(127);
-	wait1Msec(350);
-	scoreOn20();
+	nb_lift(1600, 127, 5000);
+	wait1Msec(700);
+
+	b_mogo_intake(127);
+	wait1Msec(1000);
+	b_mogo_intake(0);
+
+	b_drive(-127, -127);
+	wait1Msec(700);
+	b_drive(0);
 }

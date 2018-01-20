@@ -1,20 +1,18 @@
-void nb_cone_intake(bool state) {
-	int error;
-	int openTarget = 1240;
-	float kp = 0.05;
-	if (state == OPEN) {
-		// open at 1200
-		while (SensorValue[ClawPot] > openTarget) {
-			error = SensorValue[ClawPot] - openTarget;
-			b_cone_intake(error * kp);
+void nb_cone_intake(int state) {
+	if (state == 1) {
+		//// open at 1200
+		//while (SensorValue[ClawPot] > openTarget) {
+		//	error = SensorValue[ClawPot] - openTarget;
+		//	b_cone_intake(error * kp);
 
-			// too little power to matter; close enough to threshold
-			if (error * kp < 10) {
-				break;
-			}
-			wait1Msec(20);
-		}
-		b_cone_intake(0);
+		//	// too little power to matter; close enough to threshold
+		//	if (error * kp < 10) {
+		//		break;
+		//	}
+		//	wait1Msec(20);
+		b_cone_intake(127);
+		waitUntil(SensorValue[ClawPot] < 1120);
+		b_cone_intake(10);
 	} else {
 		b_cone_intake(-127);
 		wait1Msec(150);
@@ -23,15 +21,15 @@ void nb_cone_intake(bool state) {
 }
 
 
-//task nb_cone_intake_task() {
-//	if (coneIntake.target == OPEN) {
-//		b_cone_intake(-coneIntake.power);
-//	} else {
-//		b_cone_intake(coneIntake.power);
-//	}
-//	wait1Msec(coneIntake.timeout);
-//	b_cone_intake(0);
-//}
+task nb_cone_intake_task() {
+	if (coneIntake.target == OPEN) {
+		b_cone_intake(-coneIntake.power);
+	} else {
+		b_cone_intake(coneIntake.power);
+	}
+	wait1Msec(coneIntake.timeout);
+	b_cone_intake(0);
+}
 
 
 void nb_mogo_intake(int target, int power, int timeout) {

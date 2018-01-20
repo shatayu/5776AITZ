@@ -53,7 +53,8 @@ pink zipties := other
 
 #include "autonomous_programs/scoreOn20.c"
 #include "autonomous_programs/auton28.c"
-
+#include "autonomous_programs/auton9.c"
+#include "autonomous_programs/auton2.c"
 
 #include "Vex_Competition_Includes.c"
 
@@ -104,75 +105,57 @@ void pre_auton() {
 	//bLCDBacklight = true;
 }
 
-int sign;
 task autonomous() {
-	nb_cone_intake(true):
+
 }
 
-// drive code
-int leftPower;
-int rightPower;
-task driveControl() {
+task subsystemControl() {
 	while (true) {
-		// dead zone
-		leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
-		rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
-
-		// apply power
-		b_drive(leftPower, rightPower);
-		wait1Msec(20);
-	}
-}
-
-task liftControl() {
-	while (true) {
-			// main lift code
-		// replace 9999 with the max value of the lift potentiometer
 		if (vexRT[Btn7U] && vexRT[Btn7D]) {
-			b_lift(0);
+			b_lift(0); // remove any stall torque downward
 		} else if (vexRT[Btn7U] && SensorValue[MainLiftPot] < 3140) {
 			stopTask(nb_lift_PID_task);
-			b_lift(127);
+			b_lift(127); // raise lift
 			waitUntil(!vexRT[Btn7U]);
 			b_lift(0);
-		} else if (vexRT[Btn7D] && SensorValue[MainLiftPot] > 1140) { // replace -9999 with min value
+		} else if (vexRT[Btn7D] && SensorValue[MainLiftPot] > 1140) {
 			stopTask(nb_lift_PID_task);
-			b_lift(-127);
+			b_lift(-127); // lower lift
 			waitUntil(!vexRT[Btn7D]);
-			b_lift(-10);
+			b_lift(-10); // keep lift down (lift is so light that without pressure it will rise due to contact)
 		}
-		wait1Msec(20);
-	}
-}
-
-task vbarControl() {
-	bool vbarUp = false; // how will these things be at the end of auton? update with correct data
-	bool clawOpen = true;
-	while (true) {
 
 		// vertibar code
 		if (vexRT[Btn6U]) {
 			waitUntil(!vexRT[Btn6U]);
-			if (vbarUp) {
+			if (SensorValue[TopLiftPot] > 1700) {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(550, 127, 5000);
 			} else {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar_PID(2400, 127, 120000);
+				nb_vbar_PID(2400, 127, 121000);
 			}
-			vbarUp = !vbarUp;
 		}
 
 		// cone intake (claw) code
 		if (vexRT[Btn6D]) {
 			waitUntil(!vexRT[Btn6D]);
-			if (clawOpen) {
-				nb_cone_intake(false);
+			if (SensorValue[ClawPot] < 1400) { // if pot is sufficiently wide close, otherwise open
+				nb_cone_intake(CLOSED);
 			} else {
-				nb_cone_intake(true);
+				nb_cone_intake(OPEN);
 			}
-			clawOpen = !clawOpen;
 		}
+
+			// mogo intake code (update values accordingly)
+		if (vexRT[Btn5U] && SensorValue[MogoPot] < 2700) { // replace 2690 with current max
+			b_mogo_intake(127); // withdraw mogo intake
+		} else if (vexRT[Btn5D] && SensorValue[MogoPot] > 600) { // replace 750 with current min
+			b_mogo_intake(-127); // extend mogo intake
+		} else {
+			b_mogo_intake(0);
+		}
+
 		wait1Msec(20);
 	}
 }
@@ -181,13 +164,18 @@ int conesOnMogo = 0;
 task autostackControl() {
 	while (true) {
 		if (vexRT[Btn8R]) {
-			stopTask(liftControl);
-			stopTask(vbarControl);
-			b_cone_intake(-127);
-			wait1Msec(250);
+			stopTask(nb_vbar_PID_task);
+			stopTask(subsystemControl);
+			nb_cone_intake(CLOSED);
 			autostack(conesOnMogo, FIELD);
-			startTask(vbarControl);
-			startTask(liftControl);
+			startTask(subsystemControl);
+			conesOnMogo++;
+		} else if (vexRT[Btn8D]) {
+			stopTask(nb_vbar_PID_task);
+			stopTask(subsystemControl);
+			nb_cone_intake(CLOSED);
+			autostack(conesOnMogo, MATCH);
+			startTask(subsystemControl);
 			conesOnMogo++;
 		} else if (vexRT[Btn7L]) {
 			waitUntil(!vexRT[Btn7L]);
@@ -205,46 +193,29 @@ task autostackControl() {
 
 task usercontrol() {
 	startTask(selector);
-	// initialize drive code for drive
-	startTask(driveControl);
 
-	// initialize lift code
-	startTask(liftControl);
-
-	// initialize vertibar code
-	//startTask(vbarControl); disable for testing
+	// initialize code for lift, vbar, mogo, cone intake
+	startTask(subsystemControl);
 
 	// initialize autostack code
 	startTask(autostackControl);
 
 	while (true) {
-		// LCD code
-		//displayLCDNumber(0, 8, conesOnMogo);
+		// drive code
 
+		// dead zone
+		int leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+		int rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
+
+		// apply power
+		b_drive(leftPower, rightPower);
+
+		// abort autostack
 		if (vexRT[Btn8L]) {
 			abortAutostack();
 			autostack_state.stacked = false;
-			startTask(vbarControl);
-			startTask(liftControl);
+			startTask(subsystemControl);
 			startTask(autostackControl);
-		}
-
-
-		// mogo intake code (update values accordingly)
-		if (vexRT[Btn5U] && SensorValue[MogoPot] < 2700) { // replace 2690 with current max
-			b_mogo_intake(127); // withdraw mogo intake
-		} else if (vexRT[Btn5D] && SensorValue[MogoPot] > 600) { // replace 750 with current min
-			b_mogo_intake(-127); // extend mogo intake
-		} else {
-			b_mogo_intake(0);
-		}
-
-		//vbar PID testing
-		if(vexRT[Btn7L]) {
-			nb_vbar_PID(1500,127, 10000);
-		}else if(vexRT[Btn7R]) {
-			stopTask(nb_vbar_PID_task);
-			b_vbar(0);
 		}
 
 		wait1Msec(20);

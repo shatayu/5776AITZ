@@ -1,6 +1,6 @@
 int dt;
 int calc_PID(PID pid, int currentPoint) {
-	dt = nSystime - pid.lastTime;
+	dt = nSysTime - pid.lastTime;
 
 
 	int error = pid.setPoint - currentPoint;
