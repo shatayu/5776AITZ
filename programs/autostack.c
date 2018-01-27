@@ -1,5 +1,6 @@
 // main autostack logic
 task autostackUp() {
+	int vbarHeight = 2550; // tuned
 	stopTask(nb_lift_PID_task);
 	// open claw position = 1350
 	autostack_state.stacked = false;
@@ -8,25 +9,31 @@ task autostackUp() {
 	b_cone_intake(-30);
 
 	// raise vertibar to height farthest away from robot
-	int middleHeight = 1280;
+	int middleHeight = 1480;
 	nb_vbar_PID(middleHeight, 127, 15000);
 	waitUntil(SensorValue[TopLiftPot] > middleHeight - 200);
+	writeDebugStreamLine("Vertibar reached the middle height");
 
 	// begin raising lift to target height
 	nb_lift(autostack_state.maxHeight, 127, 15000);
 	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 100);
+	writeDebugStreamLine("Lift reached to target height");
 
 	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
-	nb_vbar_PID(autostack_state.vbarHeight, 127, 5000);
-	waitUntil(SensorValue[TopLiftPot] >=	autostack_state.vbarHeight);
+	nb_vbar(vbarHeight, 127, 5000);
+	waitUntil(SensorValue[TopLiftPot] >= vbarHeight);
+	writeDebugStreamLine("Vertibar has came up all the way, lift currently at %d", SensorValue[MainLiftPot]);
+	b_vbar(20);
 
 	// once the lift is at the top come down on the stack
-	startTask(nb_lift_velocity);
 	b_lift(-127);
-	wait1Msec(500);
-	waitUntil(lift.velocity > -150);
+	wait1Msec(250);
+	startTask(nb_lift_velocity);
+	wait1Msec(250);
+	waitUntil(lift.velocity > -500);
 	b_lift(0);
+	writeDebugStreamLine("Lift is all the way down, currently at %d", SensorValue[MainLiftPot]);
 
 	// disable vertibar PID to begin reset
 	stopTask(nb_vbar_PID_task);
@@ -35,16 +42,6 @@ task autostackUp() {
 	if (autostack_state.maxHeight <= 1500) {
 		wait1Msec(350);
 	}
-	// open claw
-	b_cone_intake(127);
-	if (SensorValue[ClawPot] > 240 && SensorValue[ClawPot] < 280) {
-		wait1Msec(250);
-	} else {
-		waitUntil(SensorValue[ClawPot] < 1100);
-	}
-
-	wait1Msec(100);
-	b_cone_intake(0);
 
 	// flag stacked as true
 	autostack_state.stacked = true;
@@ -52,32 +49,23 @@ task autostackUp() {
 
 task fieldReset() {
 	// bring the vertibar to an intermediary angle
-	int resetVbarHeight = 550;
-	int resetLiftHeight = 1540;
+	int resetVbarHeight = 830;
+	int resetLiftHeight = 1450;
 	nb_vbar(resetVbarHeight, 127, 125000);
 
 	// reset lift all the way
-		writeDebugStreamLine("Praise allah");
-	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 100);
-	writeDebugStreamLine("Praise allah2");
+	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 200);
 
 	// bring lift to reset height
 	int height = SensorValue[MainLiftPot];
 
-	//if (resetLiftHeight > height) {
-	//	b_lift(127);
-	//	waitUntil(SensorValue[MainLiftPot] > resetLiftHeight);
-	//} else {
-	//	b_lift(-127);
-	//	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight);
-	//}
-
 	//// brake lift
-	//b_lift(-sgn(resetLiftHeight - height) * 40);
-	//wait1Msec(50);
-	//b_lift(0);
-	nb_lift_PID(resetLiftHeight, 127, 1250000);
+	nb_lift(resetLiftHeight, 127, 1250000);
+	b_lift(-127);
+	wait1Msec(300);
+	b_lift(0);
 
+	nb_cone_intake(OPEN);
 	autostack_state.stacked = false;
 }
 
@@ -88,8 +76,9 @@ task matchReset() {
 
 	// reset lift all the way
 	waitUntil(SensorValue[TopLiftPot] < resetHeight + 1600);
-	nb_lift(1670, 127, 5000);
+	nb_lift_PID(1670, 127, 5000);
 
+	nb_cone_intake(OPEN);
 	autostack_state.stacked = false;
 }
 
@@ -115,69 +104,53 @@ void autostack(int conesOnMogo, bool reset) {
 	// set height to stack cone
 	switch(conesOnMogo) {
 		case 0:
-			autostack_state.maxHeight = 1520; // works 1/13
-			autostack_state.vbarHeight = 2840;
+			autostack_state.maxHeight = 1635; // works 1/26
 			break;
 		case 1:
-			autostack_state.maxHeight = 1570; // works 1/13
-			autostack_state.vbarHeight = 2840;
+			autostack_state.maxHeight = 1710; // works 1/26
 			break;
 		case 2:
-			autostack_state.maxHeight = 1650; // works 1/13
-			autostack_state.vbarHeight = 2840;
+			autostack_state.maxHeight = 1795; // works 1/26
 			break;
 		case 3:
-			autostack_state.maxHeight = 1700; // works 1/13
-			autostack_state.vbarHeight = 2800;
+			autostack_state.maxHeight = 1885; // works 1/26
 			break;
 		case 4:
-			autostack_state.maxHeight = 1820; // works 1/13
-			autostack_state.vbarHeight = 2800;
+			autostack_state.maxHeight = 1980; // works 1/26
 			break;
 		case 5:
-			autostack_state.maxHeight = 1875; // works 1/13
-			autostack_state.vbarHeight = 2800;
+			autostack_state.maxHeight = 2030; // works 1/13
 			break;
 		case 6:
-			autostack_state.maxHeight = 1920; // works 1/13
-			autostack_state.vbarHeight = 2800;
+			autostack_state.maxHeight = 2140; // works 1/13
 			break;
 		case 7:
-			autostack_state.maxHeight = 1970; // works 1/13
-			autostack_state.vbarHeight = 2800;
+			autostack_state.maxHeight = 2250; // works 1/13
 			break;
 		case 8:
-			autostack_state.maxHeight = 2030; // works 1/14
-			autostack_state.vbarHeight = 2600;
+			autostack_state.maxHeight = 2360; // works 1/14
 			break;
 		case 9:
-			autostack_state.maxHeight = 2250; // works 1/14
-			autostack_state.vbarHeight = 2400;
+			autostack_state.maxHeight = 2500; // works 1/14
 			break;
 		case 10:
 			autostack_state.maxHeight = 2330; // works 1/15
-			autostack_state.vbarHeight = 2200;
 			break;
 		case 11:
 			autostack_state.maxHeight = 2450; // works 1/15
-			autostack_state.vbarHeight = 2200;
 			break;
 		case 12:
 			autostack_state.maxHeight = 2730; // works 1/15
-			autostack_state.vbarHeight = 2200;
 			break;
 		case 13:
 			autostack_state.maxHeight = 2880; // works 1/15
-			autostack_state.vbarHeight = 2200;
 			break;
 		case 14:
 			autostack_state.maxHeight = 2915; // working
-			autostack_state.vbarHeight = 2200;
 			break;
 
 		default:
 			autostack_state.maxHeight = 3140;
-			autostack_state.vbarHeight = 2200;
 	}
 
 	startTask(autostackUp);

@@ -1,17 +1,7 @@
 void nb_cone_intake(int state) {
-	if (state == 1) {
-		//// open at 1200
-		//while (SensorValue[ClawPot] > openTarget) {
-		//	error = SensorValue[ClawPot] - openTarget;
-		//	b_cone_intake(error * kp);
-
-		//	// too little power to matter; close enough to threshold
-		//	if (error * kp < 10) {
-		//		break;
-		//	}
-		//	wait1Msec(20);
+	if (state == OPEN) {
 		b_cone_intake(127);
-		waitUntil(SensorValue[ClawPot] < 1120);
+		wait1Msec(150);
 		b_cone_intake(10);
 	} else {
 		b_cone_intake(-127);

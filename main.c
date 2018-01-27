@@ -107,6 +107,7 @@ task selector() {
 }
 
 void pre_auton() {
+	clearDebugStream();
 	startTask(selector);
 	bl_calibrate_gyro();
 	bStopTasksBetweenModes = true;
@@ -114,15 +115,17 @@ void pre_auton() {
 }
 
 task autonomous() {
-	if (abs(selectedAuton) == 1) {
-		auton2(sgn(selectedAuton));
-	} else if (abs(selectedAuton) == 2) {
-		auton28(sgn(selectedAuton));
-	} else if (abs(selectedAuton) == 3) {
-		auton9(sgn(selectedAuton));
-	}
+	//if (abs(selectedAuton) == 1) {
+	//	auton2(sgn(selectedAuton));
+	//} else if (abs(selectedAuton) == 2) {
+	//	auton28(sgn(selectedAuton));
+	//} else if (abs(selectedAuton) == 3) {
+	//	auton9(sgn(selectedAuton));
+	//}
+	autostack(9, FIELD);
 }
 
+int clawState = OPEN;
 task subsystemControl() {
 	while (true) {
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
@@ -142,9 +145,9 @@ task subsystemControl() {
 		// vertibar code
 		if (vexRT[Btn6U]) {
 			waitUntil(!vexRT[Btn6U]);
-			if (SensorValue[TopLiftPot] > 1700) {
+			if (SensorValue[TopLiftPot] > 1900) {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar(550, 127, 5000);
+				nb_vbar(1450, 127, 5000);
 			} else {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(2800, 127, 5000);
@@ -154,10 +157,12 @@ task subsystemControl() {
 		// cone intake (claw) code
 		if (vexRT[Btn6D]) {
 			waitUntil(!vexRT[Btn6D]);
-			if (SensorValue[ClawPot] < 1400) { // if pot is sufficiently wide close, otherwise open
+			if (clawState) { // if pot is sufficiently wide close, otherwise open
 				nb_cone_intake(CLOSED);
+				clawState = CLOSED;
 			} else {
 				nb_cone_intake(OPEN);
+				clawState = OPEN;
 			}
 		}
 
