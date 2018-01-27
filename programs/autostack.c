@@ -43,6 +43,10 @@ task autostackUp() {
 		wait1Msec(350);
 	}
 
+	b_cone_intake(127);
+	wait1Msec(200);
+	b_cone_intake(10);
+
 	// flag stacked as true
 	autostack_state.stacked = true;
 }
