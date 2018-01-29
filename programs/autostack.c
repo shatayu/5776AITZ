@@ -1,6 +1,7 @@
 // main autostack logic
 task autostackUp() {
 	int vbarHeight = 2550; // tuned
+	//autostack_state.maxHeight = testLiftHeight;
 	stopTask(nb_lift_PID_task);
 	// open claw position = 1350
 	autostack_state.stacked = false;
@@ -52,6 +53,7 @@ task autostackUp() {
 }
 
 task fieldReset() {
+	b_cone_intake(40);
 	// bring the vertibar to an intermediary angle
 	int resetVbarHeight = 830;
 	int resetLiftHeight = 1450;
@@ -61,15 +63,12 @@ task fieldReset() {
 	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 200);
 
 	// bring lift to reset height
-	int height = SensorValue[MainLiftPot];
+	int height = 1320;
 
 	//// brake lift
-	nb_lift(resetLiftHeight, 127, 1250000);
-	b_lift(-127);
-	wait1Msec(300);
-	b_lift(0);
-
+	nb_lift(height, 127, 7000);
 	nb_cone_intake(OPEN);
+	waitUntil(SensorValue[MainLiftPot] < height);
 	autostack_state.stacked = false;
 }
 
@@ -108,31 +107,31 @@ void autostack(int conesOnMogo, bool reset) {
 	// set height to stack cone
 	switch(conesOnMogo) {
 		case 0:
-			autostack_state.maxHeight = 1635; // works 1/26
+			autostack_state.maxHeight = 1635; // works 1/28
 			break;
 		case 1:
-			autostack_state.maxHeight = 1710; // works 1/26
+			autostack_state.maxHeight = 1680; // works 1/28
 			break;
 		case 2:
-			autostack_state.maxHeight = 1795; // works 1/26
+			autostack_state.maxHeight = 1730; // works 1/28
 			break;
 		case 3:
-			autostack_state.maxHeight = 1885; // works 1/26
+			autostack_state.maxHeight = 1780; // works 1/28
 			break;
 		case 4:
-			autostack_state.maxHeight = 1980; // works 1/26
+			autostack_state.maxHeight = 1850; // works 1/28
 			break;
 		case 5:
-			autostack_state.maxHeight = 2030; // works 1/13
+			autostack_state.maxHeight = 1920; // works 1/28
 			break;
 		case 6:
-			autostack_state.maxHeight = 2140; // works 1/13
+			autostack_state.maxHeight = 1990; // works 1/28
 			break;
 		case 7:
-			autostack_state.maxHeight = 2250; // works 1/13
+			autostack_state.maxHeight = 2090; // works 1/28
 			break;
 		case 8:
-			autostack_state.maxHeight = 2360; // works 1/14
+			autostack_state.maxHeight = 2175; // works 1/28 but vertibar goes too far back
 			break;
 		case 9:
 			autostack_state.maxHeight = 2500; // works 1/14

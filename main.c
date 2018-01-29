@@ -31,6 +31,7 @@ pink zipties := other
 // Select Download method as "competition"
 #pragma competitionControl(Competition)
 
+int testLiftHeight = 0;
 
 #include "programs/autostack.h"
 #include "PID/PID.h"
@@ -122,7 +123,8 @@ task autonomous() {
 	//} else if (abs(selectedAuton) == 3) {
 	//	auton9(sgn(selectedAuton));
 	//}
-	autostack(9, FIELD);
+	//
+	auton2(1);
 }
 
 int clawState = OPEN;
@@ -189,6 +191,7 @@ task autostackControl() {
 			autostack(conesOnMogo, FIELD);
 			startTask(subsystemControl);
 			conesOnMogo++;
+			clawState = OPEN;
 		} else if (vexRT[Btn8D]) {
 			stopTask(nb_lift_PID_task);
 			stopTask(nb_vbar_PID_task);
