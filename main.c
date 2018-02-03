@@ -208,6 +208,8 @@ task autostackControl() {
 			waitUntil(!vexRT[Btn7R]);
 			if (conesOnMogo < 16)
 				conesOnMogo++;
+		}else if(vexRT[Btn8U]){
+			conesOnMogo = 0;
 		}
 
 		wait1Msec(20);

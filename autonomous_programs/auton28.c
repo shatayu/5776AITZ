@@ -61,12 +61,23 @@ void mogoAndCones() {
 	autostack_state.maxHeight = 1680; // works 1/28
 	nb_cone_intake(CLOSED);
 	startTask(autostackUp);
+
+	// open claw
+	/*nb_cone_intake(OPEN);
+
+	// go for third cone
+	abortAutostack();
+	startTask(fieldReset);
+	bl_drive(140, 1000, 127);
+	autostack_state.maxHeight = 1680; // works 1/28
+	nb_cone_intake(CLOSED);
+	startTask(autostackUp);*/
 }
 
 void auton28(int direction) {
 	mogoAndCones();
 	// drive back, rotate
-	bl_drive(720, 3000, -127);
+	bl_drive(720, 3000, -127);// change drive back if we don want the third cone
 	abortAutostack();
 	nb_vbar(2550, 127, 5000);
 	bl_drive_rotate(450, 3000, -127 * direction);

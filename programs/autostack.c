@@ -63,15 +63,15 @@ task fieldReset() {
 	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 200);
 
 	// bring lift to reset height
-	int height = 1320;
+	int height = 1400;//change this
 
 	//// brake lift
-	nb_lift(height, 127, 7000);
+	nb_lift(height, 127, 125000);
 	nb_cone_intake(OPEN);
 	waitUntil(SensorValue[MainLiftPot] < height);
 	autostack_state.stacked = false;
 }
-
+// change this
 task matchReset() {
 		// bring the vertibar to an intermediary angle
 	int resetHeight = 550;
@@ -107,50 +107,50 @@ void autostack(int conesOnMogo, bool reset) {
 	// set height to stack cone
 	switch(conesOnMogo) {
 		case 0:
-			autostack_state.maxHeight = 1635; // works 1/28
+			autostack_state.maxHeight = 1680; // works 2/2
 			break;
 		case 1:
-			autostack_state.maxHeight = 1680; // works 1/28
+			autostack_state.maxHeight = 1730; // works 2/2
 			break;
 		case 2:
-			autostack_state.maxHeight = 1730; // works 1/28
+			autostack_state.maxHeight = 1800; // works 2/2
 			break;
 		case 3:
-			autostack_state.maxHeight = 1780; // works 1/28
+			autostack_state.maxHeight = 1850; // works 2/2
 			break;
 		case 4:
-			autostack_state.maxHeight = 1850; // works 1/28
+			autostack_state.maxHeight = 1920; // works 2/2
 			break;
 		case 5:
-			autostack_state.maxHeight = 1920; // works 1/28
+			autostack_state.maxHeight = 1990; // works 2/2
 			break;
 		case 6:
-			autostack_state.maxHeight = 1990; // works 1/28
+			autostack_state.maxHeight = 2165; // works 2/2
 			break;
 		case 7:
-			autostack_state.maxHeight = 2090; // works 1/28
+			autostack_state.maxHeight = 2314; // works 2/2
 			break;
 		case 8:
-			autostack_state.maxHeight = 2175; // works 1/28 but vertibar goes too far back
+			autostack_state.maxHeight = 2500; // works 2/2
 			break;
 		case 9:
-			autostack_state.maxHeight = 2500; // works 1/14
+			autostack_state.maxHeight = 2607; // works 1/15 vertibar went to far back
 			break;
 		case 10:
-			autostack_state.maxHeight = 2330; // works 1/15
+			autostack_state.maxHeight = 2700; // works 1/15
 			break;
 		case 11:
-			autostack_state.maxHeight = 2450; // works 1/15
+			autostack_state.maxHeight = 2930; // works 1/15
 			break;
 		case 12:
-			autostack_state.maxHeight = 2730; // works 1/15
+			autostack_state.maxHeight = 3015; // works 1/15
 			break;
-		case 13:
-			autostack_state.maxHeight = 2880; // works 1/15
-			break;
-		case 14:
+		/*case 13:
 			autostack_state.maxHeight = 2915; // working
 			break;
+		case 13:
+			autostack_state.maxHeight = 3055; // working
+			break;*/
 
 		default:
 			autostack_state.maxHeight = 3140;
