@@ -42,13 +42,13 @@ void nb_lift_PID_init() {
 	static bool already_init = false;
 	if(already_init) return;
 	liftPID.kp = 0.25;
-	liftPID.ki = 0.01;
-	liftPID.kd = 0.4;
-	liftPID.bias = 45;
+	liftPID.ki = 0.015;
+	liftPID.kd = 1.5;
+	liftPID.bias = 15;
 	liftPID.powerMax = 127;
 	liftPID.powerMin = -80;
 	liftPID.integralMax = 25;
-	liftPID.integralMin = -50;
+	liftPID.integralMin = -25;
 	already_init = true;
 }
 
@@ -69,10 +69,6 @@ task nb_lift_PID_task() {
 		int error = lift.target - SensorValue[MainLiftPot];
 		b_lift(power);
 
-		datalogDataGroupStart();
-		datalogAddValue(1,power);
-		datalogAddValue(2,error);
-		datalogDataGroupEnd();
 		/*
 		disable epoch stability test for testing
 		if(abs(error) <= stable_zone) {

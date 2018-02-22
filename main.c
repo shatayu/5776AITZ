@@ -123,7 +123,11 @@ task autonomous() {
 	//} else if (abs(selectedAuton) == 3) {
 	//	auton9(sgn(selectedAuton));
 	//}
-	autostack(0, FIELD);
+	//autostack(0, FIELD);
+
+	int resetLiftHeight = 2000;
+	nb_lift_PID(resetLiftHeight, 127 , 30000);
+
 }
 
 int clawState = 0;
