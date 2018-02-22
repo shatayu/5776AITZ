@@ -67,7 +67,6 @@ task nb_lift_PID_task() {
 	while (timer < lift.timeout) {
 		int power = calc_PID(liftPID, SensorValue[MainLiftPot]);
 		int error = lift.target - SensorValue[MainLiftPot];
-
 		b_lift(power);
 
 		datalogDataGroupStart();

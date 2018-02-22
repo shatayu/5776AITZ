@@ -16,7 +16,7 @@ void scoreOn20() {
 
 	bl_drive(300, 2500, 127);
 	b_drive(127, 127);
-	wait1Msec(700);
+	wait1Msec(1000);
 	b_mogo_intake(127);
 	wait1Msec(1000);
 

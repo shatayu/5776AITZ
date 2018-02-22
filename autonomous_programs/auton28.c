@@ -4,7 +4,7 @@ task autonManager() {
   wait1Msec(500);
 	b_mogo_intake(127);
 	wait1Msec(1200);
-	b_mogo_intake(20);
+	b_mogo_intake(40);
 	b_lift(0);
 }
 
@@ -59,6 +59,13 @@ void mogoAndCones() {
 	startTask(fieldReset);
 	bl_drive(140, 1000, 127);
 	autostack_state.maxHeight = 1680; // works 1/28
+	// bring the lift down
+	stopTask(nb_lift_PID_task);
+
+	// come down on claw
+	b_lift(-127);
+	wait1Msec(300);
+	// stack
 	nb_cone_intake(CLOSED);
 	startTask(autostackUp);
 
@@ -77,7 +84,7 @@ void mogoAndCones() {
 void auton28(int direction) {
 	mogoAndCones();
 	// drive back, rotate
-	bl_drive(720, 3000, -127);// change drive back if we don want the third cone
+	bl_drive(740, 3000, -127);// change drive back if we don want the third cone
 	abortAutostack();
 	nb_vbar(2550, 127, 5000);
 	bl_drive_rotate(450, 3000, -127 * direction);

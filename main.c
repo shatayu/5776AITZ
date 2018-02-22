@@ -123,11 +123,10 @@ task autonomous() {
 	//} else if (abs(selectedAuton) == 3) {
 	//	auton9(sgn(selectedAuton));
 	//}
-	//
-	auton2(1);
+	autostack(0, FIELD);
 }
 
-int clawState = OPEN;
+int clawState = 0;
 task subsystemControl() {
 	while (true) {
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
@@ -157,20 +156,13 @@ task subsystemControl() {
 		}
 
 		// cone intake (claw) code
-		if (vexRT[Btn6D]) {
-			waitUntil(!vexRT[Btn6D]);
-			if (clawState) { // if pot is sufficiently wide close, otherwise open
-				nb_cone_intake(CLOSED);
-				clawState = CLOSED;
-			} else {
-				nb_cone_intake(OPEN);
-				clawState = OPEN;
-			}
-		}
+		b_cone_intake(rollerState * 127);
+		if (vexRT[Btn6D])
+			rollerState = 1;
 
 			// mogo intake code (update values accordingly)
 		if (vexRT[Btn7U] && SensorValue[MogoPot] < 2800) { // replace 2690 with current max
-			b_mogo_intake(55); // withdraw mogo intake
+			b_mogo_intake(127); // withdraw mogo intake
 		} else if (vexRT[Btn7D] && SensorValue[MogoPot] > 500) { // replace 750 with current min
 			b_mogo_intake(-127); // extend mogo intake
 		} else {
@@ -185,15 +177,13 @@ int conesOnMogo = 0;
 task autostackControl() {
 	while (true) {
 		if (vexRT[Btn8R]) {
-			stopTask(nb_vbar_PID_task);
+			abortAutostack();
 			stopTask(subsystemControl);
-			nb_cone_intake(CLOSED);
 			autostack(conesOnMogo, FIELD);
 			startTask(subsystemControl);
 			conesOnMogo++;
 			clawState = OPEN;
 		} else if (vexRT[Btn8D]) {
-			stopTask(nb_lift_PID_task);
 			stopTask(nb_vbar_PID_task);
 			stopTask(subsystemControl);
 			nb_cone_intake(CLOSED);
