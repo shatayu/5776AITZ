@@ -19,11 +19,11 @@ void bl_drive(int target, int timeout, int power, bool brake) {
 
 	//bl_drive_brake(sgn(power));
 
-	SensorValue[REncoder] = 0;
+	SensorValue[LEncoder] = 0;
 
 	b_drive(power, power);
 	clearTimer(T1);
-	waitUntil(abs(SensorValue[REncoder]) > target || time1[T1] > timeout);
+	waitUntil(abs(SensorValue[LEncoder]) > target || time1[T1] > timeout);
 	if (brake) {
 		bl_drive_brake(sgn(power));
 	}

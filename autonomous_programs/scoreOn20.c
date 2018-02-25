@@ -1,15 +1,13 @@
 task liftManagement() {
-	b_lift(127);
+	nb_lift_PID(2400, 127, 125000);
 	nb_vbar(2550, 127, 5000);
 	waitUntil(SensorValue[MainLiftPot] > 1800);
-	b_lift(-50);
-	wait1Msec(50);
-	b_lift(0);
 	waitUntil(SensorValue[TopLiftPot] > 2550);
 	b_vbar(20);
 }
 
 void scoreOn20() {
+	b_cone_intake(0);
 	// raise lift and drive into the 20pt pole
 	startTask(liftManagement);
 	wait1Msec(400);
@@ -21,9 +19,11 @@ void scoreOn20() {
 	wait1Msec(1000);
 
 	// drive backwards, then lift up to escape
+	stopTask(nb_vbar_PID_task);
 	b_drive(-127, -127);
 	wait1Msec(250);
 	b_mogo_intake(-127);
+	abortAutostack();
 	wait1Msec(750);
 	b_mogo_intake(0);
 	b_drive(0, 0);
@@ -49,4 +49,5 @@ void scoreOn20() {
 	autostack_state.stacked = false;
 
 	// ensure autostack flag is not incorrect
+	abortAutostack();
 }

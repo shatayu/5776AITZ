@@ -124,10 +124,7 @@ task autonomous() {
 	//	auton9(sgn(selectedAuton));
 	//}
 	//autostack(0, FIELD);
-
-	int resetLiftHeight = 2000;
-	nb_lift_PID(resetLiftHeight, 127 , 30000);
-
+	auton28(1);
 }
 
 int clawState = 0;
@@ -161,8 +158,12 @@ task subsystemControl() {
 
 		// cone intake (claw) code
 		b_cone_intake(rollerState * 127);
-		if (vexRT[Btn6D])
-			rollerState = 1;
+		if (vexRT[Btn8U]) {
+			rollerState = -1;
+		} else if (vexRT[Btn6D]) {
+			waitUntil(!vexRT[Btn6D]);
+			rollerState = rollerState == 1 ? 0 : 1;
+		}
 
 			// mogo intake code (update values accordingly)
 		if (vexRT[Btn7U] && SensorValue[MogoPot] < 2800) { // replace 2690 with current max
@@ -202,7 +203,7 @@ task autostackControl() {
 			waitUntil(!vexRT[Btn7R]);
 			if (conesOnMogo < 16)
 				conesOnMogo++;
-		}else if(vexRT[Btn8U]){
+		} else if (vexRT[Btn8UXmtr2]){
 			conesOnMogo = 0;
 		}
 

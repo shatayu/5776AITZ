@@ -1,11 +1,17 @@
 // main autostack logic
 int rollerState = 1; // 0 := still, 1 := intaking, -1 != outtaking
+int vbarHeight;
 task autostackUp() {
 	stopTask(nb_lift_PID_task);
 	//autostack_state.maxHeight = testLiftHeight;
-	int vbarHeight = 2550; // tuned
-	if (autostack_state.maxHeight > 2650) // conesOnMogo >= 10
-		vbarHeight = 2400;
+	if (autostack_state.maxHeight == 3140) {
+		vbarHeight = 2650;
+	} else if (autostack_state.maxHeight > 2650) { // conesOnMogo >= 11
+		vbarHeight = 2550;
+  } else {
+		vbarHeight = 2550;
+	}
+
 	stopTask(nb_lift_PID_task);
 	autostack_state.stacked = false;
 
@@ -15,7 +21,7 @@ task autostackUp() {
 	// raise vertibar to height farthest away from robot
 	int middleHeight = 1480;
 	nb_vbar_PID(middleHeight, 127, 15000);
-	waitUntil(SensorValue[TopLiftPot] > middleHeight - 650);
+	waitUntil(SensorValue[TopLiftPot] > middleHeight - 550);
 	writeDebugStreamLine("Vertibar reached the middle height");
 
 	// begin raising lift to target height
@@ -130,57 +136,27 @@ bool FIELD = true;
 bool MATCH = false;
 
 void autostack(int conesOnMogo, bool reset) {
+	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
-	switch(conesOnMogo) {
-		case 0:
-			autostack_state.maxHeight = 1680; // works 2/2
-			break;
-		case 1:
-			autostack_state.maxHeight = 1760; // works 2/2
-			break;
-		case 2:
-			autostack_state.maxHeight = 1800; // works 2/2
-			break;
-		case 3:
-			autostack_state.maxHeight = 1850; // works 2/2
-			break;
-		case 4:
-			autostack_state.maxHeight = 1920; // works 2/2
-			break;
-		case 5:
-			autostack_state.maxHeight = 1990; // works 2/2
-			break;
-		case 6:
-			autostack_state.maxHeight = 2165; // works 2/2
-			break;
-		case 7:
-			autostack_state.maxHeight = 2314; // works 2/2
-			break;
-		case 8:
-			autostack_state.maxHeight = 2500; // works 2/2
-			break;
-		case 9:
-			autostack_state.maxHeight = 2607; // works 1/15 vertibar went to far back
-			break;
-		case 10:
-			autostack_state.maxHeight = 2700; // works 1/15
-			break;
-		case 11:
-			autostack_state.maxHeight = 2930; // works 1/15
-			break;
-		case 12:
-			autostack_state.maxHeight = 3015; // works 1/15
-			break;
-		/*case 13:
-			autostack_state.maxHeight = 2915; // working
-			break;
-		case 13:
-			autostack_state.maxHeight = 3055; // working
-			break;*/
+	int heights[15];
+	heights[0] = 1776;
+	heights[1] = 1800;
+	heights[2] = 1830;
+	heights[3] = 1900;
+	heights[4] = 1970;
+	heights[5] = 2020;
+	heights[6] = 2185;
+	heights[7] = 2334;
+	heights[8] = 2520;
+	heights[9] = 2627;
+	heights[10] = 2700;
+	heights[11] = 2930;
+	heights[12] = 3015;
+	heights[13] = 3140;
+	heights[14] = 3140;
 
-		default:
-			autostack_state.maxHeight = 3140;
-	}
+	autostack_state.maxHeight = heights[conesOnMogo];
+	writeDebugStreamLine("%d", autostack_state.maxHeight);
 
 	startTask(autostackUp);
 	waitUntil(autostack_state.stacked);
@@ -190,11 +166,6 @@ void autostack(int conesOnMogo, bool reset) {
 	stopTask(nb_vbar_task);
 	stopTask(nb_vbar_PID_task);
 	stopTask(nb_cone_intake_task);
-
-//	b_cone_intake(0);
-	if (autostack_state.maxHeight > 2650) {
-		waitUntil(vexRT[Btn8R]);
-	}// conesOnMogo >= 10
 
 	if (reset == FIELD) {
 		startTask(fieldReset);
