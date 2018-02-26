@@ -18,6 +18,8 @@ void scoreOn20() {
 	wait1Msec(800);
 
 	// drive backwards, then lift up to escape
+	wait1Msec(400); // needs tuning, check time
+
 	stopTask(nb_vbar_PID_task);
 	b_drive(-127, -127);
 	wait1Msec(250);
