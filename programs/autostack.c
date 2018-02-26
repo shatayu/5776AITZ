@@ -89,10 +89,10 @@ task fieldReset() {
 }
 // change this
 task matchReset() {
-		b_cone_intake(40);
+	b_cone_intake(-127);
 	// bring the vertibar to an intermediary angle
 	int resetVbarHeight = 830;
-	int resetLiftHeight = 1840;
+	int resetLiftHeight = 2100;
 	//nb_vbar(resetVbarHeight, 127, 125000);
 
 	//// reset vertibar all the way
@@ -113,6 +113,7 @@ task matchReset() {
 
 	nb_cone_intake(OPEN);
 	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 200);
+	b_cone_intake(127);
 	autostack_state.stacked = false;
 }
 

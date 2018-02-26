@@ -10,13 +10,12 @@ void scoreOn20() {
 	b_cone_intake(0);
 	// raise lift and drive into the 20pt pole
 	startTask(liftManagement);
-	wait1Msec(400);
 
 	bl_drive(300, 2500, 127);
 	b_drive(127, 127);
-	wait1Msec(1000);
+	wait1Msec(800);
 	b_mogo_intake(127);
-	wait1Msec(1000);
+	wait1Msec(800);
 
 	// drive backwards, then lift up to escape
 	stopTask(nb_vbar_PID_task);
@@ -24,6 +23,7 @@ void scoreOn20() {
 	wait1Msec(250);
 	b_mogo_intake(-127);
 	abortAutostack();
+	writeDebugStreamLine("mogo deposited");
 	wait1Msec(750);
 	b_mogo_intake(0);
 	b_drive(0, 0);

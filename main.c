@@ -32,6 +32,7 @@ pink zipties := other
 #pragma competitionControl(Competition)
 
 int testLiftHeight = 0;
+int testDistance = 80;
 
 #include "programs/autostack.h"
 #include "PID/PID.h"
@@ -115,6 +116,13 @@ void pre_auton() {
 	bLCDBacklight = true;
 }
 
+task timerLCD() {
+	for (int i = 0; i < 125000; i += 50) {
+		writeDebugStreamLine("%d", i);
+		wait1Msec(50);
+	}
+}
+
 task autonomous() {
 	//if (abs(selectedAuton) == 1) {
 	//	auton2(sgn(selectedAuton));
@@ -124,7 +132,9 @@ task autonomous() {
 	//	auton9(sgn(selectedAuton));
 	//}
 	//autostack(0, FIELD);
+	startTask(timerLCD);
 	auton28(1);
+	stopTask(timerLCD);
 }
 
 int clawState = 0;
@@ -191,7 +201,6 @@ task autostackControl() {
 		} else if (vexRT[Btn8D]) {
 			stopTask(nb_vbar_PID_task);
 			stopTask(subsystemControl);
-			nb_cone_intake(CLOSED);
 			autostack(conesOnMogo, MATCH);
 			startTask(subsystemControl);
 			conesOnMogo++;

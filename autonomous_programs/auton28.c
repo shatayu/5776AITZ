@@ -41,7 +41,7 @@ void mogoAndCones() {
 
 	// drive up to mogo
 	startTask(autonManager);
-	bl_drive(1350, 3000, 127);
+	bl_drive(1310, 3000, 127);
 	stopTask(autonManager)
 	// intake mogo
 	stopTask(nb_mogo_intake_task);
@@ -54,18 +54,17 @@ void mogoAndCones() {
 	// once the lift is at the top come down on the stack
 	stopTask(nb_vbar_PID_task);
 	stopTask(nb_lift_PID_task);
-	//b_lift(-127);
-	//wait1Msec(400);
-	//b_lift(0);
 
-	// outtake
+	// bring lift down and outtake preload
+	b_lift(-127);
 	b_cone_intake(-127);
 	wait1Msec(200);
+	b_lift(0);
 
 	// go for second cone
 	abortAutostack();
 	startTask(fieldReset);
-	bl_drive(170, 1000, 127);
+	bl_drive(130, 1000, 127);
 	waitUntil(autostack_state.stacked == false);
 	autostack_state.maxHeight = 1800; // works 1/28
 	// bring the lift down
@@ -81,7 +80,7 @@ void mogoAndCones() {
 
 	// cone #3
 	startTask(fieldReset);
-	bl_drive(170, 1000, 127);
+	bl_drive(150, 1000, 127);
 	waitUntil(autostack_state.stacked == false);
 	autostack_state.maxHeight = 1800; // works 1/28
 
@@ -108,7 +107,7 @@ void mogoAndCones() {
 void auton28(int direction) {
 	mogoAndCones();
 	// drive back, rotate
-	bl_drive(1670, 3000, -127);// change drive back if we don want the third cone
+	bl_drive(1620, 3000, -127);// change drive back if we don want the third cone
 	bl_drive_rotate(450, 3000, -127 * direction);
 	b_vbar(20);
 
