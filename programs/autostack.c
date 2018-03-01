@@ -140,11 +140,11 @@ void autostack(int conesOnMogo, bool reset) {
 	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
 	int heights[15];
-	heights[0] = 1776;
-	heights[1] = 1800;
-	heights[2] = 1830;
-	heights[3] = 1900;
-	heights[4] = 1970;
+	heights[0] = 1580;
+	heights[1] = 1780;
+	heights[2] = 1810;
+	heights[3] = 1880;
+	heights[4] = 1950;
 	heights[5] = 2020;
 	heights[6] = 2185;
 	heights[7] = 2334;

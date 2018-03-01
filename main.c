@@ -4,7 +4,7 @@
 #pragma config(Sensor, in4,    MainLiftPot,    sensorPotentiometer)
 #pragma config(Sensor, in5,    Gyro,           sensorGyro)
 #pragma config(Sensor, in6,    LLine,          sensorLineFollower)
-#pragma config(Sensor, in7,    CLine,          sensorLineFollower)
+#pragma config(Sensor, in7,    CLine,          sensorPotentiometer)
 #pragma config(Sensor, in8,    RLine,          sensorLineFollower)
 #pragma config(Sensor, dgtl1,  REncoder,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl3,  LEncoder,       sensorQuadEncoder)
@@ -189,9 +189,15 @@ task subsystemControl() {
 }
 
 int conesOnMogo = 0;
+
+bool getStackTrigger() {
+	int threshold = 2220; // tuned
+	return SensorValue[ClawPot] > threshold && !autostack_state.stacked; // false := don't stack, true := do stack
+}
+
 task autostackControl() {
 	while (true) {
-		if (vexRT[Btn8R]) {
+		if (/*vexRT[Btn8R]*/ getStackTrigger()) {
 			abortAutostack();
 			stopTask(subsystemControl);
 			autostack(conesOnMogo, FIELD);
