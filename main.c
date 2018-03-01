@@ -142,12 +142,12 @@ task subsystemControl() {
 	while (true) {
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
 			b_lift(0); // remove any stall torque downward
-		} else if (vexRT[Btn5U] && SensorValue[MainLiftPot] > 800) {
+		} else if (vexRT[Btn5U]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(127); // raise lift
 			waitUntil(!vexRT[Btn5U]);
 			b_lift(0);
-		} else if (vexRT[Btn5D] && SensorValue[MainLiftPot] < 2600) {
+		} else if (vexRT[Btn5D]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(-127); // lower lift
 			waitUntil(!vexRT[Btn5D]);
@@ -239,8 +239,8 @@ task usercontrol() {
 		// drive code
 
 		// dead zone
-		int leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
-		int rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+		int leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
+		int rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
 
 		// apply power
 		b_drive(leftPower, rightPower);
