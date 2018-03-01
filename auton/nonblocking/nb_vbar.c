@@ -35,9 +35,9 @@ task nb_vbar_task() {
 void nb_vbar_PID_init() {
 	static bool already_init = false;
 	if(already_init) return;
-	vbarPID.kp = 0.165; // used to be 0.165
+	vbarPID.kp = 0.18; // used to be 0.165
 	vbarPID.ki = 0.002;
-	vbarPID.kd = 0.3;
+	vbarPID.kd = 0.4;
 	vbarPID.powerMax = 127;
 	vbarPID.powerMin = -127;
 	vbarPID.integralMax = 40;
@@ -60,11 +60,6 @@ task nb_vbar_PID_task() {
 	while (timer < vbar.timeout) {
 		int power = calc_PID(vbarPID, SensorValue[TopLiftPot]);
 		int error = vbar.target - SensorValue[TopLiftPot];
-
-		datalogDataGroupStart();
-		datalogAddValue(1,power);
-		datalogAddValue(2,error);
-		datalogDataGroupEnd();
 
 		b_vbar(power);
 

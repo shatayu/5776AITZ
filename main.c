@@ -132,9 +132,12 @@ task autonomous() {
 	//	auton9(sgn(selectedAuton));
 	//}
 	//autostack(0, FIELD);
-	startTask(timerLCD);
-	auton28(1);
-	stopTask(timerLCD);
+
+	nb_vbar_PID(1300,127,10000);
+
+	//startTask(timerLCD);
+	//auton28(1);
+	//stopTask(timerLCD);
 }
 
 int clawState = 0;
@@ -191,7 +194,7 @@ task subsystemControl() {
 int conesOnMogo = 0;
 
 bool getStackTrigger() {
-	int threshold = 2220; // tuned
+	int threshold = 2310; // tuned
 	return SensorValue[ClawPot] > threshold && !autostack_state.stacked; // false := don't stack, true := do stack
 }
 
