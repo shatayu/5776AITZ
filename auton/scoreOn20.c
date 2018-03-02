@@ -11,20 +11,21 @@ void scoreOn20() {
 	// raise lift and drive into the 20pt pole
 	startTask(liftManagement);
 
-	bl_drive(300, 2500, 127);
-	b_drive(127, 127);
+	// drive up and deposit mobile goal
+	bl_drive(300, 2500, 127, false);
+	b_drive(127, 127); // tune?
 	wait1Msec(800);
-	b_mogo_intake(127);
-	wait1Msec(800);
+	b_mogo_intake(127); // tune?
+	wait1Msec(800); // tune?
 
 	// drive backwards, then lift up to escape
-
 	stopTask(nb_vbar_PID_task);
-	b_drive(-127, -127);
-	wait1Msec(250);
-	b_mogo_intake(-127);
+	b_drive(-127, -127); // tune?
+	wait1Msec(250); // tune?
+	b_mogo_intake(-127); // tune
+
+	// mogo withdrawn, drive stopped
 	abortAutostack();
-	writeDebugStreamLine("mogo deposited");
 	wait1Msec(750);
 	b_mogo_intake(0);
 	b_drive(0, 0);
