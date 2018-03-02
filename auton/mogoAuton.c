@@ -25,13 +25,14 @@ void mogoAuton(int direction) {
 	b_vbar(20);
 
 	// align the robot with the 20pt zone using the stago
-	b_drive(-80, -80);
-	waitUntil(stagoAlign20(direction));
+
+	b_drive(-80, -80); // tune speed
+	waitUntil(stagoAlign20(1));
 	// IF ULTRASONIC DOESN'T WORK THEN USE ENCODERS
 	// bl_drive(1000, 4000, -80); // tune distance
 
 	stopTask(nb_vbar_PID_task);
-	bl_drive_rotate(900, 5000, -80 * direction); // tune speed
+	bl_drive_rotate(920, 5000, -80 * 1); // tune speed/angle
 	stopTask(autonManager);
 	scoreOn20();
 }

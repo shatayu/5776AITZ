@@ -59,6 +59,7 @@ int conesOnMogo = 0;
 #include "auton/scoreOn20.c"
 #include "auton/mogoAndCones.c"
 #include "auton/mogoAuton.c"
+#include "auton/autob13.c"
 #include "auton/auton9.c"
 #include "auton/auton2.c"
 
@@ -75,10 +76,10 @@ task selector() {
 		if (nLCDButtons == 1) {
 			waitUntil(nLCDButtons == 0);
 			selectedAuton--;
-		} else if (nLCDButtons == 2) {
+			} else if (nLCDButtons == 2) {
 			waitUntil(nLCDButtons == 0);
 			selectedAuton *= -1;
-		} else if (nLCDButtons == 4) {
+			} else if (nLCDButtons == 4) {
 			waitUntil(nLCDButtons == 0);
 			selectedAuton++;
 		}
@@ -90,15 +91,15 @@ task selector() {
 
 		// display auton name
 		//displayLCDCenteredString(0, autonNames[abs(selectedAuton)]);
-	if (abs(selectedAuton) == 1) {
-		displayLCDCenteredString(0, autonNames[1]);
-	} else if (abs(selectedAuton) == 2) {
-		displayLCDCenteredString(0, autonNames[2]);
-	} else if (abs(selectedAuton) == 3) {
-		displayLCDCenteredString(0, autonNames[3]);
-	} else {
-		displayLCDCenteredString(0, "NO AUTON SELECTED");
-	}
+		if (abs(selectedAuton) == 1) {
+			displayLCDCenteredString(0, autonNames[1]);
+			} else if (abs(selectedAuton) == 2) {
+			displayLCDCenteredString(0, autonNames[2]);
+			} else if (abs(selectedAuton) == 3) {
+			displayLCDCenteredString(0, autonNames[3]);
+			} else {
+			displayLCDCenteredString(0, "NO AUTON SELECTED");
+		}
 
 		// display auton side
 		if (sgn(selectedAuton) == 1) {
@@ -142,8 +143,9 @@ task autonomous() {
 
 	startTask(timerLCD);
 	//mogoAndCones28();
-	//mogoAuton(1);
-		scoreOn20();
+	support13(1)
+	//scoreOn20();
+
 	stopTask(timerLCD);
 }
 
@@ -152,12 +154,12 @@ task subsystemControl() {
 	while (true) {
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
 			b_lift(0); // remove any stall torque downward
-		} else if (vexRT[Btn5U]) {
+			} else if (vexRT[Btn5U]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(127); // raise lift
 			waitUntil(!vexRT[Btn5U]);
 			b_lift(0);
-		} else if (vexRT[Btn5D]) {
+			} else if (vexRT[Btn5D]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(-127); // lower lift
 			waitUntil(!vexRT[Btn5D]);
@@ -170,7 +172,7 @@ task subsystemControl() {
 			if (SensorValue[TopLiftPot] > 1900) {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(1450, 127, 5000);
-			} else {
+				} else {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(2800, 127, 5000);
 			}
@@ -180,20 +182,20 @@ task subsystemControl() {
 		b_cone_intake(rollerState * 127);
 		if (vexRT[Btn8U]) {
 			rollerState = -1;
-		} else if (vexRT[Btn6D]) {
+			} else if (vexRT[Btn6D]) {
 			waitUntil(!vexRT[Btn6D]);
 			rollerState = rollerState == 1 ? 0 : 1;
 		}
 
-			// mogo intake code (update values accordingly)
+		// mogo intake code (update values accordingly)
 		if (vexRT[Btn7U]) { // replace 2690 with current max
 			b_mogo_intake(127); // withdraw mogo intake
-		} else if (vexRT[Btn7D]) { // replace 750 with current min
+			} else if (vexRT[Btn7D]) { // replace 750 with current min
 			b_mogo_intake(-127); // extend mogo intake
-		} else {
+			} else {
 			b_mogo_intake(0);
 		}
-// test
+		// test
 		wait1Msec(20);
 	}
 }
@@ -213,22 +215,22 @@ task autostackControl() {
 			if (conesOnMogo < 14)
 				conesOnMogo++;
 			clawState = OPEN;
-		} else if (vexRT[Btn8D]) {
+			} else if (vexRT[Btn8D]) {
 			stopTask(nb_vbar_PID_task);
 			stopTask(subsystemControl);
 			autostack(conesOnMogo, MATCH);
 			startTask(subsystemControl);
 			if (conesOnMogo < 14)
-			conesOnMogo++;
-		} else if (vexRT[Btn7L]) {
+				conesOnMogo++;
+			} else if (vexRT[Btn7L]) {
 			waitUntil(!vexRT[Btn7L]);
 			if (conesOnMogo > 0)
 				conesOnMogo--;
-		} else if (vexRT[Btn7R]) {
+			} else if (vexRT[Btn7R]) {
 			waitUntil(!vexRT[Btn7R]);
 			if (conesOnMogo < 14)
 				conesOnMogo++;
-		} else if (vexRT[Btn8UXmtr2]){
+			} else if (vexRT[Btn8UXmtr2]){
 			conesOnMogo = 0;
 		}
 

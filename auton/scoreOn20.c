@@ -14,7 +14,7 @@ void scoreOn20() {
 	// drive up and deposit mobile goal
 	bl_drive(300, 2500, 127, false);
 	b_drive(127, 127); // tune?
-	wait1Msec(800);
+	wait1Msec(900);
 	b_mogo_intake(127); // tune?
 	wait1Msec(800); // tune?
 

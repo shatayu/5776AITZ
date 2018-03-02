@@ -34,7 +34,7 @@ void mogoAndCones() {
 	// go for second cone
 	abortAutostack();
 	startTask(fieldReset);
-	bl_drive(130, 1500, 127); // tune this distance
+	bl_drive(160, 1500, 127); // tune this distance
 	waitUntil(autostack_state.stacked == false);
 	autostack_state.maxHeight = 1800; // works 1/28
 	// bring the lift down
@@ -50,7 +50,7 @@ void mogoAndCones() {
 
 	// cone #3
 	startTask(fieldReset);
-	bl_drive(130, 1500, 127); // tune this distance
+	bl_drive(160, 2100, 127); // tune this distance
 	waitUntil(autostack_state.stacked == false);
 	autostack_state.maxHeight = 1800; // works 1/28
 
@@ -70,7 +70,7 @@ void mogoAndCones28() {
 	startTask(fieldReset);
 	waitUntil(autostack_state.stacked == false);
 	b_cone_intake(127);
-	bl_drive(160, 2000, 127);
+	bl_drive(130, 2000, 127);// fourth cone
 
 	// intake cone
 	abortAutostack();
