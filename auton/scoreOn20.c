@@ -18,7 +18,6 @@ void scoreOn20() {
 	wait1Msec(800);
 
 	// drive backwards, then lift up to escape
-	wait1Msec(400); // needs tuning, check time
 
 	stopTask(nb_vbar_PID_task);
 	b_drive(-127, -127);
@@ -31,25 +30,12 @@ void scoreOn20() {
 	b_drive(0, 0);
 
 	// reset
-
-	b_cone_intake(40);
+	b_cone_intake(0);
 	// bring the vertibar to an intermediary angle
 	int resetVbarHeight = 830;
-	int resetLiftHeight = 1500;
 	nb_vbar(resetVbarHeight, 127, 125000);
 
-	// reset lift all the way
-	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 200);
-
-	// bring lift to reset height
-	int height = 1320;
-
-	//// brake lift
-	nb_lift(height, 70, 7000);
-	nb_cone_intake(OPEN);
-	waitUntil(SensorValue[MainLiftPot] < height);
-	autostack_state.stacked = false;
-
 	// ensure autostack flag is not incorrect
+	autostack_state.stacked = false;
 	abortAutostack();
 }

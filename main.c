@@ -34,28 +34,33 @@ pink zipties := other
 int testLiftHeight = 0;
 int testDistance = 80;
 
-#include "programs/autostack.h"
+int conesOnMogo = 0;
+
+#include "autostack/autostack.h"
 #include "PID/PID.h"
 #include "basic/b_functions.h"
-#include "auton/blocking/bl_drive.h"
-#include "auton/nonblocking/settings.h"
-#include "auton/nonblocking/nb_lift.h"
-#include "auton/nonblocking/nb_vbar.h"
-#include "auton/nonblocking/nb_intake.h"
+
+#include "functions/blocking/bl_drive.h"
+#include "functions/nonblocking/settings.h"
+#include "functions/nonblocking/nb_lift.h"
+#include "functions/nonblocking/nb_vbar.h"
+#include "functions/nonblocking/nb_intake.h"
 
 #include "PID/PID.c"
 #include "basic/b_functions.c"
-#include "auton/blocking/bl_drive.c"
-#include "auton/blocking/bl_sensors.c"
-#include "auton/nonblocking/nb_lift.c"
-#include "auton/nonblocking/nb_vbar.c"
-#include "auton/nonblocking/nb_intake.c"
-#include "programs/autostack.c"
+#include "functions/blocking/bl_drive.c"
+#include "functions/blocking/bl_sensors.c"
+#include "functions/nonblocking/nb_lift.c"
+#include "functions/nonblocking/nb_vbar.c"
+#include "functions/nonblocking/nb_intake.c"
 
-#include "autonomous_programs/scoreOn20.c"
-#include "autonomous_programs/auton28.c"
-#include "autonomous_programs/auton9.c"
-#include "autonomous_programs/auton2.c"
+#include "autostack/autostack.c"
+
+#include "auton/scoreOn20.c"
+#include "auton/mogoAndCones.c"
+#include "auton/mogoAuton.c"
+#include "auton/auton9.c"
+#include "auton/auton2.c"
 
 #include "Vex_Competition_Includes.c"
 
@@ -133,11 +138,12 @@ task autonomous() {
 	//}
 	//autostack(0, FIELD);
 
-	nb_vbar_PID(1300,127,10000);
+	//nb_vbar_PID(1300,127,10000);
 
-	//startTask(timerLCD);
-	//auton28(1);
-	//stopTask(timerLCD);
+	startTask(timerLCD);
+	//mogoAndCones28();
+	mogoAuton(1);
+	stopTask(timerLCD);
 }
 
 int clawState = 0;
@@ -179,19 +185,17 @@ task subsystemControl() {
 		}
 
 			// mogo intake code (update values accordingly)
-		if (vexRT[Btn7U] && SensorValue[MogoPot] < 2800) { // replace 2690 with current max
+		if (vexRT[Btn7U]) { // replace 2690 with current max
 			b_mogo_intake(127); // withdraw mogo intake
-		} else if (vexRT[Btn7D] && SensorValue[MogoPot] > 500) { // replace 750 with current min
+		} else if (vexRT[Btn7D]) { // replace 750 with current min
 			b_mogo_intake(-127); // extend mogo intake
 		} else {
 			b_mogo_intake(0);
 		}
-
+// test
 		wait1Msec(20);
 	}
 }
-
-int conesOnMogo = 0;
 
 bool getStackTrigger() {
 	int threshold = 2310; // tuned
@@ -200,18 +204,20 @@ bool getStackTrigger() {
 
 task autostackControl() {
 	while (true) {
-		if (/*vexRT[Btn8R]*/ getStackTrigger()) {
+		if (vexRT[Btn8R] || getStackTrigger()) {
 			abortAutostack();
 			stopTask(subsystemControl);
 			autostack(conesOnMogo, FIELD);
 			startTask(subsystemControl);
-			conesOnMogo++;
+			if (conesOnMogo < 14)
+				conesOnMogo++;
 			clawState = OPEN;
 		} else if (vexRT[Btn8D]) {
 			stopTask(nb_vbar_PID_task);
 			stopTask(subsystemControl);
 			autostack(conesOnMogo, MATCH);
 			startTask(subsystemControl);
+			if (conesOnMogo < 14)
 			conesOnMogo++;
 		} else if (vexRT[Btn7L]) {
 			waitUntil(!vexRT[Btn7L]);
@@ -219,7 +225,7 @@ task autostackControl() {
 				conesOnMogo--;
 		} else if (vexRT[Btn7R]) {
 			waitUntil(!vexRT[Btn7R]);
-			if (conesOnMogo < 16)
+			if (conesOnMogo < 14)
 				conesOnMogo++;
 		} else if (vexRT[Btn8UXmtr2]){
 			conesOnMogo = 0;
@@ -242,8 +248,8 @@ task usercontrol() {
 		// drive code
 
 		// dead zone
-		int leftPower = (abs(vexRT[Ch3] + vexRT[Ch1]) > 20) ? vexRT[Ch3] - vexRT[Ch1] : 0;
-		int rightPower = (abs(vexRT[Ch3] - vexRT[Ch1]) > 20) ? vexRT[Ch3] + vexRT[Ch1] : 0;
+		int leftPower = vexRT[Ch3] - vexRT[Ch1];
+		int rightPower = vexRT[Ch3] + vexRT[Ch1];
 
 		// apply power
 		b_drive(leftPower, rightPower);

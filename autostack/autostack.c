@@ -6,8 +6,8 @@ task autostackUp() {
 	//autostack_state.maxHeight = testLiftHeight;
 	if (autostack_state.maxHeight == 3140) {
 		vbarHeight = 2650;
-	} else if (autostack_state.maxHeight > 2650) { // conesOnMogo >= 11
-		vbarHeight = 2550;
+	} else if (autostack_state.maxHeight > 2200) { // conesOnMogo >= 10
+		vbarHeight = 2500;
   } else {
 		vbarHeight = 2550;
 	}
@@ -16,36 +16,26 @@ task autostackUp() {
 	autostack_state.stacked = false;
 
 	// stall torque to grip cone with
-	b_cone_intake(30);
+	b_cone_intake(20);
 
 	// raise vertibar to height farthest away from robot
 	int middleHeight = 1480;
 	nb_vbar_PID(middleHeight, 127, 15000);
 	waitUntil(SensorValue[TopLiftPot] > middleHeight - 550);
-	writeDebugStreamLine("Vertibar reached the middle height");
 
 	// begin raising lift to target height
 	nb_lift(autostack_state.maxHeight, 127, 15000);
-
 	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 100);
-	writeDebugStreamLine("Lift reached target height");
 
 	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
-	//if (autostack_state.maxHeight > 2400 && autostack_state.maxHeight != 3015) {
-	//	nb_vbar_PID(vbarHeight, 127, 5000);
-	//} else {
-	//	nb_vbar(vbarHeight, 127, 5000);
-	//}
-	if (autostack_state.maxHeight > 2650) {
+	if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight != 3140) { // conesOnMogo >= 10
 		nb_vbar_PID(vbarHeight, 127, 5000);
 	} else {
 		nb_vbar(vbarHeight, 127, 5000);
 	}
 
 	waitUntil(SensorValue[TopLiftPot] >= vbarHeight - 250);
-	writeDebugStreamLine("Vertibar has came up all the way, lift currently at %d", SensorValue[MainLiftPot]);
-	writeDebugStreamLine("Vertibar is at %d", SensorValue[TopLiftPot]);
 	b_vbar(20);
 
 	// once the lift is at the top come down on the stack
@@ -54,7 +44,6 @@ task autostackUp() {
 	startTask(nb_lift_velocity);
 	waitUntil(lift.velocity > -800);
 	b_lift(0);
-	writeDebugStreamLine("Lift is all the way down, currently at %d", SensorValue[MainLiftPot]);
 
 	// disable vertibar PID to begin reset
 	stopTask(nb_vbar_PID_task);
@@ -68,19 +57,24 @@ task autostackUp() {
 
 task fieldReset() {
 	b_lift(127);
-	wait1Msec(300);
+	wait1Msec(200); // tune
 	b_lift(0);
 	// bring the vertibar to an intermediary angle
+	int middleHeight = 1480;
 	int resetVbarHeight = 830;
 	int resetLiftHeight = 1666;
 	stopTask(nb_vbar_PID_task);
-	nb_vbar(resetVbarHeight, 127, 125000);
+	nb_vbar_PID(1480, 127, 125000);
 
 	// reset lift all the way
-	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 200);
+	waitUntil(SensorValue[TopLiftPot] < middleHeight + 200);
 
 	// bring lift to reset height
 	nb_lift_PID(resetLiftHeight, 127, 125000);
+
+	// bring vertibar down all the way
+	stopTask(nb_vbar_PID_task);
+	nb_vbar(resetVbarHeight, 127, 125000);
 
 	// brake lift
 	b_cone_intake(127);
@@ -91,17 +85,11 @@ task fieldReset() {
 task matchReset() {
 	b_cone_intake(-127);
 	// bring the vertibar to an intermediary angle
+	int middleHeight = 1480;
 	int resetVbarHeight = 830;
 	int resetLiftHeight = 2100;
-	//nb_vbar(resetVbarHeight, 127, 125000);
 
-	//// reset vertibar all the way
-	//waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + 200);
-
-	//// bring lift to reset height
-
-	////// brake lift
-
+	// if lift is too low raise it first before bringing vertibar down so vertibar doesn't hit perimeter
 	if (SensorValue[MainLiftPot] > resetLiftHeight) {
 		nb_lift(resetLiftHeight, 127, 125000);
 		waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 400);
@@ -111,7 +99,6 @@ task matchReset() {
 	}
 	nb_vbar(resetVbarHeight, 127, 125000);
 
-	nb_cone_intake(OPEN);
 	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 200);
 	b_cone_intake(127);
 	autostack_state.stacked = false;
@@ -140,19 +127,19 @@ void autostack(int conesOnMogo, bool reset) {
 	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
 	int heights[15];
-	heights[0] = 1580;
-	heights[1] = 1780;
-	heights[2] = 1810;
-	heights[3] = 1880;
-	heights[4] = 1950;
-	heights[5] = 2020;
-	heights[6] = 2185;
-	heights[7] = 2334;
-	heights[8] = 2520;
-	heights[9] = 2627;
-	heights[10] = 2700;
-	heights[11] = 2930;
-	heights[12] = 3015;
+	heights[0] = 1650;
+	heights[1] = 1700; // tuned
+	heights[2] = 1740; // tuned
+	heights[3] = 1790; // tuned
+	heights[4] = 1850; // tuned
+	heights[5] = 1900; // tuned
+	heights[6] = 1960; // tuned
+	heights[7] = 2020; // tuned
+	heights[8] = 2070; // tuned
+	heights[9] = 2180; // tuned
+	heights[10] = 2260; // tuned
+	heights[11] = 2420; // tuned
+	heights[12] = 2600; // tuned
 	heights[13] = 3140;
 	heights[14] = 3140;
 
