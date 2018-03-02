@@ -135,7 +135,7 @@ void autostack(int conesOnMogo, bool reset) {
 	heights[5] = 1900; // tuned
 	heights[6] = 1960; // tuned
 	heights[7] = 2020; // tuned
-	heights[8] = 2070; // tuned
+	heights[8] = 2090; // tuned
 	heights[9] = 2180; // tuned
 	heights[10] = 2260; // tuned
 	heights[11] = 2420; // tuned
