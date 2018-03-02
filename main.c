@@ -142,7 +142,8 @@ task autonomous() {
 
 	startTask(timerLCD);
 	//mogoAndCones28();
-	mogoAuton(1);
+	//mogoAuton(1);
+		scoreOn20();
 	stopTask(timerLCD);
 }
 
