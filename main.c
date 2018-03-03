@@ -66,11 +66,11 @@ bool autoDetection = true;
 
 #include "Vex_Competition_Includes.c"
 
-int selectedAuton = 2;
+int selectedAuton = 4;
 
 task selector() {
 	int NUM_AUTONS = 4;
-	string autonNames[] = {"ONLY DEPLOY", "2PT STAGO", "24PT MOGO", "9PT MOGO"};
+	string autonNames[] = {"NO AUTON", "2PT STAGO", "9PT MOGO", "13PT MOGO", "26PT MOGO"};
 
 	while (true) {
 		// change autons by using buttons; left and right cycle through autons, center inverts direction
@@ -98,6 +98,8 @@ task selector() {
 			displayLCDCenteredString(0, autonNames[2]);
 			} else if (abs(selectedAuton) == 3) {
 			displayLCDCenteredString(0, autonNames[3]);
+			} else if (abs(selectedAuton) == 4) {
+			displayLCDCenteredString(0, autonNames[4]);
 			} else {
 			displayLCDCenteredString(0, "NO AUTON SELECTED");
 		}
@@ -123,31 +125,27 @@ void pre_auton() {
 	bLCDBacklight = true;
 }
 
-task timerLCD() {
-	for (int i = 0; i < 125000; i += 50) {
-		writeDebugStreamLine("%d", i);
-		wait1Msec(50);
-	}
-}
-
 task autonomous() {
-	//if (abs(selectedAuton) == 1) {
-	//	auton2(sgn(selectedAuton));
-	//} else if (abs(selectedAuton) == 2) {
-	//	auton28(sgn(selectedAuton));
-	//} else if (abs(selectedAuton) == 3) {
-	//	auton9(sgn(selectedAuton));
-	//}
+	if (abs(selectedAuton) == 1) {
+		auton2(sgn(selectedAuton));
+	} else if (abs(selectedAuton) == 2) {
+		auton9(sgn(selectedAuton));
+	} else if (abs(selectedAuton) == 3) {
+		auton13(sgn(selectedAuton));
+	} else if (abs(selectedAuton) == 4) {
+		mogoAuton(sgn(selectedAuton));
+	} else {
+	}
 	//autostack(0, FIELD);
 
 	//nb_vbar_PID(1300,127,10000);
 
-	startTask(timerLCD);
+
 	//mogoAndCones28();
 	//support13(1)
 	//scoreOn20();
-	mogoAuton(1);
-	stopTask(timerLCD);
+	//support13(1);
+//	auton9(1);
 }
 
 int clawState = 0;

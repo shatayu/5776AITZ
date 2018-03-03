@@ -17,7 +17,7 @@ bool stagoAlign20(int side) {
 }
 
 void mogoAuton(int direction) {
-	mogoAndCones();
+	mogoAndCones26();
 	startTask(autonManager2);
 	// drive back, rotate
 	bl_drive(1610, 3000, -127); // tune this distance

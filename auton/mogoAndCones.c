@@ -7,7 +7,7 @@ task autonManager() {
 	b_lift(0);
 }
 
-// gets mogo and preload + 2 field cones (26pt)
+// gets mogo and preload + 1 field cones (24pt)
 void mogoAndCones() {
 // drive up to mogo
 	startTask(autonManager);
@@ -27,6 +27,7 @@ void mogoAndCones() {
 
 	// bring lift down and outtake preload
 	b_lift(-127);
+	wait1Msec(200);
 	b_cone_intake(-127);
 	wait1Msec(200);
 	b_lift(0);
@@ -36,16 +37,19 @@ void mogoAndCones() {
 	startTask(fieldReset);
 	bl_drive(160, 1500, 127); // tune this distance
 	waitUntil(autostack_state.stacked == false);
-	autostack_state.maxHeight = 1800; // works 1/28
-	// bring the lift down
+	autostack_state.maxHeight = 1750; // works 1/28
 
-	// bring rollers down
+	// bring lift and rollers down
 	abortAutostack();
 	b_cone_intake(127);
 	b_lift(-127);
 	wait1Msec(600);
 	// stack
 	startTask(autostackUp);
+}
+
+void mogoAndCones26() {
+	mogoAndCones();
 	waitUntil(autostack_state.stacked);
 
 	// cone #3
@@ -64,7 +68,7 @@ void mogoAndCones() {
 }
 
 void mogoAndCones28() {
-	mogoAndCones();
+	mogoAndCones26();
 	autostack_state.maxHeight = 1790; // works 3/1
 	waitUntil(autostack_state.stacked);
 	startTask(fieldReset);

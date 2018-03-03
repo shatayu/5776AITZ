@@ -5,11 +5,11 @@ task autostackUp() {
 	stopTask(nb_lift_PID_task);
 	//autostack_state.maxHeight = testLiftHeight;
 	if (autostack_state.maxHeight == 3140) {
-		vbarHeight = 3440;
+		vbarHeight = 3330;
 	} else if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 2400) { // conesOnMogo >= 10
-		vbarHeight = 2500 + 790;
+		vbarHeight = 3330 - 150;
   } else {
-		vbarHeight = 3440;
+		vbarHeight = 3330;
 	}
 
 	stopTask(nb_lift_PID_task);
@@ -19,13 +19,13 @@ task autostackUp() {
 	b_cone_intake(20);
 
 	// raise vertibar to height farthest away from robot
-	int middleHeight = 1480 + 790;
+	int middleHeight = 1540;
 	nb_vbar_PID(middleHeight, 127, 3000);
 	waitUntil(SensorValue[TopLiftPot] > middleHeight - 550);
 
 	// begin raising lift to target height
 	nb_lift(autostack_state.maxHeight, 127, 15000);
-	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 100);
+	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 300);
 
 	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
@@ -60,8 +60,8 @@ task fieldReset() {
 	wait1Msec(200); // tune
 	b_lift(0);
 	// bring the vertibar to an intermediary angle
-	int middleHeight = 1480 + 790;
-	int resetVbarHeight = 830 + 790;
+	int middleHeight = 1520;
+	int resetVbarHeight = 900;
 	int resetLiftHeight = 1666;
 	stopTask(nb_vbar_PID_task);
 	nb_vbar(resetVbarHeight, 127, 125000);
@@ -85,8 +85,8 @@ task fieldReset() {
 task matchReset() {
 	b_cone_intake(-127);
 	// bring the vertibar to an intermediary angle
-	int middleHeight = 1480 + 790;
-	int resetVbarHeight = 830 + 790;
+	int middleHeight = 1520;
+	int resetVbarHeight = 900;
 	int resetLiftHeight = 2100;
 
 	// if lift is too low raise it first before bringing vertibar down so vertibar doesn't hit perimeter
@@ -128,10 +128,10 @@ void autostack(int conesOnMogo, bool reset) {
 	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
 	int heights[15];
-	heights[0] = 1650;
-	heights[1] = 1700; // tuned
-	heights[2] = 1740; // tuned
-	heights[3] = 1790; // tuned
+	heights[0] = 1600;
+	heights[1] = 1660; // tuned
+	heights[2] = 1700; // tuned
+	heights[3] = 1780; // tuned
 	heights[4] = 1850; // tuned
 	heights[5] = 1900; // tuned
 	heights[6] = 1960; // tuned
