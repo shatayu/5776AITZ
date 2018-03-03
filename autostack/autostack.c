@@ -6,8 +6,8 @@ task autostackUp() {
 	//autostack_state.maxHeight = testLiftHeight;
 	if (autostack_state.maxHeight == 3140) {
 		vbarHeight = 3330;
-	} else if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 2400) { // conesOnMogo >= 10
-		vbarHeight = 3330 - 150;
+	} else if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 3140) { // conesOnMogo >= 10
+		vbarHeight = 3330 - 250;
   } else {
 		vbarHeight = 3330;
 	}
@@ -25,7 +25,7 @@ task autostackUp() {
 
 	// begin raising lift to target height
 	nb_lift(autostack_state.maxHeight, 127, 15000);
-	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 300);
+	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 150);
 
 	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
@@ -40,9 +40,7 @@ task autostackUp() {
 
 	// once the lift is at the top come down on the stack
 	b_lift(-127);
-	wait1Msec(250);
-	startTask(nb_lift_velocity);
-	waitUntil(lift.velocity > -800);
+	wait1Msec(400);
 	b_lift(0);
 
 	// disable vertibar PID to begin reset
@@ -57,7 +55,7 @@ task autostackUp() {
 
 task fieldReset() {
 	b_lift(127);
-	wait1Msec(200); // tune
+	wait1Msec(300); // tune
 	b_lift(0);
 	// bring the vertibar to an intermediary angle
 	int middleHeight = 1520;
@@ -134,15 +132,15 @@ void autostack(int conesOnMogo, bool reset) {
 	heights[3] = 1780; // tuned
 	heights[4] = 1850; // tuned
 	heights[5] = 1900; // tuned
-	heights[6] = 1960; // tuned
-	heights[7] = 2020; // tuned
-	heights[8] = 2090; // tuned
-	heights[9] = 2180; // tuned
-	heights[10] = 2260; // tuned
-	heights[11] = 2420; // tuned
-	heights[12] = 2600; // tuned
+	heights[6] = 2050; // tuned
+	heights[7] = 2120; // tuned at states
+	//heights[7] = 2120; // tuned
+	heights[8] = 2180; // tuned
+	heights[9] = 2280; // tuned
+	heights[10] = 2450; // tuned
+	heights[11] = 2620; // tuned
+	heights[12] = 3120;
 	heights[13] = 3140;
-	heights[14] = 3140;
 
 
 	autostack_state.maxHeight = heights[conesOnMogo];
