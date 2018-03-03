@@ -5,11 +5,11 @@ task autostackUp() {
 	stopTask(nb_lift_PID_task);
 	//autostack_state.maxHeight = testLiftHeight;
 	if (autostack_state.maxHeight == 3140) {
-		vbarHeight = 2650;
-	} else if (autostack_state.maxHeight > 2200) { // conesOnMogo >= 10
-		vbarHeight = 2500;
+		vbarHeight = 3440;
+	} else if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 2400) { // conesOnMogo >= 10
+		vbarHeight = 2500 + 790;
   } else {
-		vbarHeight = 2550;
+		vbarHeight = 3440;
 	}
 
 	stopTask(nb_lift_PID_task);
@@ -19,8 +19,8 @@ task autostackUp() {
 	b_cone_intake(20);
 
 	// raise vertibar to height farthest away from robot
-	int middleHeight = 1480;
-	nb_vbar_PID(middleHeight, 127, 15000);
+	int middleHeight = 1480 + 790;
+	nb_vbar_PID(middleHeight, 127, 3000);
 	waitUntil(SensorValue[TopLiftPot] > middleHeight - 550);
 
 	// begin raising lift to target height
@@ -29,7 +29,7 @@ task autostackUp() {
 
 	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
-	if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight != 3140) { // conesOnMogo >= 10
+	if (autostack_state.maxHeight > 2200) { // conesOnMogo >= 10
 		nb_vbar_PID(vbarHeight, 127, 5000);
 	} else {
 		nb_vbar(vbarHeight, 127, 5000);
@@ -60,11 +60,11 @@ task fieldReset() {
 	wait1Msec(200); // tune
 	b_lift(0);
 	// bring the vertibar to an intermediary angle
-	int middleHeight = 1480;
-	int resetVbarHeight = 830;
+	int middleHeight = 1480 + 790;
+	int resetVbarHeight = 830 + 790;
 	int resetLiftHeight = 1666;
 	stopTask(nb_vbar_PID_task);
-	nb_vbar_PID(1480, 127, 125000);
+	nb_vbar(resetVbarHeight, 127, 125000);
 
 	// reset lift all the way
 	waitUntil(SensorValue[TopLiftPot] < middleHeight + 200);
@@ -85,8 +85,8 @@ task fieldReset() {
 task matchReset() {
 	b_cone_intake(-127);
 	// bring the vertibar to an intermediary angle
-	int middleHeight = 1480;
-	int resetVbarHeight = 830;
+	int middleHeight = 1480 + 790;
+	int resetVbarHeight = 830 + 790;
 	int resetLiftHeight = 2100;
 
 	// if lift is too low raise it first before bringing vertibar down so vertibar doesn't hit perimeter
@@ -105,6 +105,7 @@ task matchReset() {
 }
 
 void abortAutostack() {
+	// set clawpot port to no sensor
 	stopTask(autostackUp);
 	stopTask(matchReset);
 	stopTask(fieldReset);
@@ -142,6 +143,7 @@ void autostack(int conesOnMogo, bool reset) {
 	heights[12] = 2600; // tuned
 	heights[13] = 3140;
 	heights[14] = 3140;
+
 
 	autostack_state.maxHeight = heights[conesOnMogo];
 	writeDebugStreamLine("%d", autostack_state.maxHeight);

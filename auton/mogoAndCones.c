@@ -1,8 +1,8 @@
 // helper task to manage lift/mogo intake
 task autonManager() {
-	nb_lift_PID(1700, 127, 5000);
+	nb_lift_PID(1800, 127, 5000);
 	b_vbar(20);
-  wait1Msec(250);
+	wait1Msec(300);
 	nb_mogo_intake(800, 127, 3000);
 	b_lift(0);
 }
@@ -70,7 +70,7 @@ void mogoAndCones28() {
 	startTask(fieldReset);
 	waitUntil(autostack_state.stacked == false);
 	b_cone_intake(127);
-	bl_drive(130, 2000, 127);// fourth cone
+	bl_drive(160, 2000, 127);// fourth cone
 
 	// intake cone
 	abortAutostack();

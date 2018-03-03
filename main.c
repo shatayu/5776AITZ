@@ -35,6 +35,7 @@ int testLiftHeight = 0;
 int testDistance = 80;
 
 int conesOnMogo = 0;
+bool autoDetection = true;
 
 #include "autostack/autostack.h"
 #include "PID/PID.h"
@@ -143,9 +144,9 @@ task autonomous() {
 
 	startTask(timerLCD);
 	//mogoAndCones28();
-	support13(1)
+	//support13(1)
 	//scoreOn20();
-
+	mogoAuton(1);
 	stopTask(timerLCD);
 }
 
@@ -183,6 +184,7 @@ task subsystemControl() {
 		if (vexRT[Btn8U]) {
 			rollerState = -1;
 			} else if (vexRT[Btn6D]) {
+			autoDetection = true;
 			waitUntil(!vexRT[Btn6D]);
 			rollerState = rollerState == 1 ? 0 : 1;
 		}
@@ -202,7 +204,7 @@ task subsystemControl() {
 
 bool getStackTrigger() {
 	int threshold = 2310; // tuned
-	return SensorValue[ClawPot] > threshold && !autostack_state.stacked; // false := don't stack, true := do stack
+	return SensorValue[ClawPot] > threshold && !autostack_state.stacked && autoDetection; // false := don't stack, true := do stack
 }
 
 task autostackControl() {
@@ -261,6 +263,7 @@ task usercontrol() {
 		if (vexRT[Btn8L]) {
 			abortAutostack();
 			autostack_state.stacked = false;
+			autoDetection = false;
 			startTask(subsystemControl);
 			startTask(autostackControl);
 		}
