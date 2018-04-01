@@ -79,6 +79,7 @@ void pre_auton() {
 }
 
 task autonomous() {
+	/*
 	if (abs(selectedAuton) == 1) {
 		auton2(sgn(selectedAuton));
 	} else if (abs(selectedAuton) == 2) {
@@ -89,9 +90,11 @@ task autonomous() {
 		mogoAuton(sgn(selectedAuton));
 	} else {
 	}
+	*/
 	//autostack(0, FIELD);
 
-	//nb_vbar_PID(1300,127,10000);
+	//1660 field
+	nb_lift_PID(1660,127,10000);
 
 
 	//mogoAndCones28();

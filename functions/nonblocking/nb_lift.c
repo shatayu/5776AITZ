@@ -41,8 +41,8 @@ void nb_lift_PID_init() {
 	static bool already_init = false;
 	if(already_init) return;
 	liftPID.kp = 0.25;
-	liftPID.ki = 0.015;
-	liftPID.kd = 1.5;
+	liftPID.ki = 0.01;
+	liftPID.kd = 1.35;
 	liftPID.bias = 15;
 	liftPID.powerMax = 127;
 	liftPID.powerMin = -80;
