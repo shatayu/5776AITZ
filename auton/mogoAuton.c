@@ -33,6 +33,6 @@ void mogoAuton(int direction) {
 
 	stopTask(nb_vbar_PID_task);
 	bl_drive_rotate(920, 5000, -80 * 1); // tune speed/angle
-	stopTask(autonManager);
+	stopTask(forwardAutonHelper);
 	scoreOn20();
 }

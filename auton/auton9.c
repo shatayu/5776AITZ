@@ -13,5 +13,5 @@ void auton9(int direction) {
 	wait1Msec(800); // tune?
 	bl_drive(500, 3000, -127);
 
-	stopTask(autonManager);
+	stopTask(autonManager2);
 }

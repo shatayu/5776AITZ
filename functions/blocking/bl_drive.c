@@ -5,7 +5,7 @@ void bl_drive_brake(int direction) {
 }
 
 
-void bl_drive(int target, int timeout, int power, bool brake) {
+void bl_drive(int target, int power, int timeout, bool brake) {
 	//SensorValue[LEncoder] = 0;
 	//SensorValue[REncoder] = 0;
 
@@ -35,7 +35,7 @@ void bl_drive_rotate_brake(int direction) {
 	b_drive(0, 0);
 }
 
-void bl_drive_rotate(int target, int timeout, int power) {
+void bl_drive_rotate(int target, int power, int timeout) {
 	int timer = 0;
 
 	SensorValue[Gyro] = 0;

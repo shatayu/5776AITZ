@@ -1,5 +1,6 @@
 void b_drive(int left, int right) {
 	motor[LDrive] = left;
+	motor[MDrive] = left;
 	motor[RDrive] = right;
 }
 
@@ -30,6 +31,6 @@ void b_cone_intake(int power) {
 }
 
 void b_mogo_intake(int power) {
-	motor[LMogoIntake] = power;
-	motor[RMogoIntake] = power;
+	motor[MogoIntake] = power;
+	//motor[RMogoIntake] = power;
 }

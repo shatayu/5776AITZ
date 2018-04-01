@@ -1,5 +1,5 @@
 // helper task to manage lift/mogo intake
-task autonManager() {
+task forwardAutonHelper() {
 	nb_lift_PID(1800, 127, 5000);
 	b_vbar(20);
 	wait1Msec(300);
@@ -10,9 +10,9 @@ task autonManager() {
 // gets mogo and preload + 1 field cones (24pt)
 void mogoAndCones() {
 // drive up to mogo
-	startTask(autonManager);
+	startTask(forwardAutonHelper);
 	bl_drive(1310, 3000, 127);
-	stopTask(autonManager)
+	stopTask(forwardAutonHelper)
 	// intake mogo
 	stopTask(nb_mogo_intake_task);
 	//nb_mogo_intake(2700, 127, 3000);

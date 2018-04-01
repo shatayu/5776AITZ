@@ -18,7 +18,6 @@ task nb_lift_task() {
 	int error = lift.target - SensorValue[MainLiftPot];
 	int timer = 0;
 
-
 	if (SensorValue[MainLiftPot] < lift.target) {
 		while (SensorValue[MainLiftPot] < lift.target && timer < lift.timeout) {
 			b_lift(abs(lift.power));

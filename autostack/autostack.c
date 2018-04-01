@@ -1,16 +1,18 @@
 // main autostack logic
 int rollerState = 1; // 0 := still, 1 := intaking, -1 != outtaking
-int vbarHeight;
 task autostackUp() {
 	stopTask(nb_lift_PID_task);
-	//autostack_state.maxHeight = testLiftHeight;
-	if (autostack_state.maxHeight == 3140) {
-		vbarHeight = 3330;
-	} else if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 3140) { // conesOnMogo >= 10
-		vbarHeight = 3330 - 250;
-  } else {
-		vbarHeight = 3330;
-	}
+
+	//if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 3140) { // conesOnMogo >= 10
+	//	autostack_state.vbarHeight = 1790 - 250;
+ // } else {
+	//	autostack_state.vbarHeight = 1790;
+	//}
+
+	// debug code
+	autostack_state.maxHeight = testLiftHeight; // debug code
+	autostack_state.vbarHeight = testVbarHeight;
+	autostack_state.dropTime = testDropTime;
 
 	stopTask(nb_lift_PID_task);
 	autostack_state.stacked = false;
@@ -19,7 +21,7 @@ task autostackUp() {
 	b_cone_intake(20);
 
 	// raise vertibar to height farthest away from robot
-	int middleHeight = 1540;
+	int middleHeight = 530;
 	nb_vbar_PID(middleHeight, 127, 3000);
 	waitUntil(SensorValue[TopLiftPot] > middleHeight - 550);
 
@@ -30,17 +32,17 @@ task autostackUp() {
 	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
 	stopTask(nb_vbar_PID_task);
 	if (autostack_state.maxHeight > 2200) { // conesOnMogo >= 10
-		nb_vbar_PID(vbarHeight, 127, 5000);
+		nb_vbar_PID(autostack_state.vbarHeight, 127, 5000);
 	} else {
-		nb_vbar(vbarHeight, 127, 5000);
+		nb_vbar(autostack_state.vbarHeight, 127, 5000);
 	}
 
-	waitUntil(SensorValue[TopLiftPot] >= vbarHeight - 250);
+	waitUntil(SensorValue[TopLiftPot] >= autostack_state.vbarHeight - 250);
 	b_vbar(20);
 
 	// once the lift is at the top come down on the stack
 	b_lift(-127);
-	wait1Msec(400);
+	wait1Msec(autostack_state.dropTime);
 	b_lift(0);
 
 	// disable vertibar PID to begin reset
@@ -58,8 +60,8 @@ task fieldReset() {
 	wait1Msec(300); // tune
 	b_lift(0);
 	// bring the vertibar to an intermediary angle
-	int middleHeight = 1520;
-	int resetVbarHeight = 900;
+	int middleHeight = 530;
+	int resetVbarHeight = 130;
 	int resetLiftHeight = 1666;
 	stopTask(nb_vbar_PID_task);
 	nb_vbar(resetVbarHeight, 127, 125000);
@@ -125,25 +127,28 @@ bool MATCH = false;
 void autostack(int conesOnMogo, bool reset) {
 	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
-	int heights[15];
-	heights[0] = 1600;
-	heights[1] = 1660; // tuned
-	heights[2] = 1700; // tuned
-	heights[3] = 1780; // tuned
-	heights[4] = 1850; // tuned
-	heights[5] = 1900; // tuned
-	heights[6] = 2050; // tuned
-	heights[7] = 2120; // tuned at states
-	//heights[7] = 2120; // tuned
-	heights[8] = 2180; // tuned
-	heights[9] = 2280; // tuned
-	heights[10] = 2450; // tuned
-	heights[11] = 2620; // tuned
-	heights[12] = 3120;
-	heights[13] = 3140;
 
+	int firstHeight = 1495;
+	int heights[14] = {firstHeight, firstHeight+95, firstHeight + 180, 1780,
+										 1850, 1900, 2050, 2120,
+									 	 2180, 2280, 2450, 2620,
+									 	 3120, 3140};
+
+	int firstVbarHeight = 1880;
+	int vbarHeights[14] = {firstVbarHeight, firstVbarHeight, firstVbarHeight-20, 1780,
+												 1850, 1900, 2050, 2120,
+											 	 2180, 2280, 2450, 2620,
+											 	 3120, 3140};
+
+	int firstDropTime = 200;
+	int dropTimes[14] = {firstDropTime, firstDropTime, firstDropTime, 400,
+											 400, 400, 400, 400,
+											 400, 400, 400, 400,
+											 400, 400};
 
 	autostack_state.maxHeight = heights[conesOnMogo];
+	autostack_state.vbarHeight = vbarHeights[conesOnMogo];
+	autostack_state.dropTime = dropTimes[conesOnMogo];
 	writeDebugStreamLine("%d", autostack_state.maxHeight);
 
 	startTask(autostackUp);

@@ -1,26 +1,31 @@
-void nb_cone_intake(int state) {
-	if (state == OPEN) {
-		b_cone_intake(127);
-		wait1Msec(150);
-		b_cone_intake(10);
-	} else {
-		b_cone_intake(-127);
-		wait1Msec(150);
-		b_cone_intake(-20);
-	}
+bool getStackTrigger() {
+	int threshold = 2310; // tuned
+	return SensorValue[ClawPot] > threshold && autoDetection; // false := don't stack, true := do stack
 }
 
+void detect(bool state) {
+	autoDetection = state;
+}
+
+void nb_cone_intake(int state) {
+	coneIntake.target = state;
+	startTask(nb_cone_intake_task);
+}
 
 task nb_cone_intake_task() {
-	if (coneIntake.target == OPEN) {
-		b_cone_intake(-coneIntake.power);
-	} else {
-		b_cone_intake(coneIntake.power);
+	if (coneIntake.target == INTAKE) { // sensor based intake
+		b_cone_intake(127);
+		waitUntil(getStackTrigger());
+		b_cone_intake(0);
+	} else if (coneIntake.target == OUTTAKE) { // time based outtake
+		int outtakeTime = 300;
+		b_cone_intake(-127);
+		wait1Msec(outtakeTime);
+		b_cone_intake(0);
+	} else { // neutral
+		b_cone_intake(0);
 	}
-	wait1Msec(coneIntake.timeout);
-	b_cone_intake(0);
 }
-
 
 void nb_mogo_intake(int target, int power, int timeout) {
 	mogoIntake.target = target;
@@ -29,7 +34,6 @@ void nb_mogo_intake(int target, int power, int timeout) {
 
 	startTask(nb_mogo_intake_task);
 }
-
 
 // 720 all the way out
 // 2720 all the way in
