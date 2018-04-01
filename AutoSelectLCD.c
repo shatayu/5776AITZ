@@ -142,7 +142,7 @@ task selector() {
 		// sensor check
 		string goodSensor, badSensor;
 		string liftCode = "L";
-		string vbarCode = "V";
+		string vbarCode	 = "V";
 		string mogoCode = "M";
 		string encoderCode = "E";
 		string gyroCode = "G";
