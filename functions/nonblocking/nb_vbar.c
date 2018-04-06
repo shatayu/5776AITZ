@@ -1,4 +1,3 @@
-
 void nb_set_vbar_settings(int target, int power, int timeout) {
 	vbar.target = target;
 	vbar.power = power;
@@ -16,18 +15,22 @@ void nb_vbar_PID(int target, int power, int timeout) {
 }
 
 task nb_vbar_task() {
-	int error = vbar.target - SensorValue[TopLiftPot];
-	int original_error = error;
-	int timer = 0;
+	// config
+	int power = abs(vbar.power) * sgn(vbar.target - sget_vbar(SENSOR)); // corrects the sign
+	clearTimer(T2);
 
-	while (sgn(error) == sgn(original_error) && timer < vbar.timeout) {
-		error = vbar.target - SensorValue[TopLiftPot];
-		b_vbar(vbar.power * sgn(error));
-		timer += 20;
-		wait1Msec(20);
+	// powers the vertibar
+	b_vbar(power);
+
+	// waits until either the target is reached or the timeout has been hit
+	if (power > 0) {
+		waitUntil(vbar.target < sget_vbar(SENSOR) || time1[T2] > vbar.timeout);
+	} else {
+		waitUntil(vbar.target > sget_vbar(SENSOR) || time1[T2] > vbar.timeout);
 	}
 
-	b_vbar(-sgn(error) * BRAKE_POWER);
+	// brake the vertibar
+	b_vbar(-sgn(power) * BRAKE_POWER);
 	wait1Msec(50);
 	b_vbar(0);
 }
@@ -58,8 +61,8 @@ task nb_vbar_PID_task() {
 
 	int timer = 0;
 	while (timer < vbar.timeout) {
-		int power = calc_PID(vbarPID, SensorValue[TopLiftPot]);
-		int error = vbar.target - SensorValue[TopLiftPot];
+		int power = calc_PID(vbarPID, sget_vbar(SENSOR));
+		int error = vbar.target - sget_vbar(SENSOR);
 
 		b_vbar(power);
 

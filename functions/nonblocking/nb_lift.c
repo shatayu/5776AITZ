@@ -15,24 +15,22 @@ void nb_lift_PID(int target, int power, int timeout) {
 }
 
 task nb_lift_task() {
-	int error = lift.target - SensorValue[MainLiftPot];
-	int timer = 0;
+	// config
+	int power = abs(lift.power) * sgn(lift.target - sget_lift(SENSOR)); // corrects the sign
+	clearTimer(T1);
 
-	if (SensorValue[MainLiftPot] < lift.target) {
-		while (SensorValue[MainLiftPot] < lift.target && timer < lift.timeout) {
-			b_lift(abs(lift.power));
-			timer += 20;
-			wait1Msec(20);
-		}
+	// powers the lift
+	b_lift(power);
+
+	// waits until either the target is reached or the timeout has been hit
+	if (power > 0) {
+		waitUntil(lift.target < sget_lift(SENSOR) || time1[T1] > lift.timeout);
 	} else {
-		while (SensorValue[MainLiftPot] > lift.target && timer < lift.timeout) {
-			b_lift(-abs(lift.power));
-			timer += 20;
-			wait1Msec(20);
-		}
+		waitUntil(lift.target > sget_lift(SENSOR) || time1[T1] > lift.timeout);
 	}
 
-	b_lift(-sgn(error) * 30);
+	// stopping
+	b_lift(-sgn(power) * 30);
 	wait1Msec(50);
 	b_lift(0);
 }
@@ -64,8 +62,8 @@ task nb_lift_PID_task() {
 
 	int timer = 0;
 	while (timer < lift.timeout) {
-		int power = calc_PID(liftPID, SensorValue[MainLiftPot]);
-		int error = lift.target - SensorValue[MainLiftPot];
+		int power = calc_PID(liftPID, sget_lift(SENSOR));
+		int error = lift.target - sget_lift(SENSOR);
 		b_lift(power);
 
 		/*
@@ -83,16 +81,4 @@ task nb_lift_PID_task() {
 	}
 
 	b_lift(0);
-}
-
-// finds velocity lift is moving with in ticks/second
-task nb_lift_velocity() {
-	int a, b;
-
-	while (true) {
-		int a = SensorValue[MainLiftPot];
-		wait1Msec(50);
-		int b = SensorValue[MainLiftPot];
-		lift.velocity = (b - a)/0.1;
-	}
 }

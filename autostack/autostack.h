@@ -1,4 +1,6 @@
 typedef struct {
+	int conesOnMogo;
+	int conesOnStago;
 	int maxHeight;
 	int vbarHeight;
 	int dropTime;

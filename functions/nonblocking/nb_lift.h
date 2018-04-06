@@ -6,4 +6,3 @@ void nb_lift_PID(int target, int power, int timeout);
 
 task nb_lift_task();
 task nb_lift_PID_task();
-task nb_lift_velocity();

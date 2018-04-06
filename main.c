@@ -52,6 +52,9 @@ int conesOnMogo = 0;
 #include "functions/nonblocking/nb_vbar.h"
 #include "functions/nonblocking/nb_intake.h"
 
+#include "basic/b_sensors.h"
+#include "basic/b_sensors.c"
+
 #include "PID/PID.c"
 #include "basic/b_functions.c"
 #include "functions/blocking/bl_drive.c"
@@ -124,14 +127,15 @@ task autonomous() {
 int clawState = 0;
 task subsystemControl() {
 	while (true) {
+		// lift drive code
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
 			b_lift(0); // remove any stall torque downward
-			} else if (vexRT[Btn5U]) {
+		} else if (vexRT[Btn5U]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(127); // raise lift
 			waitUntil(!vexRT[Btn5U]);
 			b_lift(0);
-			} else if (vexRT[Btn5D]) {
+		} else if (vexRT[Btn5D]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(-127); // lower lift
 			waitUntil(!vexRT[Btn5D]);
@@ -149,13 +153,6 @@ task subsystemControl() {
 		//		stopTask(nb_vbar_PID_task);
 		//		nb_vbar(1770, 127, 5000);
 		//	}
-		//}
-		//if (vexRT[Btn6U]) {
-		//	b_vbar(127);
-		//} else if (vexRT[Btn6D]) {
-		//	b_vbar(-127);
-		//} else {
-		//	b_vbar(0);
 		//}
 
 		// cone intake (claw) code
@@ -183,7 +180,7 @@ task subsystemControl() {
 
 task autostackControl() {
 	while (true) {
-		if (vexRT[Btn8R] || getStackTrigger()) {
+		if (vexRT[Btn8R] || sget_trigger()) {
 			waitUntil(!vexRT[Btn8R]);
 			abortAutostack();
 			stopTask(subsystemControl);
@@ -242,7 +239,6 @@ task usercontrol() {
 		if (vexRT[Btn8L]) {
 			abortAutostack();
 			autostack_state.stacked = false;
-			autoDetection = false;
 			startTask(subsystemControl);
 			startTask(autostackControl);
 			b_cone_intake(0);

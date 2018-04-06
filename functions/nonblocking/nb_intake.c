@@ -1,22 +1,14 @@
-bool getStackTrigger() {
-	return SensorValue[stackTrigger]; // 0 := not triggered, 1 := triggered
-}
-
-void detect(bool state) {
-	autoDetection = state;
-}
-
 void nb_cone_intake(int state) {
-	coneIntake.target = state;
+	cone_intake.target = state;
 	startTask(nb_cone_intake_task);
 }
 
 task nb_cone_intake_task() {
-	if (coneIntake.target == INTAKE) { // sensor based intake
+	if (cone_intake.target == INTAKE) { // sensor based intake
 		b_cone_intake(127);
-		waitUntil(getStackTrigger());
+		waitUntil(sget_trigger());
 		b_cone_intake(0);
-	} else if (coneIntake.target == OUTTAKE) { // time based outtake
+	} else if (cone_intake.target == OUTTAKE) { // time based outtake
 		int outtakeTime = 300;
 		b_cone_intake(-127);
 		wait1Msec(outtakeTime);
@@ -27,24 +19,28 @@ task nb_cone_intake_task() {
 }
 
 void nb_mogo_intake(int target, int power, int timeout) {
-	mogoIntake.target = target;
-	mogoIntake.power = power;
-	mogoIntake.timeout = timeout;
+	mogo_intake.target = target;
+	mogo_intake.power = power;
+	mogo_intake.timeout = timeout;
 
 	startTask(nb_mogo_intake_task);
 }
 
-// 720 all the way out
-// 2720 all the way in
-// 1270 release mogo
 task nb_mogo_intake_task() {
-	clearTimer(T2);
-	if (mogoIntake.target > SensorValue[MogoPot]) {
-		b_mogo_intake(-abs(mogoIntake.power));
-		waitUntil(mogoIntake.target < SensorValue[MogoPot]);
+	// config
+	int power = abs(mogo_intake.power) * sgn(mogo_intake.target - sget_mogo(SENSOR)); // corrects sign
+	clearTimer(T3);
+
+	// powers the mogo intake
+	b_mogo_intake(power);
+
+	// waits until either the target is reached or the timeout has been hit
+	if (power > 0) {
+		waitUntil(mogo_intake.target < sget_mogo(SENSOR) || time1[T3] > mogo_intake.timeout);
 	} else {
-		b_mogo_intake(abs(mogoIntake.power));
-		waitUntil(mogoIntake.target > SensorValue[MogoPot]);
+		waitUntil(mogo_intake.target > sget_mogo(SENSOR) || time1[T3] > mogo_intake.timeout);
 	}
+
+	// stop the mogo
 	b_mogo_intake(0);
 }
