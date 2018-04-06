@@ -1,6 +1,5 @@
 bool getStackTrigger() {
-	int threshold = 2310; // tuned
-	return SensorValue[ClawPot] > threshold && autoDetection; // false := don't stack, true := do stack
+	return SensorValue[stackTrigger]; // 0 := not triggered, 1 := triggered
 }
 
 void detect(bool state) {

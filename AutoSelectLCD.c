@@ -139,6 +139,17 @@ task selector() {
 		displayLCD(LCDState, 1, PEXText, false);
 		wait1Msec(50);
 
+		//// display lift value
+		//string liftText = "LIFT: ";
+		//string vbarText = "VBAR: ";
+		//string lift, vertibar;
+		//sprintf(lift, "%d", SensorValue[MainLiftPot]);
+		//strcat(liftText, lift);
+		//displayLCD(!LCDState, 0, liftText, false);
+		//sprintf(vertibar, "%d", SensorValue[TopLiftPot]);
+		//strcat(vbarText, vertibar);
+		//displayLCD(!LCDState, 1, vbarText, false);
+
 		// sensor check
 		string goodSensor, badSensor;
 		string liftCode = "L";
@@ -148,41 +159,42 @@ task selector() {
 		string gyroCode = "G";
 		string leftUltraCode = "RU";
 		string rightUltraCode = "LU"
-		//string str0, str1;
-		//sprintf(str0, "LIFT: %d", SensorValue[MainLiftPot]);
-		//displayLCD(!LCDState, 0, str0, false);
-		//wait1Msec(50);
-		//sprintf(str1, "VBAR: %d", SensorValue[TopLiftPot]);
-		//displayLCD(!LCDState, 1, str1, false);
-		//wait1Msec(50);
 
-		// lift check
-		if (SensorValue[MainLiftPot] < 260 && SensorValue[MainLiftPot] > 240) {
-			strcat(badSensor, liftCode);
-		} else {
-			strcat(goodSensor, liftCode);
-		}
+		string str0, str1;
+		sprintf(str0, "LIFT: %d", SensorValue[MainLiftPot]);
+		displayLCD(!LCDState, 0, str0, false);
+		wait1Msec(50);
+		sprintf(str1, "VBAR: %d", SensorValue[TopLiftPot]);
+		displayLCD(!LCDState, 1, str1, false);
+		wait1Msec(50);
 
-		// vertibar check
-		if (SensorValue[TopLiftPot] < 260 && SensorValue[TopLiftPot] > 240) {
-			strcat(badSensor, vbarCode);
-		} else {
-			strcat(goodSensor, vbarCode);
-		}
+		//// lift check
+		//if (SensorValue[MainLiftPot] < 260 && SensorValue[MainLiftPot] > 240) {
+		//	strcat(badSensor, liftCode);
+		//} else {
+		//	strcat(goodSensor, liftCode);
+		//}
 
-		// mogo check
-		if (SensorValue[MogoPot] < 260 && SensorValue[MogoPot] > 240) {
-			strcat(badSensor, mogoCode);
-		} else {
-			strcat(goodSensor, mogoCode);
-		}
+		//// vertibar check
+		//if (SensorValue[TopLiftPot] < 260 && SensorValue[TopLiftPot] > 240) {
+		//	strcat(badSensor, vbarCode);
+		//} else {
+		//	strcat(goodSensor, vbarCode);
+		//}
 
-		//
+		//// mogo check
+		//if (SensorValue[MogoPot] < 260 && SensorValue[MogoPot] > 240) {
+		//	strcat(badSensor, mogoCode);
+		//} else {
+		//	strcat(goodSensor, mogoCode);
+		//}
 
-		// toggle LCDs
-		if (nLCDButtons == 7) {
-			waitUntil(nLCDButtons == 0);
-			LCDState = !LCDState;
-		}
+		////
+
+		//// toggle LCDs
+		//if (nLCDButtons == 7) {
+		//	waitUntil(nLCDButtons == 0);
+		//	LCDState = !LCDState;
+		//}
 	}
 }
