@@ -1,97 +1,10 @@
 // main autostack logic
-int rollerState = 1; // 0 := still, 1 := intaking, -1 != outtaking
-task autostackUp() {
-	stopTask(nb_lift_PID_task);
-	//// debug code
-	//autostack_state.maxHeight = testLiftHeight; // debug code
-	//autostack_state.vbarHeight = testVbarHeight;
-	//autostack_state.dropTime = testDropTime;
-
-	stopTask(nb_lift_PID_task);
-	autostack_state.stacked = false;
-
-	// stall torque to grip cone with
-	b_cone_intake(20);
-
-	if (autostack_state.maxHeight > 2300) {
-		nb_lift(autostack_state.maxHeight, 127, 15000);
-		waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 250);
-		nb_vbar(autostack_state.vbarHeight, 127, 2000);
-	} else {
-		nb_lift(autostack_state.maxHeight, 127, 15000);
-		waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 250);
-		nb_vbar(autostack_state.vbarHeight, 127, 2000);
-	}
-
-	waitUntil(SensorValue[TopLiftPot] > autostack_state.vbarHeight);
-	stopTask(nb_lift_task);
-	b_lift(-127);
-	wait1Msec(autostack_state.dropTime);
-	b_cone_intake(-127);
-	wait1Msec(100);
-	// flag stacked as true
-	autostack_state.stacked = true;
-}
-
-task fieldReset() {
-	b_lift(127);
-	wait1Msec(100);
-	b_lift(20)
-	// bring the vertibar to an intermediary angle
-	int resetVbarHeight = 1470;
-	int resetLiftHeight = 1570;
-	stopTask(nb_vbar_PID_task);
-
-	if (autostack_state.maxHeight > 2300) {
-		nb_vbar(resetVbarHeight, 127, 125000);
-	} else {
-		nb_vbar(resetVbarHeight, 127, 125000);
-	}
-
-	// reset lift all the way
-	int offset = 1600;
-	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + testOffset);
-
-	// bring lift to reset height
-	nb_lift_PID(resetLiftHeight, 127, 125000);
-
-	// bring vertibar down all the way
-	stopTask(nb_vbar_PID_task);
-	//nb_vbar(resetVbarHeight, 127, 125000);
-
-	// finish up
-	b_cone_intake(127);
-	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 200);
-	autostack_state.stacked = false;
-}
-// change this
-task matchReset() {
-	b_cone_intake(-127);
-	// bring the vertibar to an intermediary angle
-	int middleHeight = 1520;
-	int resetVbarHeight = 900;
-	int resetLiftHeight = 2100;
-
-	// if lift is too low raise it first before bringing vertibar down so vertibar doesn't hit perimeter
-	if (SensorValue[MainLiftPot] > resetLiftHeight) {
-		nb_lift(resetLiftHeight, 127, 125000);
-		waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 400);
-	} else {
-		nb_lift_PID(resetLiftHeight, 127, 125000);
-		waitUntil(SensorValue[MainLiftPot] > resetLiftHeight - 100);
-	}
-	nb_vbar(resetVbarHeight, 127, 125000);
-
-	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 200);
-	b_cone_intake(127);
-	autostack_state.stacked = false;
-}
+//int rollerState = 1; // 0 := still, 1 := intaking, -1 != outtaking
 
 void abortAutostack() {
-	// set clawpot port to no sensor
-	stopTask(autostackUp);
-	stopTask(matchReset);
-	stopTask(fieldReset);
+	stopTask(field_up);
+	stopTask(match_reset);
+	stopTask(field_reset);
 	stopTask(nb_lift_PID_task);
 	stopTask(nb_lift_task);
 	stopTask(nb_vbar_task);
@@ -100,14 +13,76 @@ void abortAutostack() {
 
 	b_lift(0);
 	b_vbar(0);
-	rollerState = 0;
 	b_cone_intake(0);
 }
 
-bool FIELD = true;
-bool MATCH = false;
+task autostack_control() {
+	while (true) {
+		if (vexRT[Btn8R] || sget_trigger()) {
+			// let button get released
+			waitUntil(!vexRT[Btn8R]);
 
-void autostack(int conesOnMogo, bool reset) {
+			// disable potentially interfering systems
+			stopTask(subsystemControl);
+			abortAutostack();
+
+			// stack
+			if (autostack_state.type != NONE) {
+				autostack(autostack_state.mogo_cones, autostack_state.type);
+			}
+
+			// increment the appropriate internal counts
+			if (autostack_state.mogo_cones < 13 && (autostack_state.type == FIELD || autostack_state.type == MATCH)) {
+				autostack_state.mogo_cones++;
+			} else if (autostack_state.mogo_cones > 0 && autostack_state.type == STAGO) {
+				autostack_state.mogo_cones--;
+				autostack_state.stago_cones++;
+			}
+		}
+
+		// manual control for incrementing
+		if (vexRT[Btn7R]) {
+			waitUntil(!vexRT[Btn7R]);
+			autostack_state.mogo_cones++;
+		} else if (vexRT[Btn7L]) {
+			waitUntil(!vexRT[Btn7L]);
+			autostack_state.mogo_cones--;
+		}
+		//if (vexRT[Btn8R] || sget_trigger()) {
+		//	waitUntil(!vexRT[Btn8R]);
+		//	abortAutostack();
+		//	stopTask(subsystemControl);
+		//	autostack(conesOnMogo, FIELD);
+		//	startTask(subsystemControl);
+		//	if (conesOnMogo < 14) {
+		//		conesOnMogo++;
+		//	}
+		//	else if (vexRT[Btn8D]) {
+		//	stopTask(nb_vbar_PID_task);
+		//	stopTask(subsystemControl);
+		//	autostack(conesOnMogo, MATCH);
+		//	startTask(subsystemControl);
+		//	if (conesOnMogo < 14)
+		//		conesOnMogo++;
+		//	} else if (vexRT[Btn7L]) {
+		//		waitUntil(!vexRT[Btn7L]);
+		//		if (conesOnMogo > 0) {
+		//			conesOnMogo--;
+		//		}
+		//	} else if (vexRT[Btn7R]) {
+		//		waitUntil(!vexRT[Btn7R]);
+		//		if (conesOnMogo < 12) {
+		//			conesOnMogo++;
+		//		}
+		//	} else if (vexRT[Btn8UXmtr2]){
+		//	conesOnMogo = 0;
+		//}
+
+		wait1Msec(20);
+	}
+}
+
+void autostack(int cone, int reset) {
 	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
 	// upTime = 100ms
@@ -130,12 +105,11 @@ void autostack(int conesOnMogo, bool reset) {
 											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime};
 
-	autostack_state.maxHeight = heights[conesOnMogo];
-	autostack_state.vbarHeight = vbarHeights[conesOnMogo];
-	autostack_state.dropTime = dropTimes[conesOnMogo];
-	writeDebugStreamLine("%d", autostack_state.maxHeight);
+	autostack_state.lift_height = heights[cone];
+	autostack_state.vbar_height = vbarHeights[cone];
+	autostack_state.drop = dropTimes[cone];
 
-	startTask(autostackUp);
+	startTask(field_up);
 	waitUntil(autostack_state.stacked);
 
 	stopTask(nb_lift_PID_task);
@@ -145,10 +119,9 @@ void autostack(int conesOnMogo, bool reset) {
 	stopTask(nb_cone_intake_task);
 
 	if (reset == FIELD) {
-		startTask(fieldReset);
+		startTask(field_reset);
 	} else {
-		startTask(matchReset);
+		startTask(match_reset);
 	}
 	waitUntil(!autostack_state.stacked);
-	rollerState = 1;
 }

@@ -30,8 +30,8 @@ task nb_lift_task() {
 	}
 
 	// stopping
-	b_lift(-sgn(power) * 30);
-	wait1Msec(50);
+	//b_lift(-sgn(power) * 30);
+	//wait1Msec(50);
 	b_lift(0);
 }
 

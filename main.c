@@ -43,6 +43,10 @@ int testOffset = 1600;
 int conesOnMogo = 0;
 
 #include "autostack/autostack.h"
+#include "autostack/field.h"
+#include "autostack/match.h"
+#include "autostack/stago.h"
+
 #include "PID/PID.h"
 #include "basic/b_functions.h"
 
@@ -64,13 +68,16 @@ int conesOnMogo = 0;
 #include "functions/nonblocking/nb_intake.c"
 
 #include "autostack/autostack.c"
+#include "autostack/field.c"
+#include "autostack/match.c"
+#include "autostack/stago.c"
 
-#include "auton/scoreOn20.c"
-#include "auton/mogoAndCones.c"
-#include "auton/mogoAuton.c"
-#include "auton/auton13.c"
-#include "auton/auton9.c"
-#include "auton/auton2.c"
+//#include "auton/scoreOn20.c"
+//#include "auton/mogoAndCones.c"
+//#include "auton/mogoAuton.c"
+//#include "auton/auton13.c"
+//#include "auton/auton9.c"
+//#include "auton/auton2.c"
 
 #include "AutoSelectLCD.c"
 
@@ -85,46 +92,10 @@ void pre_auton() {
 }
 
 task autonomous() {
-	nb_vbar_PID(2000, 127, 125000);
-	//nb_vbar(2000, 127, 15000);
+	nb_vbar(2000, 127, 2000);
 
-	/*
-	if (abs(selectedAuton) == 1) {
-		auton2(sgn(selectedAuton));
-	} else if (abs(selectedAuton) == 2) {
-		auton9(sgn(selectedAuton));
-	} else if (abs(selectedAuton) == 3) {
-		auton13(sgn(selectedAuton));
-	} else if (abs(selectedAuton) == 4) {
-		mogoAuton(sgn(selectedAuton));
-	} else {
-	}
-	*/
-	//autostack(0, FIELD);
-
-	//1660 field
-	//nb_lift_PID(1660,127,10000);
-	//nb_lift(1510, 127, 15000);
-	//waitUntil(SensorValue[MainLiftPot] > 1510 - 150);
-	//nb_vbar(1880, 127, 2000);
-	//waitUntil(SensorValue[TopLiftPot] < 1880);
-	//stopTask(nb_lift_task);
-	//b_lift(-127);
-	//wait1Msec(200);
-	//b_cone_intake(-127);
-	//b_lift(127);
-	//wait1Msec(200);
-	//b_lift(0);
-
-
-	//mogoAndCones28();
-	//support13(1)
-	//scoreOn20();
-	//support13(1);
-//	auton9(1);
 }
 
-int clawState = 0;
 task subsystemControl() {
 	while (true) {
 		// lift drive code
@@ -178,44 +149,6 @@ task subsystemControl() {
 	}
 }
 
-task autostackControl() {
-	while (true) {
-		if (vexRT[Btn8R] || sget_trigger()) {
-			waitUntil(!vexRT[Btn8R]);
-			abortAutostack();
-			stopTask(subsystemControl);
-			autostack(conesOnMogo, FIELD);
-			startTask(subsystemControl);
-			if (conesOnMogo < 14) {
-				conesOnMogo++;
-			}
-
-			clawState = OUTTAKE;
-			} else if (vexRT[Btn8D]) {
-			stopTask(nb_vbar_PID_task);
-			stopTask(subsystemControl);
-			autostack(conesOnMogo, MATCH);
-			startTask(subsystemControl);
-			if (conesOnMogo < 14)
-				conesOnMogo++;
-			} else if (vexRT[Btn7L]) {
-				waitUntil(!vexRT[Btn7L]);
-				if (conesOnMogo > 0) {
-					conesOnMogo--;
-				}
-			} else if (vexRT[Btn7R]) {
-				waitUntil(!vexRT[Btn7R]);
-				if (conesOnMogo < 12) {
-					conesOnMogo++;
-				}
-			} else if (vexRT[Btn8UXmtr2]){
-			conesOnMogo = 0;
-		}
-
-		wait1Msec(20);
-	}
-}
-
 task usercontrol() {
 	startTask(selector);
 
@@ -223,7 +156,7 @@ task usercontrol() {
 	startTask(subsystemControl);
 
 	// initialize autostack code
-	startTask(autostackControl);
+	// startTask(autostackControl);
 
 	while (true) {
 		// drive code
@@ -240,7 +173,7 @@ task usercontrol() {
 			abortAutostack();
 			autostack_state.stacked = false;
 			startTask(subsystemControl);
-			startTask(autostackControl);
+			//startTask(autostackControl);
 			b_cone_intake(0);
 		}
 
