@@ -4,6 +4,7 @@ typedef struct {
 	int maxHeight;
 	int vbarHeight;
 	int dropTime;
+	int offsetUp;
 	bool stacked;
 	bool matchLoading;
 } Autostack;

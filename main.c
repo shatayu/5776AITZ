@@ -39,6 +39,7 @@ int testDropTime = 150;
 int testUptime = 100;
 int testDistance = 80;
 int testOffset = 1600;
+int testOffsetUp = 250;
 
 int conesOnMogo = 0;
 
@@ -154,6 +155,15 @@ task subsystemControl() {
 		//		nb_vbar(1770, 127, 5000);
 		//	}
 		//}
+		if (vexRT[Btn6U]) {
+			b_vbar(127);
+			waitUntil(!vexRT[Btn6U]);
+			b_vbar(0);
+		} else if (vexRT[Btn6D]) {
+			b_vbar(-127);
+			waitUntil(!vexRT[Btn6D]);
+			b_vbar(0);
+		}
 
 		// cone intake (claw) code
 		//b_cone_intake(rollerState * 127);
@@ -180,14 +190,14 @@ task subsystemControl() {
 
 task autostackControl() {
 	while (true) {
-		if (vexRT[Btn8R] || sget_trigger()) {
+		if (vexRT[Btn8R] || (sget_trigger() && !autostack_state.stacked)) {
 			waitUntil(!vexRT[Btn8R]);
 			abortAutostack();
 			stopTask(subsystemControl);
 			autostack(conesOnMogo, FIELD);
 			startTask(subsystemControl);
 			if (conesOnMogo < 14) {
-				conesOnMogo++;
+				//conesOnMogo++;
 			}
 
 			clawState = OUTTAKE;
@@ -217,6 +227,7 @@ task autostackControl() {
 }
 
 task usercontrol() {
+	b_cone_intake(127);
 	startTask(selector);
 
 	// initialize code for lift, vbar, mogo, cone intake
