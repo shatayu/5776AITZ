@@ -68,9 +68,9 @@ int conesOnMogo = 0;
 #include "functions/nonblocking/nb_intake.c"
 
 #include "autostack/autostack.c"
-#include "autostack/field.c"
-#include "autostack/match.c"
-#include "autostack/stago.c"
+//#include "autostack/field.c"
+//#include "autostack/match.c"
+//#include "autostack/stago.c"
 
 //#include "auton/scoreOn20.c"
 //#include "auton/mogoAndCones.c"
