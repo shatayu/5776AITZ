@@ -3,8 +3,9 @@ typedef struct {
 	int stago_cones;
 	int lift_height;
 	int vbar_height;
+	int offset_up;
 	int drop;
-	bool stacked;
+	int stacked;
 	int type;
 } Autostack;
 
@@ -14,3 +15,7 @@ typedef struct {
 #define STAGO 3
 
 Autostack autostack_state;
+
+task abort_autostack();
+task autostack_control();
+void autostack(int cone, int reset);
