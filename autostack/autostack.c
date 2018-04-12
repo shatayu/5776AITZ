@@ -37,11 +37,12 @@ task fieldReset() {
 	int resetLiftHeight = 1570;
 	stopTask(nb_vbar_PID_task);
 
-	if (autostack_state.maxHeight > 2300) {
-		nb_vbar(resetVbarHeight, 127, 125000);
-	} else {
-		nb_vbar(resetVbarHeight, 127, 125000);
-	}
+	//if (autostack_state.maxHeight > 2300) {
+	//	nb_vbar(resetVbarHeight, 127, 125000);
+	//} else {
+	//	nb_vbar(resetVbarHeight, 127, 125000);
+	//}
+	b_vbar(-127);
 
 	// reset lift all the way
 	int offset = 1200;
