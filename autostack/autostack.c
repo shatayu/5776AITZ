@@ -2,11 +2,25 @@
 int rollerState = 1; // 0 := still, 1 := intaking, -1 != outtaking
 task autostackUp() {
 	stopTask(nb_lift_PID_task);
+<<<<<<< HEAD
 	//// debug code
 	//autostack_state.maxHeight = testLiftHeight; // debug code
 	//autostack_state.vbarHeight = testVbarHeight;
 	//autostack_state.dropTime = testDropTime;
 	autostack_state.offsetUp = testOffsetUp;
+=======
+
+	//if (autostack_state.maxHeight > 2200 && autostack_state.maxHeight < 3140) { // conesOnMogo >= 10
+	//	autostack_state.vbarHeight = 1790 - 250;
+ // } else {
+	//	autostack_state.vbarHeight = 1790;
+	//}
+
+	// debug code
+	autostack_state.maxHeight = testLiftHeight; // debug code
+	autostack_state.vbarHeight = testVbarHeight;
+	autostack_state.dropTime = testDropTime;
+>>>>>>> parent of 5373f15... tuned autostack better
 
 	stopTask(nb_lift_PID_task);
 	autostack_state.stacked = false;
@@ -14,28 +28,57 @@ task autostackUp() {
 	// stall torque to grip cone with
 	b_cone_intake(20);
 
+<<<<<<< HEAD
 	nb_lift(autostack_state.maxHeight, 127, 15000);
 	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - autostack_state.offsetUp);
 	nb_vbar(autostack_state.vbarHeight, 127, 2000);
+=======
+	// raise vertibar to height farthest away from robot
+	int middleHeight = 530;
+	nb_vbar_PID(middleHeight, 127, 3000);
+	waitUntil(SensorValue[TopLiftPot] > middleHeight - 550);
 
-	waitUntil(SensorValue[TopLiftPot] > autostack_state.vbarHeight);
-	stopTask(nb_lift_task);
+	// begin raising lift to target height
+	nb_lift(autostack_state.maxHeight, 127, 15000);
+	waitUntil(SensorValue[MainLiftPot] > autostack_state.maxHeight - 150);
+
+	// once the lift is almost at the top, raise vertibar all the way (fully back) and keep it there
+	stopTask(nb_vbar_PID_task);
+	if (autostack_state.maxHeight > 2200) { // conesOnMogo >= 10
+		nb_vbar_PID(autostack_state.vbarHeight, 127, 5000);
+	} else {
+		nb_vbar(autostack_state.vbarHeight, 127, 5000);
+	}
+>>>>>>> parent of 5373f15... tuned autostack better
+
+	waitUntil(SensorValue[TopLiftPot] >= autostack_state.vbarHeight - 250);
+	b_vbar(20);
+
+	// once the lift is at the top come down on the stack
 	b_lift(-127);
 	wait1Msec(autostack_state.dropTime);
+	b_lift(0);
+
+	// disable vertibar PID to begin reset
+	stopTask(nb_vbar_PID_task);
+
+	// outtake rollers
 	b_cone_intake(-127);
-	wait1Msec(100);
+
 	// flag stacked as true
 	autostack_state.stacked = true;
 }
 
 task fieldReset() {
 	b_lift(127);
-	wait1Msec(100);
-	b_lift(20)
+	wait1Msec(300); // tune
+	b_lift(0);
 	// bring the vertibar to an intermediary angle
-	int resetVbarHeight = 1470;
-	int resetLiftHeight = 1570;
+	int middleHeight = 530;
+	int resetVbarHeight = 130;
+	int resetLiftHeight = 1666;
 	stopTask(nb_vbar_PID_task);
+<<<<<<< HEAD
 
 	//if (autostack_state.maxHeight > 2300) {
 	//	nb_vbar(resetVbarHeight, 127, 125000);
@@ -48,15 +91,21 @@ task fieldReset() {
 	int offset = 1200;
 	waitUntil(SensorValue[TopLiftPot] < resetVbarHeight + testOffset && SensorValue[TopLiftPot] > 280);
 	writeDebugStreamLine("middle vbar height: %d", SensorValue[TopLiftPot]);
+=======
+	nb_vbar(resetVbarHeight, 127, 125000);
+
+	// reset lift all the way
+	waitUntil(SensorValue[TopLiftPot] < middleHeight + 200);
+>>>>>>> parent of 5373f15... tuned autostack better
 
 	// bring lift to reset height
 	nb_lift_PID(resetLiftHeight, 127, 125000);
 
 	// bring vertibar down all the way
 	stopTask(nb_vbar_PID_task);
-	//nb_vbar(resetVbarHeight, 127, 125000);
+	nb_vbar(resetVbarHeight, 127, 125000);
 
-	// finish up
+	// brake lift
 	b_cone_intake(127);
 	waitUntil(SensorValue[MainLiftPot] < resetLiftHeight + 200);
 	writeDebugStreamLine("final vbar height: %d", SensorValue[TopLiftPot]);
@@ -108,6 +157,7 @@ bool MATCH = false;
 void autostack(int conesOnMogo, bool reset) {
 	writeDebugStreamLine("%d", conesOnMogo);
 	// set height to stack cone
+<<<<<<< HEAD
 	// upTime = 100ms
 	// dropTime = 150ms
 	int firstHeight = 1580;
@@ -127,6 +177,26 @@ void autostack(int conesOnMogo, bool reset) {
 											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime};
+=======
+
+	int firstHeight = 1495;
+	int heights[14] = {firstHeight, firstHeight+95, firstHeight + 180, 1780,
+										 1850, 1900, 2050, 2120,
+									 	 2180, 2280, 2450, 2620,
+									 	 3120, 3140};
+
+	int firstVbarHeight = 1880;
+	int vbarHeights[14] = {firstVbarHeight, firstVbarHeight, firstVbarHeight-20, 1780,
+												 1850, 1900, 2050, 2120,
+											 	 2180, 2280, 2450, 2620,
+											 	 3120, 3140};
+
+	int firstDropTime = 200;
+	int dropTimes[14] = {firstDropTime, firstDropTime, firstDropTime, 400,
+											 400, 400, 400, 400,
+											 400, 400, 400, 400,
+											 400, 400};
+>>>>>>> parent of 5373f15... tuned autostack better
 
 	int firstOffsetUp = 250;
 	int offsets[14] = {firstOffsetUp, firstOffsetUp, firstOffsetUp, firstOffsetUp,

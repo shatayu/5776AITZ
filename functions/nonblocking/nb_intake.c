@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+=======
+bool getStackTrigger() {
+	int threshold = 2310; // tuned
+	return SensorValue[ClawPot] > threshold && autoDetection; // false := don't stack, true := do stack
+}
+
+void detect(bool state) {
+	autoDetection = state;
+}
+
+>>>>>>> parent of 5373f15... tuned autostack better
 void nb_cone_intake(int state) {
 	cone_intake.target = state;
 	startTask(nb_cone_intake_task);
