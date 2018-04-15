@@ -1,6 +1,5 @@
 void b_drive(int left, int right) {
 	motor[LDrive] = left;
-	motor[MDrive] = left;
 	motor[RDrive] = right;
 }
 
