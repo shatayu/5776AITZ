@@ -66,11 +66,11 @@ task autostack_control() {
 }
 
 void autostack(int cone, int reset) {
-	// set height to stack cone
-	int firstHeight = 180;
-	int heights[14] = {firstHeight - 30, firstHeight + 25, firstHeight + 115, firstHeight + 225, // 0-11 tuned
-										 firstHeight + 325, firstHeight + 415, firstHeight + 515, firstHeight + 605,
-									 	 firstHeight + 795, firstHeight + 895, firstHeight + 1035, firstHeight + 1275,
+	// set height to stack cone (finalize arithmetic)
+	int firstHeight = 180 - 10;
+	int heights[14] = {firstHeight - 90, firstHeight - 35, firstHeight + 115, firstHeight + 225, // 0-11 tuned
+										 firstHeight + 305, firstHeight + 415, firstHeight + 555, firstHeight + 615,
+									 	 firstHeight + 795, firstHeight + 915, firstHeight + 1035, firstHeight + 1275,
 									 	 firstHeight + 1815, 3140};
 
 	int firstVbarHeight = 3750;
@@ -81,26 +81,38 @@ void autostack(int cone, int reset) {
 
 
 	int firstDropTime = 200;
-
-	int dropTimes[14] = {firstDropTime, firstDropTime, firstDropTime, firstDropTime,
+	int dropTimes[14] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime};
 
+	int firstOffsetUp = 350;
+	int offsetsUp[14] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
+											 firstOffsetUp, firstOffsetUp, firstOffsetUp - 100, firstOffsetUp,
+											 firstOffsetUp, firstOffsetUp - 100, firstOffsetUp, firstOffsetUp,
+											 firstOffsetUp, firstOffsetUp}
+
 	autostack_state.lift_height = heights[cone];
 	autostack_state.vbar_height = vbarHeights[cone];
 	autostack_state.drop = dropTimes[cone];
-  autostack_state.offset_up = 330;
+  autostack_state.offset_up = offsetsUp[cone];
 
-	startTask(field_up);
+  if (autostack_state.type == FIELD) {
+  	startTask(field_up);
+  } else if (autostack_state.type == MATCH) {
+  	startTask(field_up);
+	}
+
 	waitUntil(autostack_state.stacked == 2);
 
 	stopTask(nb_lift_task);
 	stopTask(nb_vbar_task);
+	writeDebugStreamLine("%d", autostack_state.lift_height);
+	writeDebugStreamLine("%d", autostack_state.offset_up);
 
-	if (reset == FIELD) {
+	if (autostack_state.type == FIELD) {
 		startTask(field_reset);
-	} else {
+	} else if (autostack_state.type == MATCH) {
 		startTask(match_reset);
 	}
 

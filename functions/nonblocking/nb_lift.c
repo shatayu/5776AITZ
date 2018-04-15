@@ -43,7 +43,7 @@ void nb_lift_PID_init() {
 	liftPID.kd = 1.35;
 	liftPID.bias = 15;
 	liftPID.powerMax = 127;
-	liftPID.powerMin = -80;
+	liftPID.powerMin = -127;
 	liftPID.integralMax = 25;
 	liftPID.integralMin = -25;
 	already_init = true;

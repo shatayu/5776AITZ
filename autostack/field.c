@@ -2,7 +2,7 @@ task field_up() {
 	stopTask(nb_lift_PID_task);
 
 	//// debug code - leave this here
-	//autostack_state.vbar_height = testLiftHeight; // debug code
+	//autostack_state.lift_height = testLiftHeight - 1400; // debug code
 	//autostack_state.vbar_height = testVbarHeight;
 	//autostack_state.drop = testDropTime;
 
@@ -27,7 +27,6 @@ task field_up() {
 	b_lift(-127);
 	wait1Msec(autostack_state.drop);
 	b_cone_intake(-127);
-
 	// flag stacked as true
 	autostack_state.stacked = 2;
 }
