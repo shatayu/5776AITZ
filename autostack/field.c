@@ -17,7 +17,11 @@ task field_up() {
 	waitUntil(sget_lift(SENSOR) > autostack_state.lift_height - autostack_state.offset_up);
 	writeDebugStreamLine("vbar moving back now");
 	stopTask(nb_vbar_PID_task);
-	nb_vbar(autostack_state.vbar_height, 127, 15000);
+	if (autostack_state.mogo_cones < 11) {
+		nb_vbar(autostack_state.vbar_height, 127, 15000);
+	} else {
+		nb_vbar_PID(autostack_state.vbar_height, 127, 15000);
+	}
 
 	// come down once the vbar's all the way back
 	waitUntil(sget_vbar(SENSOR) > autostack_state.vbar_height);

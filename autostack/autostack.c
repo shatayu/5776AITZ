@@ -33,7 +33,7 @@ task autostack_control() {
 			//abortAutostack();
 
 			// stack
-			autostack_state.type = FIELD;
+			autostack_state.type = MATCH;
 			if (autostack_state.type != NONE) {
 				autostack(autostack_state.mogo_cones, autostack_state.type);
 			}
@@ -67,16 +67,16 @@ task autostack_control() {
 
 void autostack(int cone, int reset) {
 	// set height to stack cone (finalize arithmetic)
-	int firstHeight = 180 - 10;
-	int heights[14] = {firstHeight - 90, firstHeight - 35, firstHeight + 115, firstHeight + 225, // 0-11 tuned
-										 firstHeight + 305, firstHeight + 415, firstHeight + 555, firstHeight + 615,
-									 	 firstHeight + 795, firstHeight + 915, firstHeight + 1035, firstHeight + 1275,
+	int firstHeight = 180 - 30;
+	int heights[14] = {firstHeight - 90, firstHeight - 35, firstHeight + 105, firstHeight + 235, // 0-11 tuned
+										 firstHeight + 315, firstHeight + 415, firstHeight + 555, firstHeight + 625,
+									 	 firstHeight + 795, firstHeight + 915, firstHeight + 1065, firstHeight + 1275,
 									 	 firstHeight + 1815, 3140};
 
 	int firstVbarHeight = 3750;
 	int vbarHeights[14] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
 												 firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 	 firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
+											 	 firstVbarHeight, firstVbarHeight, firstVbarHeight - 300, firstVbarHeight - 200,
 											 	 firstVbarHeight, firstVbarHeight};
 
 
@@ -100,6 +100,19 @@ void autostack(int cone, int reset) {
   if (autostack_state.type == FIELD) {
   	startTask(field_up);
   } else if (autostack_state.type == MATCH) {
+  	dropTimes[0] -= 100;
+  	dropTimes[1] -= 50;
+  	dropTimes[2] += 50;
+  	heights[4] += 50;
+		heights[5] += 150;
+		heights[6] += 150;
+		heights[7] += 120;
+		heights[8] += 150;
+
+		autostack_state.lift_height = heights[cone];
+		autostack_state.vbar_height = vbarHeights[cone];
+		autostack_state.drop = dropTimes[cone];
+		autostack_state.offset_up = offsetsUp[cone];
   	startTask(field_up);
 	}
 

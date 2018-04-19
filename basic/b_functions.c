@@ -1,6 +1,12 @@
 void b_drive(int left, int right) {
 	motor[LDrive] = left;
+	if (left == 0 || abs(left) == 127) {
+		motor[MLDrive] = left;
+	}
 	motor[RDrive] = right;
+	if (right == 0 || abs(right) == 127) {
+		motor[MRDrive] = right;
+	}
 }
 
 //positive power -> cw
