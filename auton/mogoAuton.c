@@ -1,5 +1,5 @@
 task autonManager2() {
-	waitUntil(autostack_state.stacked == true);
+	waitUntil(autostack_state.stacked == 2);
 	nb_lift_PID(2000, 127, 125000);
 }
 

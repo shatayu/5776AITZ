@@ -73,7 +73,7 @@ task subsystemControl();
 //#include "auton/scoreOn20.c"
 #include "auton/mogoAndCones.c"
 //#include "auton/mogoAuton.c"
-//#include "auton/auton13.c"
+#include "auton/auton13.c"
 //#include "auton/auton9.c"
 //#include "auton/auton2.c"
 
@@ -90,11 +90,13 @@ void pre_auton() {
 }
 
 task autonomous() {
-	int field_reset_ = 390;
-	nb_lift_PID(field_reset_,0,10000);
+	//int field_reset_ = 390;
+	//nb_lift_PID(field_reset_,0,10000);
 
-	//mogoAndCones();
-	//bl_drive(1000, -127, 5000);
+	auton13(1);
+	//b_mogo_intake(127);
+	//wait1Msec(1000); // tune time
+	//b_mogo_intake(0);
 
 	//autostack_state.lift_height = 300; // works 1/28
 	//autostack_state.vbar_height = 3900;

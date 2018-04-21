@@ -23,7 +23,7 @@ void abortAutostack() {
 task autostack_control() {
 	autostack_state.type = FIELD;
 	while (true) {
-		if (vexRT[Btn8R] /*|| sget_trigger()*/) {
+		if (vexRT[Btn8R] || sget_trigger()) {
 			if (vexRT[Btn8R]) {
 				autostack_state.stacked = 0;
 			}

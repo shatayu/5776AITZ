@@ -36,6 +36,6 @@ void b_cone_intake(int power) {
 }
 
 void b_mogo_intake(int power) {
+	writeDebugStreamLine("MOGO POWER %d", power);
 	motor[MogoIntake] = power;
-	//motor[RMogoIntake] = power;
 }
