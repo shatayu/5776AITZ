@@ -8,6 +8,7 @@ void abortAutostack() {
 	stopTask(nb_vbar_PID_task);
 	stopTask(nb_cone_intake_task);
 	stopTask(field_up);
+	stopTask(match_up);
 	stopTask(match_reset);
 	stopTask(field_reset);
 	stopTask(autostack_control);
@@ -20,6 +21,7 @@ void abortAutostack() {
 }
 
 task autostack_control() {
+	autostack_state.type = FIELD;
 	while (true) {
 		if (vexRT[Btn8R] || sget_trigger()) {
 			if (vexRT[Btn8R]) {
@@ -33,7 +35,6 @@ task autostack_control() {
 			//abortAutostack();
 
 			// stack
-			autostack_state.type = MATCH;
 			if (autostack_state.type != NONE) {
 				autostack(autostack_state.mogo_cones, autostack_state.type);
 			}
@@ -65,7 +66,7 @@ task autostack_control() {
 	}
 }
 
-void autostack(int cone, int reset) {
+void autostack(int cone, int reset, bool blocking) {
 	// set height to stack cone (finalize arithmetic)
 	int firstHeight = 180 - 30;
 	int heights[14] = {firstHeight - 90, firstHeight - 35, firstHeight + 105, firstHeight + 235, // 0-11 tuned
@@ -129,5 +130,7 @@ void autostack(int cone, int reset) {
 		startTask(match_reset);
 	}
 
-	waitUntil(!autostack_state.stacked);
+	if (blocking) {
+		waitUntil(!autostack_state.stacked);
+	}
 }

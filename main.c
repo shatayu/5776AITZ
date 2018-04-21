@@ -12,13 +12,13 @@
 #pragma config(Sensor, dgtl5,  stackTrigger,   sensorTouch)
 #pragma config(Sensor, dgtl7,  RUltrasonic,    sensorSONAR_cm)
 #pragma config(Sensor, dgtl11, LUltrasonic,    sensorSONAR_cm)
-#pragma config(Motor,  port1,           MRDrive,       tmotorVex393_HBridge, openLoop)
+#pragma config(Motor,  port1,           MRDrive,       tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           RDrive,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RMainLift,     tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port4,           MogoIntake,    tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port5,           ConeIntake,    tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port6,           TopLift,       tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port7,            ,             tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port5,            ,             tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port6,           ConeIntake,    tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port7,           TopLift,       tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           LMainLift,     tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port9,           LDrive,        tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port10,          MLDrive,       tmotorNone, openLoop)
@@ -71,7 +71,7 @@ task subsystemControl();
 #include "autostack/stago.c"
 
 //#include "auton/scoreOn20.c"
-//#include "auton/mogoAndCones.c"
+#include "auton/mogoAndCones.c"
 //#include "auton/mogoAuton.c"
 //#include "auton/auton13.c"
 //#include "auton/auton9.c"
@@ -90,7 +90,17 @@ void pre_auton() {
 }
 
 task autonomous() {
-	autostack(0, FIELD);
+	mogoAndCones();
+	bl_drive(1000, -127, 5000);
+
+	//autostack_state.lift_height = 300; // works 1/28
+	//autostack_state.vbar_height = 3900;
+	//autostack_state.drop = 200;
+	//autostack_state.offset_up = 300;
+
+	//getCone();
+	//// stack
+	//startTask(field_up);
 }
 
 task subsystemControl() {
@@ -139,6 +149,12 @@ task subsystemControl() {
 		} else {
 			b_mogo_intake(0);
 		}
+
+		if (vexRT[Btn8RXmtr2]) {
+			autostack_state.type = FIELD;
+		} else if (vexRT[Btn8DXmtr2]) {
+			autostack_state.type = MATCH;
+		}
 		// test
 		wait1Msec(20);
 	}
@@ -162,9 +178,6 @@ task usercontrol() {
 
 		// apply power
 		b_drive(leftPower, rightPower);
-		if (leftPower != 0 || rightPower != 0) {
-			free_drive();
-		}
 
 		// abort autostack
 		if (vexRT[Btn8L]) {

@@ -18,4 +18,4 @@ Autostack autostack_state;
 
 task abort_autostack();
 task autostack_control();
-void autostack(int cone, int reset);
+void autostack(int cone, int reset, bool blocking = true);

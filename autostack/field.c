@@ -11,6 +11,7 @@ task field_up() {
 	b_cone_intake(30);
 	nb_vbar_PID(2000, 127, 15000);
 	waitUntil(sget_vbar(SENSOR) > 1650);
+	writeDebugStreamLine("the height is %d", autostack_state.lift_height);
 
 	// tell lift to go up until vbar can start rising with it, then have both go up
 	nb_lift_PID(autostack_state.lift_height, 127, 15000);
@@ -59,5 +60,7 @@ task field_reset() {
 	b_cone_intake(127);
 	waitUntil(sget_lift(SENSOR) < lift_reset + 200 && sget_vbar(SENSOR) < vbar_reset + 600);
 	b_lift(20);
+	waitUntil(sget_vbar(SENSOR) < vbar_reset + 40);
+	b_vbar(-20);
 	autostack_state.stacked = 0;
 }
