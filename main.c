@@ -29,8 +29,8 @@
 // Select Download method as "competition"
 #pragma competitionControl(Competition)
 
-int testLiftHeight = 2660;
-int testVbarHeight = 1850;
+int testLiftHeight = 2430;
+int testVbarHeight = 3500;
 int testDropTime = 150;
 int testUptime = 100;
 int testDistance = 80;

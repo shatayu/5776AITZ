@@ -23,7 +23,7 @@ void abortAutostack() {
 task autostack_control() {
 	autostack_state.type = FIELD;
 	while (true) {
-		if (vexRT[Btn8R] || sget_trigger()) {
+		if (vexRT[Btn8R] /*|| sget_trigger()*/) {
 			if (vexRT[Btn8R]) {
 				autostack_state.stacked = 0;
 			}
@@ -68,30 +68,26 @@ task autostack_control() {
 
 void autostack(int cone, int reset, bool blocking) {
 	// set height to stack cone (finalize arithmetic)
-	int firstHeight = 180 - 30;
-	int heights[14] = {firstHeight - 90, firstHeight - 35, firstHeight + 105, firstHeight + 235, // 0-11 tuned
-										 firstHeight + 315, firstHeight + 415, firstHeight + 555, firstHeight + 625,
-									 	 firstHeight + 795, firstHeight + 915, firstHeight + 1065, firstHeight + 1275,
-									 	 firstHeight + 1815, 3140};
+	int firstHeight = 120;
+	int heights[12] = {firstHeight, firstHeight + 80, firstHeight + 240, firstHeight + 370, // 0-11 tuned
+										 firstHeight + 450, firstHeight + 550, firstHeight + 680, firstHeight + 770,
+									 	 firstHeight + 880, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
 
-	int firstVbarHeight = 3750;
-	int vbarHeights[14] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
+	int firstVbarHeight = 3950;
+	int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
 												 firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 	 firstVbarHeight, firstVbarHeight, firstVbarHeight - 300, firstVbarHeight - 200,
-											 	 firstVbarHeight, firstVbarHeight};
+											 	 firstVbarHeight, firstVbarHeight - 300, firstVbarHeight - 300, firstVbarHeight - 600};
 
 
 	int firstDropTime = 200;
-	int dropTimes[14] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firstDropTime,
+	int dropTimes[12] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firstDropTime,
 											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
-											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
-											 firstDropTime, firstDropTime};
+											 firstDropTime, firstDropTime, firstDropTime, firstDropTime}
 
 	int firstOffsetUp = 350;
-	int offsetsUp[14] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
+	int offsetsUp[12] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
 											 firstOffsetUp, firstOffsetUp, firstOffsetUp - 100, firstOffsetUp,
-											 firstOffsetUp, firstOffsetUp - 100, firstOffsetUp, firstOffsetUp,
-											 firstOffsetUp, firstOffsetUp}
+											 firstOffsetUp, firstOffsetUp - 100, firstOffsetUp, firstOffsetUp};
 
 	autostack_state.lift_height = heights[cone];
 	autostack_state.vbar_height = vbarHeights[cone];
@@ -124,10 +120,17 @@ void autostack(int cone, int reset, bool blocking) {
 	writeDebugStreamLine("%d", autostack_state.lift_height);
 	writeDebugStreamLine("%d", autostack_state.offset_up);
 
-	if (autostack_state.type == FIELD) {
-		startTask(field_reset);
-	} else if (autostack_state.type == MATCH) {
-		startTask(match_reset);
+	if (autostack_state.mogo_cones < 11) {
+		if (autostack_state.type == FIELD) {
+			startTask(field_reset);
+		} else if (autostack_state.type == MATCH) {
+			startTask(match_reset);
+		}
+	} else {
+		b_lift(127);
+		wait1Msec(200);
+		b_lift(0);
+		b_cone_intake(0);
 	}
 
 	if (blocking) {
