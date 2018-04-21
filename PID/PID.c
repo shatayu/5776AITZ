@@ -25,14 +25,14 @@ int calc_PID(PID pid, int currentPoint) {
 	pid.lastError = error;
 	pid.lastTime = nSysTime;
 
-	//datalogDataGroupStart();
-	//	datalogAddValue(0,power);
-	//	datalogAddValue(1,error);
+	datalogDataGroupStart();
+		datalogAddValue(0,power);
+		datalogAddValue(1,error);
 
-	//	datalogAddValue(3,proportion);
-	//	datalogAddValue(4,pid.integral);
-	//	datalogAddValue(5,derivative);
-	//datalogDataGroupEnd();
+		datalogAddValue(3,proportion);
+		datalogAddValue(4,pid.integral);
+		datalogAddValue(5,derivative);
+	datalogDataGroupEnd();
 
 	return power;
 }

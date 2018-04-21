@@ -90,8 +90,11 @@ void pre_auton() {
 }
 
 task autonomous() {
-	mogoAndCones();
-	bl_drive(1000, -127, 5000);
+	int field_reset_ = 390;
+	nb_lift_PID(field_reset_,0,10000);
+
+	//mogoAndCones();
+	//bl_drive(1000, -127, 5000);
 
 	//autostack_state.lift_height = 300; // works 1/28
 	//autostack_state.vbar_height = 3900;
@@ -187,6 +190,10 @@ task usercontrol() {
 			//startTask(autostackControl);
 			b_cone_intake(0);
 		}
+
+		//datalogDataGroupStart();
+		//datalogAddValue(0,SensorValue[MainLiftPot]);
+		//datalogDataGroupEnd();
 
 		wait1Msec(20);
 	}
