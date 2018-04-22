@@ -90,10 +90,10 @@ void pre_auton() {
 }
 
 task autonomous() {
-	//int field_reset_ = 390;
-	//nb_lift_PID(field_reset_,0,10000);
+	int field_reset_ = 390;
+	nb_lift_PID(field_reset_,0,10000);
 
-	auton13(1);
+	//auton13(1);
 	//b_mogo_intake(127);
 	//wait1Msec(1000); // tune time
 	//b_mogo_intake(0);
