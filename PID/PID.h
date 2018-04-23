@@ -16,7 +16,7 @@ typedef struct {
 	int integralMax;
 
 	int lastError;
-
+	int lastPoint;
 	long lastTime;
 } PID;
 
