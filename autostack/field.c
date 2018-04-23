@@ -37,6 +37,7 @@ task field_up() {
 }
 
 task field_reset() {
+	b_cone_intake(-127);
 	b_lift(127);
 	wait1Msec(150);
 	b_lift(20);

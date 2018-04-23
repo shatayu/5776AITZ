@@ -73,7 +73,7 @@ void autostack(int cone, int reset, bool blocking) {
 										 firstHeight + 450, firstHeight + 550, firstHeight + 680, firstHeight + 770,
 									 	 firstHeight + 880, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
 
-	int firstVbarHeight = 3950;
+	int firstVbarHeight = 3650;
 	int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
 												 firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
 											 	 firstVbarHeight, firstVbarHeight - 300, firstVbarHeight - 300, firstVbarHeight - 600};

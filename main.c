@@ -29,7 +29,7 @@
 // Select Download method as "competition"
 #pragma competitionControl(Competition)
 
-int testLiftHeight = 2430;
+int testLiftHeight = 2420;
 int testVbarHeight = 3500;
 int testDropTime = 150;
 int testUptime = 100;
@@ -70,9 +70,9 @@ task subsystemControl();
 #include "autostack/match.c"
 #include "autostack/stago.c"
 
-//#include "auton/scoreOn20.c"
+#include "auton/scoreOn20.c"
 #include "auton/mogoAndCones.c"
-//#include "auton/mogoAuton.c"
+#include "auton/mogoAuton.c"
 #include "auton/auton13.c"
 //#include "auton/auton9.c"
 //#include "auton/auton2.c"
@@ -90,13 +90,23 @@ void pre_auton() {
 }
 
 task autonomous() {
+	//nb_lift_PID(900, 127, 125000);
+	//bl_drive_rotate(900, 127, 3000);
+	//bl_drive_rotate(900, -127, 3000);
+	mogoAuton(-1);
 	//int field_reset_ = 390;
 	//nb_lift_PID(field_reset_,0,10000);
-
-	auton13(1);
+	//scoreOn20();
+	//auton13(1);
 	//b_mogo_intake(127);
 	//wait1Msec(1000); // tune time
 	//b_mogo_intake(0);
+
+	//mogoAndCones28(true);
+	//stopTask(forwardAutonHelper);
+	//stopTask(subsystemControl);
+	//stopTask(autostack_control);
+	//bl_drive(1000, -127, 5000);
 
 	//autostack_state.lift_height = 300; // works 1/28
 	//autostack_state.vbar_height = 3900;
@@ -128,6 +138,7 @@ task subsystemControl() {
 		// vertibar code
 		if (vexRT[Btn6U]) {
 			waitUntil(!vexRT[Btn6U]);
+			writeDebugStreamLine("button pressed");
 			if (SensorValue[TopLiftPot] > 2000) {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(1550, 127, 5000);
