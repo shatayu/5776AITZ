@@ -38,14 +38,14 @@ task nb_lift_task() {
 void nb_lift_PID_init() {
 	static bool already_init = false;
 	if(already_init) return;
-	liftPID.kp = 0.3;
+	liftPID.kp = 0.27;
 	liftPID.ki = 0.01;
-	liftPID.kd = 2.2;
-	liftPID.bias = 15;
+	liftPID.kd = 2.3;
+	liftPID.bias = 10;
 	liftPID.powerMax = 127;
-	liftPID.powerMin = -80;
+	liftPID.powerMin = -127;
 	liftPID.integralMax = 25;
-	liftPID.integralMin = -25;
+	liftPID.integralMin = -5;
 	already_init = true;
 }
 

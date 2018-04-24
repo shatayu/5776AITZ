@@ -92,7 +92,7 @@ void pre_auton() {
 task autonomous() {
 	//mogoAuton(-1);
 	//auton9(1);
-	nb_lift_PID(700,0,10000)
+	nb_lift_PID(200,0,10000)
 }
 
 task subsystemControl() {

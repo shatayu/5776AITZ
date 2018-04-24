@@ -30,7 +30,7 @@ int calc_PID(PID pid, int currentPoint) {
 	//prevent excessively abrupt stops
 	int velocity = 0;
 	if(nSysTime!=pid.lastTime) velocity = (currentPoint - pid.lastPoint)*1000/(nSysTime-pid.lastTime);
-	if(abs(velocity) > 100 && sgn(power) != sgn(velocity) ) {
+	if(abs(velocity) > 300 && sgn(power) != sgn(velocity) ) {
 		power = sgn(power) * min(abs(power),20);
 	}
 
