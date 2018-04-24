@@ -68,15 +68,15 @@ task autostack_control() {
 
 void autostack(int cone, int reset, bool blocking) {
 	// set height to stack cone (finalize arithmetic)
-	int firstHeight = 120;
-	int heights[12] = {firstHeight, firstHeight + 80, firstHeight + 240, firstHeight + 370, // 0-11 tuned
-										 firstHeight + 450, firstHeight + 550, firstHeight + 680, firstHeight + 770,
-									 	 firstHeight + 880, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
+	int firstHeight = 180;
+	int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeight + 340, // 0-11 tuned
+										 firstHeight + 470, firstHeight + 565, firstHeight + 715, firstHeight + 810,
+									 	 firstHeight + 930, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
 
 	int firstVbarHeight = 3650;
 	int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-												 firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 	 firstVbarHeight, firstVbarHeight - 300, firstVbarHeight - 300, firstVbarHeight - 600};
+												 firstVbarHeight - 700, firstVbarHeight, firstVbarHeight, firstVbarHeight,
+											 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 600};
 
 
 	int firstDropTime = 200;

@@ -19,7 +19,7 @@ void mogoAuton(int direction) {
 	stopTask(subsystemControl);
 	stopTask(autostack_control);
 	//bl_drive_rotate(SensorValue[Gyro] * 0.8, -40, 1000);
-	int error = abs(SensorValue[Gyro]);
+	int error = -SensorValue[Gyro];
 	if (error > 150) {
 		bl_drive_rotate(450 - (error - 150), 127 * direction, 3000);
 	}

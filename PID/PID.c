@@ -28,7 +28,8 @@ int calc_PID(PID pid, int currentPoint) {
 	if(power < pid.powerMin) power = pid.powerMin;
 
 	//prevent excessively abrupt stops
-	int velocity = (currentPoint - pid.lastPoint)*1000/(nSysTime-pid.lastTime);
+	int velocity = 0;
+	if(nSysTime!=pid.lastTime) velocity = (currentPoint - pid.lastPoint)*1000/(nSysTime-pid.lastTime);
 	if(abs(velocity) > 100 && sgn(power) != sgn(velocity) ) {
 		power = sgn(power) * min(abs(power),20);
 	}
@@ -38,14 +39,14 @@ int calc_PID(PID pid, int currentPoint) {
 	pid.lastError = error;
 	pid.lastTime = nSysTime;
 
-	datalogDataGroupStart();
-		datalogAddValue(0,power);
-		datalogAddValue(1,error);
-		datalogAddValue(2,velocity);
-		datalogAddValue(3,proportion);
-		datalogAddValue(4,pid.integral);
-		datalogAddValue(5,derivative);
-	datalogDataGroupEnd();
+	//datalogDataGroupStart();
+	//	datalogAddValue(0,power);
+	//	datalogAddValue(1,error);
+	//	datalogAddValue(2,velocity);
+	//	datalogAddValue(3,proportion);
+	//	datalogAddValue(4,pid.integral);
+	//	datalogAddValue(5,derivative);
+	//datalogDataGroupEnd();
 
 	return power;
 }

@@ -30,7 +30,7 @@
 #pragma competitionControl(Competition)
 
 int testLiftHeight = 2420;
-int testVbarHeight = 3500;
+int testVbarHeight = 3650;
 int testDropTime = 150;
 int testUptime = 100;
 int testDistance = 80;
@@ -74,7 +74,7 @@ task subsystemControl();
 #include "auton/mogoAndCones.c"
 #include "auton/mogoAuton.c"
 #include "auton/auton13.c"
-//#include "auton/auton9.c"
+#include "auton/auton9.c"
 //#include "auton/auton2.c"
 
 #include "AutoSelectLCD.c"
@@ -90,33 +90,8 @@ void pre_auton() {
 }
 
 task autonomous() {
-	//nb_lift_PID(900, 127, 125000);
-	//bl_drive_rotate(900, 127, 3000);
-	//bl_drive_rotate(900, -127, 3000);
-	mogoAuton(-1);
-	//int field_reset_ = 390;
-	//nb_lift_PID(field_reset_,0,10000);
-	//scoreOn20();
-
-	//auton13(1);
-	//b_mogo_intake(127);
-	//wait1Msec(1000); // tune time
-	//b_mogo_intake(0);
-
-	//mogoAndCones28(true);
-	//stopTask(forwardAutonHelper);
-	//stopTask(subsystemControl);
-	//stopTask(autostack_control);
-	//bl_drive(1000, -127, 5000);
-
-	//autostack_state.lift_height = 300; // works 1/28
-	//autostack_state.vbar_height = 3900;
-	//autostack_state.drop = 200;
-	//autostack_state.offset_up = 300;
-
-	//getCone();
-	//// stack
-	//startTask(field_up);
+	//mogoAuton(-1);
+	auton9(1);
 }
 
 task subsystemControl() {
@@ -142,10 +117,10 @@ task subsystemControl() {
 			writeDebugStreamLine("button pressed");
 			if (SensorValue[TopLiftPot] > 2000) {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar(1550, 127, 5000);
+				nb_vbar(1450, 127, 5000);
 			} else {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar(3750, 127, 5000);
+				nb_vbar(3575, 127, 5000);
 			}
 		}
 
@@ -190,8 +165,8 @@ task usercontrol() {
 		// drive code
 
 		// dead zone
-		int leftPower = abs(vexRT[Ch3]) > 15 ? vexRT[Ch3] : 0;
-		int rightPower = abs(vexRT[Ch2]) > 15 ? vexRT[Ch2] : 0;
+		int leftPower = abs(vexRT[Ch3]) > 25 ? vexRT[Ch3] : 0;
+		int rightPower = abs(vexRT[Ch2]) > 25 ? vexRT[Ch2] : 0;
 
 		// apply power
 		b_drive(leftPower, rightPower);

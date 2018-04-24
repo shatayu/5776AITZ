@@ -30,7 +30,7 @@ void mogoAndCones(bool correct) {
 	wait1Msec(600);
 	// proceed with auton
 	bl_drive(570, 127, 3000, false); // used to be 1185 127 3000
-	bl_drive(600, 80, 3000);
+	bl_drive(610, 80, 3000);
 	stopTask(forwardAutonHelper);
 	// intake mogo
 	stopTask(nb_mogo_intake_task);
@@ -50,7 +50,9 @@ void mogoAndCones(bool correct) {
 	b_lift(-127);
 	wait1Msec(300);
 	b_cone_intake(-127);
-	b_lift(0);
+	b_lift(127);
+	wait1Msec(100);
+
 
 	// go for second cone
 	abortAutostack();

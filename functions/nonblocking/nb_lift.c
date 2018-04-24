@@ -30,21 +30,20 @@ task nb_lift_task() {
 	}
 
 	// stopping
-	//b_lift(-sgn(power) * 30);
-	//wait1Msec(50);
+	b_lift(-sgn(power) * 30);
+	wait1Msec(50);
 	b_lift(0);
 }
 
 void nb_lift_PID_init() {
 	static bool already_init = false;
-	liftPID.lastPoint = sget_lift(SENSOR);
 	if(already_init) return;
-	liftPID.kp = 0.27;
+	liftPID.kp = 0.25;
 	liftPID.ki = 0.01;
-	liftPID.kd = 2.3;
+	liftPID.kd = 1.35;
 	liftPID.bias = 15;
 	liftPID.powerMax = 127;
-	liftPID.powerMin = -127;
+	liftPID.powerMin = -80;
 	liftPID.integralMax = 25;
 	liftPID.integralMin = -25;
 	already_init = true;
