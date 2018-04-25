@@ -10,7 +10,7 @@ task field_up() {
 	// stall torque to grip cone with
 	b_cone_intake(30);
 	nb_vbar_PID(2000, 127, 15000);
-	waitUntil(sget_vbar(SENSOR) > 1450);
+	waitUntil(sget_vbar(SENSOR) > 1750);
 	writeDebugStreamLine("the height is %d", autostack_state.lift_height);
 
 	// tell lift to go up until vbar can start rising with it, then have both go up
@@ -41,15 +41,15 @@ task field_up() {
 task field_reset() {
 	b_cone_intake(-127);
 	b_lift(127);
-	wait1Msec(180);
+	wait1Msec(210);
 	b_lift(20);
 
 	// bring the vertibar down all the way
-	int vbar_reset = 1550;
+	int vbar_reset = 2000;
 	int lift_reset = 390;
 	stopTask(nb_vbar_PID_task);
 
-	nb_vbar(vbar_reset, 127, 125000);
+	nb_vbar_PID(vbar_reset, 127, 125000);
 
 	// reset lift all the way
 	int offset = 1400;
@@ -62,6 +62,7 @@ task field_reset() {
 	// finish up
 	b_cone_intake(127);
 	waitUntil(sget_vbar(SENSOR) < vbar_reset + 40);
+	stopTask(nb_vbar_PID_task);
 	b_vbar(-20);
 	autostack_state.stacked = 0;
 }

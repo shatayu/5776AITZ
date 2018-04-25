@@ -51,18 +51,60 @@ task autostack_control() {
 		}
 
 		// manual control for incrementing
-		if (vexRT[Btn7R]) {
+
+		// field cones
+		if (vexRT[Btn6UXmtr2] && vexRT[Btn6DXmtr2]) {
+			waitUntil(!(vexRT[Btn6UXmtr2] && vexRT[Btn6DXmtr2]));
+			autostack_state.mogo_cones = 0;
+		} else if (vexRT[Btn6UXmtr2]) {
 			if (autostack_state.mogo_cones < 12) {
-				waitUntil(!vexRT[Btn7R]);
+				waitUntil(!vexRT[Btn6UXmtr2]);
 				autostack_state.mogo_cones++;
 			}
-		} else if (vexRT[Btn7L]) {
+		} else if (vexRT[Btn6DXmtr2]) {
 			if (autostack_state.mogo_cones > 0) {
-				waitUntil(!vexRT[Btn7L]);
+				waitUntil(!vexRT[Btn6DXmtr2]);
 				autostack_state.mogo_cones--;
 			}
 		}
-		wait1Msec(20);
+
+		// stago cones
+		if (vexRT[Btn5UXmtr2] && vexRT[Btn5DXmtr2]) {
+			waitUntil(!(vexRT[Btn5UXmtr2] && vexRT[Btn5DXmtr2]));
+			autostack_state.stago_cones = 0;
+		} else if (vexRT[Btn5UXmtr2]) {
+			if (autostack_state.stago_cones < 12) {
+				waitUntil(!vexRT[Btn5UXmtr2]);
+				autostack_state.stago_cones++;
+			}
+		} else if (vexRT[Btn5DXmtr2]) {
+			if (autostack_state.stago_cones > 0) {
+				waitUntil(!vexRT[Btn5DXmtr2]);
+				autostack_state.stago_cones--;
+			}
+		}
+
+		// set types of stacks
+		if (vexRT[Btn8RXmtr2]) {
+			autostack_state.type = FIELD;
+		} else if (vexRT[Btn8DXmtr2]) {
+			autostack_state.type = MATCH;
+		} else if (vexRT[Btn8LXmtr2]) {
+			autostack_state.type = STAGO;
+		}
+
+		// go to reset heights
+		if (vexRT[Btn7RXmtr2]) {
+			stopTask(nb_lift_PID_task);
+			nb_lift_PID(390, 127, 125000);
+			autostack_state.type = FIELD;
+		} else if (vexRT[Btn7DXmtr2]) {
+			stopTask(nb_lift_PID_task);
+			nb_lift_PID(800, 127, 125000);
+			autostack_state.type = MATCH;
+		} else if (vexRT[Btn7LXmtr2]) {
+			autostack_state.type = STAGO;
+		}
 	}
 }
 
@@ -72,9 +114,9 @@ int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeigh
 									 firstHeight + 470, firstHeight + 565, firstHeight + 715, firstHeight + 810,
 								 	 firstHeight + 930, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
 
-int firstVbarHeight = 3650;
+int firstVbarHeight = 3450;
 int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 firstVbarHeight - 300, firstVbarHeight - 300, firstVbarHeight - 400, firstVbarHeight - 500,
+											 firstVbarHeight - 200, firstVbarHeight - 200, firstVbarHeight - 200, firstVbarHeight - 300,
 										 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 600};
 
 

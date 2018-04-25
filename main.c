@@ -88,20 +88,20 @@ void pre_auton() {
 	bStopTasksBetweenModes = true;
 	bLCDBacklight = true;
 }
-void drivetesteroo() {
-	b_drive(127,127);
-	int startTime = nSysTime;
-	int lastEncoder = sget_encoder();
-	wait1Msec(20);
-	while((nSysTime - startTime) < 2000) {
+//void drivetesteroo() {
+//	b_drive(127,127);
+//	int startTime = nSysTime;
+//	int lastEncoder = sget_encoder();
+//	wait1Msec(20);
+//	while((nSysTime - startTime) < 2000) {
 
-		datalogDataGroupStart();
-		datalogAddValue(0,sget_encoder()-lastEncoder);
-		datalogDataGroupEnd();
-		lastEncoder=sget_encoder();
-		wait1Msec(40);
-	}
-}
+//		datalogDataGroupStart();
+//		datalogAddValue(0,sget_encoder()-lastEncoder);
+//		datalogDataGroupEnd();
+//		lastEncoder=sget_encoder();
+//		wait1Msec(40);
+//	}
+//}
 task autonomous() {
 	//mogoAuton(-1);
 	//auton9(1);
@@ -114,10 +114,6 @@ task autonomous() {
 //b_lift(0);
 //nb_vbar_PID(3500, 127, 5000);
 drivetesteroo();
-}
-
-
-
 
 task subsystemControl() {
 	while (true) {
@@ -142,10 +138,14 @@ task subsystemControl() {
 			writeDebugStreamLine("button pressed");
 			if (SensorValue[TopLiftPot] > 2000) {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar(1450, 127, 5000);
+				nb_vbar(1860, 127, 5000);
+				waitUntil(sget_vbar(SENSOR) < 1870);
+				b_vbar(-20);
 			} else {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar(3575, 127, 5000);
+				nb_vbar(3400, 127, 5000);
+				waitUntil(sget_vbar(SENSOR) > 3400);
+				b_vbar(20);
 			}
 		}
 
@@ -167,12 +167,6 @@ task subsystemControl() {
 			b_mogo_intake(0);
 		}
 
-		if (vexRT[Btn8RXmtr2]) {
-			autostack_state.type = FIELD;
-		} else if (vexRT[Btn8DXmtr2]) {
-			autostack_state.type = MATCH;
-		}
-		// test
 		wait1Msec(20);
 	}
 }
@@ -185,7 +179,7 @@ task usercontrol() {
 
 	// initialize autostack code
 	startTask(autostack_control);
-
+	b_vbar(-20);
 	while (true) {
 		// drive code
 
