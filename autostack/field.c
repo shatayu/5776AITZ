@@ -2,8 +2,8 @@ task field_up() {
 	stopTask(nb_lift_PID_task);
 
 	//// debug code - leave this here
-	autostack_state.lift_height = testLiftHeight - 1000; // debug code
-	autostack_state.vbar_height = testVbarHeight;
+	//autostack_state.lift_height = testLiftHeight - 1000; // debug code
+	//autostack_state.vbar_height = testVbarHeight;
 	//autostack_state.drop = testDropTime;
 
 	autostack_state.stacked = 1;
@@ -20,7 +20,7 @@ task field_up() {
 	waitUntil(sget_lift(SENSOR) > autostack_state.lift_height - autostack_state.offset_up);
 	writeDebugStreamLine("vbar moving back now");
 	stopTask(nb_vbar_PID_task);
-	if (autostack_state.mogo_cones < 8) {
+	if (autostack_state.mogo_cones < 4) {
 		nb_vbar(autostack_state.vbar_height, 127, 15000);
 	} else {
 		nb_vbar_PID(autostack_state.vbar_height, 127, 15000);

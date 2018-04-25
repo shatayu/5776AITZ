@@ -66,29 +66,29 @@ task autostack_control() {
 	}
 }
 
+// set height to stack cone (finalize arithmetic)
+int firstHeight = 180;
+int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeight + 340, // 0-11 tuned
+									 firstHeight + 470, firstHeight + 565, firstHeight + 715, firstHeight + 810,
+								 	 firstHeight + 930, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
+
+int firstVbarHeight = 3650;
+int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
+											 firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 500, firstVbarHeight - 500,
+										 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 600};
+
+
+int firstDropTime = 200;
+int dropTimes[12] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firstDropTime,
+										 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
+										 firstDropTime, firstDropTime, firstDropTime, firstDropTime};
+
+int firstOffsetUp = 350;
+int offsetsUp[12] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
+										 firstOffsetUp, firstOffsetUp, firstOffsetUp - 100, firstOffsetUp,
+										 firstOffsetUp, firstOffsetUp - 100, firstOffsetUp, firstOffsetUp};
+
 void autostack(int cone, int reset, bool blocking) {
-	// set height to stack cone (finalize arithmetic)
-	int firstHeight = 180;
-	int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeight + 340, // 0-11 tuned
-										 firstHeight + 470, firstHeight + 565, firstHeight + 715, firstHeight + 810,
-									 	 firstHeight + 930, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
-
-	int firstVbarHeight = 3650;
-	int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-												 firstVbarHeight - 700, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 600};
-
-
-	int firstDropTime = 200;
-	int dropTimes[12] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firstDropTime,
-											 firstDropTime, firstDropTime, firstDropTime, firstDropTime,
-											 firstDropTime, firstDropTime, firstDropTime, firstDropTime}
-
-	int firstOffsetUp = 350;
-	int offsetsUp[12] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
-											 firstOffsetUp, firstOffsetUp, firstOffsetUp - 100, firstOffsetUp,
-											 firstOffsetUp, firstOffsetUp - 100, firstOffsetUp, firstOffsetUp};
-
 	autostack_state.lift_height = heights[cone];
 	autostack_state.vbar_height = vbarHeights[cone];
 	autostack_state.drop = dropTimes[cone];
@@ -110,7 +110,9 @@ void autostack(int cone, int reset, bool blocking) {
 		autostack_state.vbar_height = vbarHeights[cone];
 		autostack_state.drop = dropTimes[cone];
 		autostack_state.offset_up = offsetsUp[cone];
-  	startTask(field_up);
+  	startTask(match_up);
+	} else if (autostack_state.type == STAGO) {
+		startTask(stago_up);
 	}
 
 	waitUntil(autostack_state.stacked == 2);
@@ -125,12 +127,15 @@ void autostack(int cone, int reset, bool blocking) {
 			startTask(field_reset);
 		} else if (autostack_state.type == MATCH) {
 			startTask(match_reset);
+		} else if (autostack_state.type == STAGO) {
+			startTask(stago_reset);
 		}
 	} else {
 		b_lift(127);
 		wait1Msec(200);
 		b_lift(0);
 		b_cone_intake(0);
+		abortAutostack();
 	}
 
 	if (blocking) {

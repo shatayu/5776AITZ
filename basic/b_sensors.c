@@ -1,6 +1,6 @@
 int sget_lift(int value) {
 	// bounds of lift motion (based on actual pot)
-	int min = 1800; // with mogo out
+	int min = 850; // with mogo out
 	int max = 4095;
 
 	if (value == MIN) {
