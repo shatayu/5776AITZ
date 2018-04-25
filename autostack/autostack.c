@@ -74,7 +74,7 @@ int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeigh
 
 int firstVbarHeight = 3650;
 int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 500, firstVbarHeight - 500,
+											 firstVbarHeight - 300, firstVbarHeight - 300, firstVbarHeight - 400, firstVbarHeight - 500,
 										 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 600};
 
 

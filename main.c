@@ -88,7 +88,20 @@ void pre_auton() {
 	bStopTasksBetweenModes = true;
 	bLCDBacklight = true;
 }
+void drivetesteroo() {
+	b_drive(127,127);
+	int startTime = nSysTime;
+	int lastEncoder = sget_encoder();
+	wait1Msec(20);
+	while((nSysTime - startTime) < 2000) {
 
+		datalogDataGroupStart();
+		datalogAddValue(0,sget_encoder()-lastEncoder);
+		datalogDataGroupEnd();
+		lastEncoder=sget_encoder();
+		wait1Msec(40);
+	}
+}
 task autonomous() {
 	//mogoAuton(-1);
 	//auton9(1);
@@ -99,8 +112,12 @@ task autonomous() {
 //	wait1Msec(30);
 //}
 //b_lift(0);
-nb_vbar_PID(3500, 127, 5000);
+//nb_vbar_PID(3500, 127, 5000);
+drivetesteroo();
 }
+
+
+
 
 task subsystemControl() {
 	while (true) {

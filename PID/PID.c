@@ -42,7 +42,7 @@ int calc_PID(PID pid, int currentPoint) {
 	datalogDataGroupStart();
 		datalogAddValue(0,power);
 		datalogAddValue(1,error);
-		datalogAddValue(2,velocity);
+		datalogAddValue(2,currentPoint);
 		datalogAddValue(3,proportion);
 		datalogAddValue(4,pid.integral);
 		datalogAddValue(5,derivative);

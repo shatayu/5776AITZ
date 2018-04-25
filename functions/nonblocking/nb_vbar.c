@@ -40,7 +40,7 @@ void nb_vbar_PID_init() {
 	if(already_init) return;
 	vbarPID.kp = 0.18; // used to be 0.165
 	vbarPID.ki = 0.002;
-	vbarPID.kd = 0.4;
+	vbarPID.kd = 1.5;
 	vbarPID.powerMax = 127;
 	vbarPID.powerMin = -127;
 	vbarPID.integralMax = 40;
