@@ -96,7 +96,7 @@ task autostack_control() {
 		// go to reset heights
 		if (vexRT[Btn7RXmtr2]) {
 			stopTask(nb_lift_PID_task);
-			nb_lift_PID(390, 127, 125000);
+			nb_lift_PID(300, 127, 125000);
 			autostack_state.type = FIELD;
 		} else if (vexRT[Btn7DXmtr2]) {
 			stopTask(nb_lift_PID_task);
@@ -105,19 +105,21 @@ task autostack_control() {
 		} else if (vexRT[Btn7LXmtr2]) {
 			autostack_state.type = STAGO;
 		}
+
+		wait1Msec(20);
 	}
 }
 
 // set height to stack cone (finalize arithmetic)
-int firstHeight = 180;
+int firstHeight = 170;
 int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeight + 340, // 0-11 tuned
 									 firstHeight + 470, firstHeight + 565, firstHeight + 715, firstHeight + 810,
-								 	 firstHeight + 930, firstHeight + 1030, firstHeight + 1140, firstHeight + 1310};
+								 	 firstHeight + 930, firstHeight + 1030, firstHeight + 1150, firstHeight + 1320};
 
-int firstVbarHeight = 3450;
+int firstVbarHeight = 3850;
 int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 firstVbarHeight - 200, firstVbarHeight - 200, firstVbarHeight - 200, firstVbarHeight - 300,
-										 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 600};
+											 firstVbarHeight, firstVbarHeight, firstVbarHeight - 200, firstVbarHeight - 200,
+										 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 400};
 
 
 int firstDropTime = 200;
@@ -127,8 +129,8 @@ int dropTimes[12] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firs
 
 int firstOffsetUp = 350;
 int offsetsUp[12] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
-										 firstOffsetUp, firstOffsetUp, firstOffsetUp - 100, firstOffsetUp,
-										 firstOffsetUp, firstOffsetUp - 100, firstOffsetUp, firstOffsetUp};
+										 firstOffsetUp, firstOffsetUp, firstOffsetUp, firstOffsetUp + 50,
+										 firstOffsetUp + 50, firstOffsetUp + 50, firstOffsetUp + 50, firstOffsetUp + 50};
 
 void autostack(int cone, int reset, bool blocking) {
 	autostack_state.lift_height = heights[cone];
@@ -139,8 +141,8 @@ void autostack(int cone, int reset, bool blocking) {
   if (autostack_state.type == FIELD) {
   	startTask(field_up);
   } else if (autostack_state.type == MATCH) {
-  	dropTimes[0] -= 100;
-  	dropTimes[1] -= 50;
+  	dropTimes[0] += 100;
+  	dropTimes[1] += 50;
   	dropTimes[2] += 50;
   	heights[4] += 50;
 		heights[5] += 150;

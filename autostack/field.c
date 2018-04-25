@@ -9,18 +9,19 @@ task field_up() {
 	autostack_state.stacked = 1;
 	// stall torque to grip cone with
 	b_cone_intake(30);
-	nb_vbar_PID(2000, 127, 15000);
-	waitUntil(sget_vbar(SENSOR) > 1750);
+	//nb_vbar_PID(2000, 127, 15000);
+	//waitUntil(sget_vbar(SENSOR) > 1750);
 	writeDebugStreamLine("the height is %d", autostack_state.lift_height);
 
 	// tell lift to go up until vbar can start rising with it, then have both go up
 	nb_lift_PID(autostack_state.lift_height, 127, 15000);
 
-
 	waitUntil(sget_lift(SENSOR) > autostack_state.lift_height - autostack_state.offset_up);
 	writeDebugStreamLine("vbar moving back now");
+	b_vbar(0);
+	stopTask(nb_vbar_task);
 	stopTask(nb_vbar_PID_task);
-	if (autostack_state.mogo_cones < 4) {
+	if (autostack_state.mogo_cones < 7){
 		nb_vbar(autostack_state.vbar_height, 127, 15000);
 	} else {
 		nb_vbar_PID(autostack_state.vbar_height, 127, 15000);
@@ -45,11 +46,11 @@ task field_reset() {
 	b_lift(20);
 
 	// bring the vertibar down all the way
-	int vbar_reset = 2000;
-	int lift_reset = 390;
+	int vbar_reset = 2120;
+	int lift_reset = 300;
 	stopTask(nb_vbar_PID_task);
 
-	nb_vbar_PID(vbar_reset, 127, 125000);
+	nb_vbar(vbar_reset, 127, 125000);
 
 	// reset lift all the way
 	int offset = 1400;
@@ -63,6 +64,6 @@ task field_reset() {
 	b_cone_intake(127);
 	waitUntil(sget_vbar(SENSOR) < vbar_reset + 40);
 	stopTask(nb_vbar_PID_task);
-	b_vbar(-20);
+	b_vbar(-10);
 	autostack_state.stacked = 0;
 }

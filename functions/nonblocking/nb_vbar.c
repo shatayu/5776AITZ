@@ -38,9 +38,9 @@ task nb_vbar_task() {
 void nb_vbar_PID_init() {
 	static bool already_init = false;
 	if(already_init) return;
-	vbarPID.kp = 0.18; // used to be 0.165
+	vbarPID.kp = 0.25; // used to be 0.18
 	vbarPID.ki = 0.002;
-	vbarPID.kd = 1.5;
+	vbarPID.kd = 2;//old 1.5
 	vbarPID.powerMax = 127;
 	vbarPID.powerMin = -127;
 	vbarPID.integralMax = 40;

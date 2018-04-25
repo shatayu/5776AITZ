@@ -112,8 +112,8 @@ task autonomous() {
 //	wait1Msec(30);
 //}
 //b_lift(0);
-//nb_vbar_PID(3500, 127, 5000);
-drivetesteroo();
+nb_vbar_PID(3300, 127, 5000);
+}
 
 task subsystemControl() {
 	while (true) {
@@ -139,13 +139,15 @@ task subsystemControl() {
 			if (SensorValue[TopLiftPot] > 2000) {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(1860, 127, 5000);
-				waitUntil(sget_vbar(SENSOR) < 1870);
-				b_vbar(-20);
+				if (sget_vbar(SENSOR) < 1870) {
+					b_vbar(-10);
+				}
 			} else {
 				stopTask(nb_vbar_PID_task);
 				nb_vbar(3400, 127, 5000);
-				waitUntil(sget_vbar(SENSOR) > 3400);
-				b_vbar(20);
+				if (sget_vbar(SENSOR) > 3400) {
+				  b_vbar(10);
+				}
 			}
 		}
 
