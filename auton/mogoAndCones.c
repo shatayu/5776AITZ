@@ -1,13 +1,13 @@
 // helper task to manage lift/mogo intake
 task forwardAutonHelper() {
 	b_cone_intake(40);
-	nb_lift_PID(600, 127, 5000);
+	nb_lift_PID(400, 127, 5000);
 	b_vbar(20);
 	wait1Msec(300);
 	// extend mogo
 	b_mogo_intake(127);
 	wait1Msec(1000); // tune time
-	b_mogo_intake(0);
+	b_mogo_intake(20);
 
 	b_lift(0);
 }
@@ -23,20 +23,36 @@ void getCone() {
 	waitUntil(sget_trigger() || time1[T1] > 600);
 }
 
+bool detectMogo() {
+	int threshold = 6;
+	return SensorValue[MogoDetector] > -1 && SensorValue[MogoDetector] < threshold;
+}
+
 // gets mogo and preload + 1 field cones (24pt)
 void mogoAndCones(bool correct) {
 // drive up to mogo
 	startTask(forwardAutonHelper);
 	wait1Msec(600);
 	// proceed with auton
-	bl_drive(570, 127, 3000, false); // used to be 1185 127 3000
-	bl_drive(610, 80, 3000);
+	//bl_drive(570, 127, 3000, false); // used to be 1185 127 3000
+
+	// test drive distance
+	//bl_drive(610, 80, 3000);
+	//bl_drive(distance1, 80, 3000);
+	int timer = 0;
+	b_drive(127, 127);
+	while (!detectMogo() && timer < 8000) {
+		timer += 20;
+		wait1Msec(20);
+	}
+	bl_drive(70, 127, 1000);
+
 	stopTask(forwardAutonHelper);
 	// intake mogo
 	stopTask(nb_mogo_intake_task);
 	b_cone_intake(20);
 	// withdraw mogo
-	nb_vbar_PID(3500, 127, 125000);
+	//nb_vbar_PID(3500, 127, 125000);
 	b_mogo_intake(-127);
 	wait1Msec(1300); // tune time
 	b_mogo_intake(0);
@@ -59,9 +75,12 @@ void mogoAndCones(bool correct) {
 	startTask(field_reset);
 	autostack_state.mogo_cones = 1;
 	if (correct) {
-		bl_drive_rotate(sget_gyro(), 127, 1000);
+		//bl_drive_rotate(-sget_gyro()/2, 60, 1000);
 	}
-	bl_drive(70, 127, 1500); // tune this distance
+
+	// test distance
+	//bl_drive(70, 127, 1500); // tune this distance
+	bl_drive(distance2, 127, 1500);
 	waitUntil(autostack_state.stacked == 0);
 
 	// bring lift and rollers down
@@ -71,7 +90,7 @@ void mogoAndCones(bool correct) {
 	//wait1Msec(600);
 	getCone();
 	// stack
-	autostack(3, FIELD, false);
+	autostack(1, FIELD, false);
 }
 
 void mogoAndCones26(bool correct) {
@@ -81,11 +100,13 @@ void mogoAndCones26(bool correct) {
 	// cone #3
 	startTask(field_reset);
 	if (correct) {
-		bl_drive_rotate(sget_gyro(), 127, 1000);
+		bl_drive_rotate(-sget_gyro(), 127, 1000);
 	}
 
 	// drive forward at partial power
-	bl_drive(120, 127, 2100); // tune this distance
+	// test distance
+	bl_drive(distance3, 127, 2100);
+	//bl_drive(120, 127, 2100); // tune this distance
 
 	// wait until lift is back down
 	waitUntil(autostack_state.stacked == 0);
@@ -108,11 +129,15 @@ void mogoAndCones28(bool correct) {
 	}
 	waitUntil(autostack_state.stacked == 0);
 	b_cone_intake(127);
-	bl_drive(170, 127, 2000);// fourth cone
+
+	// test distance
+	bl_drive(distance4, 127, 2000);
+	//bl_drive(170, 127, 2000);// fourth cone
 
 	// intake cone
 	abortAutostack();
 	getCone();
+
 	bl_drive(80, -127, 2000);
 	// stack
 	autostack(3, MATCH, false);

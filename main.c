@@ -7,17 +7,19 @@
 #pragma config(Sensor, in6,    LLine,          sensorLineFollower)
 #pragma config(Sensor, in7,    CLine,          sensorPotentiometer)
 #pragma config(Sensor, in8,    PEX,            sensorPotentiometer)
-#pragma config(Sensor, dgtl1,  REncoder,       sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  LEncoder,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl1,  LEncoder,       sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  REncoder,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl5,  stackTrigger,   sensorTouch)
-#pragma config(Sensor, dgtl7,  RUltrasonic,    sensorSONAR_cm)
+#pragma config(Sensor, dgtl6,  meme,           sensorTouch)
+#pragma config(Sensor, dgtl7,  MogoDetector,   sensorSONAR_cm)
+#pragma config(Sensor, dgtl9,  RUltrasonic,    sensorSONAR_cm)
 #pragma config(Sensor, dgtl11, LUltrasonic,    sensorSONAR_cm)
-#pragma config(Motor,  port1,           MRDrive,       tmotorVex393_HBridge, openLoop, reversed)
+#pragma config(Motor,  port1,           MogoIntake,    tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           RDrive,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port3,           RMainLift,     tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port4,           MogoIntake,    tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port5,           MLDrive,       tmotorVex393_MC29, openLoop)
-#pragma config(Motor,  port6,           ConeIntake,    tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port4,           MRDrive,       tmotorVex393_MC29, openLoop, reversed)
+#pragma config(Motor,  port5,           ConeIntake,    tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port6,           MLDrive,       tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port7,           TopLift,       tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port8,           LMainLift,     tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port9,           LDrive,        tmotorVex393_MC29, openLoop)
@@ -28,6 +30,11 @@
 
 // Select Download method as "competition"
 #pragma competitionControl(Competition)
+
+int distance1 = 610;
+int distance2 = 120;
+int distance3 = 120;
+int distance4 = 170;
 
 int testLiftHeight = 2420;
 int testVbarHeight = 3650;
@@ -82,7 +89,7 @@ task subsystemControl();
 #include "Vex_Competition_Includes.c"
 
 void pre_auton() {
-	clearDebugStream();
+	//clearDebugStream();
 	startTask(selector);
 	bl_calibrate_gyro();
 	bStopTasksBetweenModes = true;
@@ -103,7 +110,9 @@ void pre_auton() {
 //	}
 //}
 task autonomous() {
-	//mogoAuton(-1);
+	//autostack(6, FIELD);
+	//nb_lift_PID(400, 127, 5000);
+	mogoAuton(-1);
 	//auton9(1);
 	//nb_lift_PID(200,0,10000)
 //while (SensorValue[MainLiftPot] < 2400) {
@@ -112,7 +121,12 @@ task autonomous() {
 //	wait1Msec(30);
 //}
 //b_lift(0);
-nb_vbar_PID(3300, 127, 5000);
+//nb_vbar_PID(3300, 127, 5000);
+//mogoAndCones26(true);
+//waitUntil(SensorValue[MogoDetector] < 7);
+//b_drive(-127, -127);
+//bl_drive(300, 127, 4000);
+//bl_drive_rotate(900, 127, 2000);
 }
 
 task subsystemControl() {
