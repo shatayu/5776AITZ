@@ -91,19 +91,8 @@ task autostack_control() {
 			autostack_state.type = MATCH;
 		} else if (vexRT[Btn8LXmtr2]) {
 			autostack_state.type = STAGO;
-		}
-
-		// go to reset heights
-		if (vexRT[Btn7RXmtr2]) {
-			stopTask(nb_lift_PID_task);
-			nb_lift_PID(300, 127, 125000);
-			autostack_state.type = FIELD;
-		} else if (vexRT[Btn7DXmtr2]) {
-			stopTask(nb_lift_PID_task);
-			nb_lift_PID(800, 127, 125000);
-			autostack_state.type = MATCH;
-		} else if (vexRT[Btn7LXmtr2]) {
-			autostack_state.type = STAGO;
+		} else if (vexRT[Btn8UXmtr2]) {
+			autostack_state.type = NONE:
 		}
 
 		wait1Msec(20);
@@ -118,7 +107,7 @@ int heights[12] = {firstHeight, firstHeight + 160, firstHeight + 220, firstHeigh
 
 int firstVbarHeight = 3850;
 int vbarHeights[12] = {firstVbarHeight, firstVbarHeight, firstVbarHeight, firstVbarHeight,
-											 firstVbarHeight, firstVbarHeight, firstVbarHeight - 200, firstVbarHeight - 200,
+											 firstVbarHeight, firstVbarHeight, firstVbarHeight - 200, firstVbarHeight - 100,
 										 	 firstVbarHeight - 600, firstVbarHeight - 400, firstVbarHeight - 400, firstVbarHeight - 400};
 
 
@@ -132,28 +121,33 @@ int offsetsUp[12] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffs
 										 firstOffsetUp, firstOffsetUp, firstOffsetUp, firstOffsetUp + 50,
 										 firstOffsetUp + 50, firstOffsetUp + 50, firstOffsetUp + 50, firstOffsetUp + 50};
 
+int firstTimeUp = 180;
+int timesUp[12] = {firstTimeUp, firstTimeUp, firstTimeUp, firstTimeUp,
+							 firstTimeUp, firstTimeUp, firstTimeUp, firstTimeUp,
+							 firstTimeUp + 100, firstTimeUp + 100, firstTimeUp + 50, firstTimeUp + 50}
+
 void autostack(int cone, int reset, bool blocking) {
 	autostack_state.lift_height = heights[cone];
 	autostack_state.vbar_height = vbarHeights[cone];
 	autostack_state.drop = dropTimes[cone];
   autostack_state.offset_up = offsetsUp[cone];
+  autostack_state.up = timesUp[cone];
 
   if (autostack_state.type == FIELD) {
+  	dropTimes[0] = firstDropTime + 50;
+  	dropTimes[1] = firstDropTime + 50;
+  	dropTimes[2] = firstDropTime;
   	startTask(field_up);
   } else if (autostack_state.type == MATCH) {
-  	dropTimes[0] += 100;
-  	dropTimes[1] += 50;
-  	dropTimes[2] += 50;
-  	heights[4] += 50;
-		heights[5] += 150;
-		heights[6] += 150;
-		heights[7] += 120;
-		heights[8] += 150;
+  	dropTimes[0] = firstDropTime + 150;
+  	dropTimes[1] = firstDropTime + 100;
+  	dropTimes[2] = firstDropTime + 50;
 
 		autostack_state.lift_height = heights[cone];
 		autostack_state.vbar_height = vbarHeights[cone];
 		autostack_state.drop = dropTimes[cone];
 		autostack_state.offset_up = offsetsUp[cone];
+		autostack_state.up = timesUp[cone];
   	startTask(match_up);
 	} else if (autostack_state.type == STAGO) {
 		startTask(stago_up);

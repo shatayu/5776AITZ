@@ -42,7 +42,7 @@ task field_up() {
 task field_reset() {
 	b_cone_intake(-127);
 	b_lift(127);
-	wait1Msec(210);
+	wait1Msec(autostack_state.up);
 	b_lift(20);
 
 	// bring the vertibar down all the way

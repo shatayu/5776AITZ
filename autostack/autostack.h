@@ -5,6 +5,7 @@ typedef struct {
 	int vbar_height;
 	int offset_up;
 	int drop;
+	int up;
 	int stacked;
 	int type;
 } Autostack;

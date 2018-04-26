@@ -14,8 +14,8 @@ task stago_up() {
 	waitUntil(autostack_state.lift_height - 100 < sget_lift(SENSOR));
 
 	// bring vbar to correct heights
-	autostack_state.vbar_height = 2000; // vbar angle to land on stago - needs tuning
-	nb_vbar_PID(autostack_state.vbar_height, 127, 5000);
+	autostack_state.vbar_height = 2100; // vbar angle to land on stago - needs tuning
+	nb_vbar(autostack_state.vbar_height, 127, 5000);
 	waitUntil(autostack_state.vbar_height + 50 > sget_vbar(SENSOR));
 
 	b_lift(-127);
@@ -35,6 +35,8 @@ task stago_reset() {
 	if (autostack_state.mogo_cones > 11) {
 		autostack_state.mogo_cones = 11;
 	}
+	b_lift(127);
+	wait1Msec(200);
 	nb_lift_PID(heights[autostack_state.mogo_cones + 1], 127, 10000);
 	waitUntil(sget_lift(SENSOR) > heights[autostack_state.mogo_cones] - 50);
 

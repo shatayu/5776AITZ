@@ -89,7 +89,7 @@ task subsystemControl();
 #include "Vex_Competition_Includes.c"
 
 void pre_auton() {
-	//clearDebugStream();
+	clearDebugStream();
 	startTask(selector);
 	bl_calibrate_gyro();
 	bStopTasksBetweenModes = true;
@@ -112,7 +112,7 @@ void pre_auton() {
 task autonomous() {
 	//autostack(6, FIELD);
 	//nb_lift_PID(400, 127, 5000);
-	mogoAuton(-1);
+	mogoAuton(LEFT);
 	//auton9(1);
 	//nb_lift_PID(200,0,10000)
 //while (SensorValue[MainLiftPot] < 2400) {
@@ -134,25 +134,25 @@ task subsystemControl() {
 		// lift drive code
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
 			b_lift(0); // remove any stall torque downward
-		} else if (vexRT[Btn5U]) {
-			stopTask(nb_lift_PID_task);
-			b_lift(127); // raise lift
-			waitUntil(!vexRT[Btn5U]);
-			b_lift(0);
 		} else if (vexRT[Btn5D]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(-127); // lower lift
 			waitUntil(!vexRT[Btn5D]);
 			b_lift(-10); // keep lift down (lift is so light that without pressure it will rise due to contact)
+		} else if (vexRT[Btn5U] && sget_lift(SENSOR) < 1490) {
+			stopTask(nb_lift_PID_task);
+			b_lift(127); // raise lift
+			waitUntil(!vexRT[Btn5U]);
+			b_lift(0);
 		}
 
 		// vertibar code
 		if (vexRT[Btn6U]) {
 			waitUntil(!vexRT[Btn6U]);
 			writeDebugStreamLine("button pressed");
-			if (SensorValue[TopLiftPot] > 2000) {
+			if (SensorValue[TopLiftPot] > 2400) {
 				stopTask(nb_vbar_PID_task);
-				nb_vbar(1860, 127, 5000);
+				nb_vbar(2050, 127, 5000);
 				if (sget_vbar(SENSOR) < 1870) {
 					b_vbar(-10);
 				}
@@ -183,6 +183,21 @@ task subsystemControl() {
 			b_mogo_intake(0);
 		}
 
+		// partner stick controls to adjust lift heights
+		if (vexRT[Btn7RXmtr2]) {
+			waitUntil(!vexRT[Btn7RXmtr2]);
+			nb_lift_PID(300, 127, 125000);
+			autostack_state.type = FIELD;
+			b_cone_intake(127);
+		} else if (vexRT[Btn7DXmtr2]) {
+			waitUntil(!vexRT[Btn7DXmtr2]);
+			nb_lift_PID(660, 12, 125000);
+			autostack_state.type = MATCH;
+			b_cone_intake(127);
+		} else if (vexRT[Btn7LXmtr2]) {
+			waitUntil(!vexRT[Btn7LXmtr2]);
+			autostack_state.type = STAGO;
+		}
 		wait1Msec(20);
 	}
 }
@@ -195,7 +210,7 @@ task usercontrol() {
 
 	// initialize autostack code
 	startTask(autostack_control);
-	b_vbar(-20);
+	b_vbar(-10);
 	while (true) {
 		// drive code
 
@@ -207,7 +222,7 @@ task usercontrol() {
 		b_drive(leftPower, rightPower);
 
 		// abort autostack
-		if (vexRT[Btn8L]) {
+		if (vexRT[Btn8L] || vexRT[Btn7UXmtr2]) {
 			abortAutostack();
 			autostack_state.stacked = false;
 			startTask(subsystemControl);

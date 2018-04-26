@@ -10,7 +10,7 @@ int writeSecondLCD(int line, string s) {
     int len;
 
     // bounds check line variable
-    if( ( line < 0 ) || (line > 1) )
+    if(( line < 0 ) || (line > 1))
         return(-1);
 
     // Header for LCD communication
@@ -54,7 +54,7 @@ int writeSecondLCD(int line, string s) {
     return(1);
 }
 
-int selectedAuton = 4;
+int selectedAuton = 2;
 
 #define MAIN true
 #define SECOND false
@@ -71,9 +71,8 @@ void displayLCD(int LCD, int line, string text, bool centered) {
 
 
 task selector() {
-	bool LCDState = true; // true = auton selector on main, false = debug on main
-	int NUM_AUTONS = 4;
-	string autonNames[] = {"NO AUTON", "2PT STAGO", "9PT MOGO", "13PT MOGO", "26PT MOGO"};
+	int NUM_AUTONS = 3;
+	string autonNames[] = {"NO AUTON", "9PT MOGO", "26PT MOGO"};
   setBaudRate(uartOne, baudRate19200);
   wait1Msec(100);
 	// uart1 right LCD
@@ -81,120 +80,37 @@ task selector() {
   //int encoderValue = Sensor
 	while (true) {
 		// change autons by using buttons; left and right cycle through autons, center inverts direction
-		//if (nLCDButtons == 1) {
-		//	waitUntil(nLCDButtons == 0);
-		//	selectedAuton--;
-		//} else if (nLCDButtons == 2) {
-		//	waitUntil(nLCDButtons == 0);
-		//	selectedAuton *= -1;
-		//} else if (nLCDButtons == 4) {
-		//	waitUntil(nLCDButtons == 0);
-		//	selectedAuton++;
-		//}
+		if (nLCDButtons == 1) {
+			waitUntil(nLCDButtons == 0);
+			selectedAuton--;
+		} else if (nLCDButtons == 2) {
+			waitUntil(nLCDButtons == 0);
+			selectedAuton *= -1;
+		} else if (nLCDButtons == 4) {
+			waitUntil(nLCDButtons == 0);
+			selectedAuton++;
+		}
 
-		//// loop over to the other end of the list if no more autons to go through
-		//if (abs(selectedAuton) > NUM_AUTONS) {
-		//	selectedAuton = -sgn(selectedAuton) * NUM_AUTONS;
-		//}
+		// loop over to the other end of the list if no more autons to go through
+		if (abs(selectedAuton) > NUM_AUTONS - 1) {
+			selectedAuton = -sgn(selectedAuton) * (NUM_AUTONS - 1);
+		}
 
-		//// display auton name
-		////displayLCDCenteredString(0, autonNames[abs(selectedAuton)]);
-		//if (abs(selectedAuton) == 1) {
-		//	displayLCDCenteredString(0, autonNames[1]);
-		//} else if (abs(selectedAuton) == 2) {
-		//	displayLCDCenteredString(0, autonNames[2]);
-		//} else if (abs(selectedAuton) == 3) {
-		//	displayLCDCenteredString(0, autonNames[3]);
-		//} else if (abs(selectedAuton) == 4) {
-		//	displayLCDCenteredString(0, autonNames[4]);
-		//} else {
-		//	displayLCDCenteredString(0, "NO AUTON SELECTED");
-		//}
+		// display auton name
+		if (abs(selectedAuton) >= 0 && abs(selectedAuton) <= NUM_AUTONS - 1) {
+			displayLCDCenteredString(0, autonNames[abs(selectedAuton)]);
+		} else {
+			displayLCDCenteredString(0, "NO AUTON");
+		}
 
-		//// display auton side
-		//if (sgn(selectedAuton) == 1) {
-		//	displayLCDCenteredString(1, "RIGHT");
-		//} else if (sgn(selectedAuton) == -1) {
-		//	displayLCDCenteredString(1, "LEFT");
-		//} else {
-		//	displayLCDCenteredString(1, "N/A");
-		//}
 
-		// main LCD
-		string primary = "MAIN: ";
-		string mainBattery, PEXBattery;
-		//Display the Primary Robot battery voltage
-		//displayLCD(MAIN, 0, primary, false);
-		sprintf(mainBattery, "%1.2f", nImmediateBatteryLevel/1000.0); //Build the value to be displayed
-		//displayLCDCenteredString(0, mainBattery);
-		strcat(primary, mainBattery);
-		displayLCD(LCDState, 0, primary, false);
-
-		// display PEX voltage
-		string PEXText = "P-EX: ";
-		displayLCD(LCDState, 1, PEXText, false);
-		wait1Msec(50);
-		sprintf(PEXBattery, "%1.2f", ((float)SensorValue[PEX]/270.0));    //Build the value to be displayed
-		strcat(PEXText, PEXBattery);
-		displayLCD(LCDState, 1, PEXText, false);
-		wait1Msec(50);
-
-		//// display lift value
-		//string liftText = "LIFT: ";
-		//string vbarText = "VBAR: ";
-		//string lift, vertibar;
-		//sprintf(lift, "%d", SensorValue[MainLiftPot]);
-		//strcat(liftText, lift);
-		//displayLCD(!LCDState, 0, liftText, false);
-		//sprintf(vertibar, "%d", SensorValue[TopLiftPot]);
-		//strcat(vbarText, vertibar);
-		//displayLCD(!LCDState, 1, vbarText, false);
-
-		// sensor check
-		string goodSensor, badSensor;
-		string liftCode = "L";
-		string vbarCode	 = "V";
-		string mogoCode = "M";
-		string encoderCode = "E";
-		string gyroCode = "G";
-		string leftUltraCode = "RU";
-		string rightUltraCode = "LU"
-
-		string str0, str1;
-		sprintf(str0, "LIFT: %d", SensorValue[MainLiftPot]);
-		displayLCD(!LCDState, 0, str0, false);
-		wait1Msec(50);
-		sprintf(str1, "VBAR: %d", SensorValue[TopLiftPot]);
-		displayLCD(!LCDState, 1, str1, false);
-		wait1Msec(50);
-
-		//// lift check
-		//if (SensorValue[MainLiftPot] < 260 && SensorValue[MainLiftPot] > 240) {
-		//	strcat(badSensor, liftCode);
-		//} else {
-		//	strcat(goodSensor, liftCode);
-		//}
-
-		//// vertibar check
-		//if (SensorValue[TopLiftPot] < 260 && SensorValue[TopLiftPot] > 240) {
-		//	strcat(badSensor, vbarCode);
-		//} else {
-		//	strcat(goodSensor, vbarCode);
-		//}
-
-		//// mogo check
-		//if (SensorValue[MogoPot] < 260 && SensorValue[MogoPot] > 240) {
-		//	strcat(badSensor, mogoCode);
-		//} else {
-		//	strcat(goodSensor, mogoCode);
-		//}
-
-		////
-
-		//// toggle LCDs
-		//if (nLCDButtons == 7) {
-		//	waitUntil(nLCDButtons == 0);
-		//	LCDState = !LCDState;
-		//}
+		// display auton side
+		if (sgn(selectedAuton) == 1) {
+			displayLCDCenteredString(1, "RIGHT");
+		} else if (sgn(selectedAuton) == -1) {
+			displayLCDCenteredString(1, "LEFT");
+		} else {
+			displayLCDCenteredString(1, "N/A");
+		}
 	}
 }

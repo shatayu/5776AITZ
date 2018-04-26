@@ -5,9 +5,9 @@ bool stagoAlign20(int side) {
 	bool result;
 
 	if (side == LEFT) {
-		result = (SensorValue[LUltrasonic] > 0 && SensorValue[LUltrasonic] < 40);
+		result = (SensorValue[LUltrasonic] > 0 && SensorValue[LUltrasonic] < 50);
 	} else if (side == RIGHT) {
-		result = (SensorValue[RUltrasonic] > 0 && SensorValue[RUltrasonic] < 40);
+		result = (SensorValue[RUltrasonic] > 0 && SensorValue[RUltrasonic] < 50);
 	}
 	return result;
 }
@@ -34,7 +34,8 @@ void mogoAuton(int direction) {
 	//bl_drive_rotate(450 - error, 127 * direction, 3000);
 
 	// align the robot with the 20pt zone using the stago
-	b_drive(-60, -60); // tune speed
+	b_drive(-61, -61); // tune speed
+	writeDebugStreamLine("NOW SAMPLING ULTRASONIC");
 	while (true) {
 		if (stagoAlign20(direction)) {
 			break;
@@ -47,5 +48,5 @@ void mogoAuton(int direction) {
 
 	stopTask(nb_vbar_PID_task);
 	bl_drive_rotate(900, 127 * direction, 5000); // tune speed/angle
-	//scoreOn20();
+	scoreOn20();
 }

@@ -43,8 +43,8 @@ task match_up() {
 
 task match_reset() {
 	// bring the vertibar down all the way
-	int vbar_reset = 1550;
-	int lift_reset = 2200 - 1400;
+	int vbar_reset = 2050;
+	int lift_reset = 660;
 
 	if (autostack_state.mogo_cones < 5) {
 		nb_lift_PID(lift_reset - 200, 127, 5000);
@@ -52,7 +52,7 @@ task match_reset() {
 		writeDebugStreamLine("reached reset height (for 0-4 cones on mogo)");
 	} else {
 		b_lift(127);
-		wait1Msec(180);
+		wait1Msec(autostack_state.up);
 		b_lift(20);
 	}
 
