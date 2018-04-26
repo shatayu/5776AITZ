@@ -110,23 +110,11 @@ void pre_auton() {
 //	}
 //}
 task autonomous() {
-	//autostack(6, FIELD);
-	//nb_lift_PID(400, 127, 5000);
-	mogoAuton(LEFT);
-	//auton9(1);
-	//nb_lift_PID(200,0,10000)
-//while (SensorValue[MainLiftPot] < 2400) {
-//	b_lift(60);
-//	writeDebugStreamLine("%d", SensorValue[MainLiftPot]);
-//	wait1Msec(30);
-//}
-//b_lift(0);
-//nb_vbar_PID(3300, 127, 5000);
-//mogoAndCones26(true);
-//waitUntil(SensorValue[MogoDetector] < 7);
-//b_drive(-127, -127);
-//bl_drive(300, 127, 4000);
-//bl_drive_rotate(900, 127, 2000);
+	if (abs(selectedAuton) == 1) {
+		auton9(sgn(selectedAuton));
+	} else if (abs(selectedAuton) == 2) {
+		mogoAuton(sgn(selectedAuton));
+	}
 }
 
 task subsystemControl() {
@@ -147,29 +135,26 @@ task subsystemControl() {
 		}
 
 		// vertibar code
-		if (vexRT[Btn6U]) {
-			waitUntil(!vexRT[Btn6U]);
-			writeDebugStreamLine("button pressed");
-			if (SensorValue[TopLiftPot] > 2400) {
-				stopTask(nb_vbar_PID_task);
-				nb_vbar(2050, 127, 5000);
-				if (sget_vbar(SENSOR) < 1870) {
-					b_vbar(-10);
-				}
-			} else {
-				stopTask(nb_vbar_PID_task);
-				nb_vbar(3400, 127, 5000);
-				if (sget_vbar(SENSOR) > 3400) {
-				  b_vbar(10);
-				}
-			}
+		if(vexRT[Btn7L]) {
+			stopTask(nb_vbar_PID_task);
+			b_vbar(-100);
+		} else if(vexRT[Btn7R]) {
+			stopTask(nb_vbar_PID_task);
+			b_vbar(100);
+		}else if(!nb_vbar_running()){
+				stopTask(nb_vbar_PID_task);//just in casr
+				if (sget_vbar(SENSOR) < 2000) b_vbar(-15);
+				if (sget_vbar(SENSOR) > 3400) b_vbar(15);
 		}
+
 
 		// cone intake (claw) code
 		if (vexRT[Btn6D]) {
 			b_cone_intake(127);
 		} else if (vexRT[Btn8U]) {
 			b_cone_intake(-127);
+			waitUntil(!vexRT[Btn8U]);
+			b_cone_intake(0);
 		} else if (vexRT[Btn8D]) {
 			b_cone_intake(0);
 		}

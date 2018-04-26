@@ -47,7 +47,10 @@ void nb_vbar_PID_init() {
 	vbarPID.integralMin = -40;
 	already_init = true;
 }
-
+bool nb_vbar_running() {
+	if(abs(nSysTime-vbarPIDlastTime) < 50) return true;
+	return false;
+}
 task nb_vbar_PID_task() {
 	nb_vbar_PID_init();
 	vbarPID.integral = 0;
@@ -61,6 +64,7 @@ task nb_vbar_PID_task() {
 
 	int timer = 0;
 	while (timer < vbar.timeout) {
+		vbarPIDlastTime = nSysTime;
 		int power = calc_PID(vbarPID, sget_vbar(SENSOR));
 		int error = vbar.target - sget_vbar(SENSOR);
 

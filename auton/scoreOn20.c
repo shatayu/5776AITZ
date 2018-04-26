@@ -6,11 +6,11 @@ void scoreOn20() {
 	waitUntil(sget_lift(SENSOR) > 400);
 
 
-	//b_drive(127, 127); // tune?
-	//wait1Msec(1800);
+	b_drive(127, 127); // tune?
+	wait1Msec(1800);
 
-	// test
-	bl_drive(400, 127, 2000);
+	//// test
+	//bl_drive(400, 127, 2000);
 
 
 	b_mogo_intake(127); // tune?
@@ -24,8 +24,8 @@ void scoreOn20() {
 	// mogo withdrawn, drive stopped
 
 	// test
-	//wait1Msec(750);
-	wait1Msec(250);
+	wait1Msec(750);
+	//wait1Msec(250);
 
 
 	b_drive(0, 0);

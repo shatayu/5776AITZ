@@ -118,13 +118,13 @@ int dropTimes[12] = {firstDropTime + 50, firstDropTime + 50, firstDropTime, firs
 
 int firstOffsetUp = 350;
 int offsetsUp[12] = {firstOffsetUp, firstOffsetUp - 30, firstOffsetUp, firstOffsetUp,
-										 firstOffsetUp, firstOffsetUp, firstOffsetUp, firstOffsetUp + 50,
-										 firstOffsetUp + 50, firstOffsetUp + 50, firstOffsetUp + 50, firstOffsetUp + 50};
+										 firstOffsetUp, firstOffsetUp, firstOffsetUp, firstOffsetUp + 150,
+										 firstOffsetUp + 150, firstOffsetUp + 150, firstOffsetUp + 150, firstOffsetUp + 150};
 
 int firstTimeUp = 180;
 int timesUp[12] = {firstTimeUp, firstTimeUp, firstTimeUp, firstTimeUp,
 							 firstTimeUp, firstTimeUp, firstTimeUp, firstTimeUp,
-							 firstTimeUp + 100, firstTimeUp + 100, firstTimeUp + 50, firstTimeUp + 50}
+							 firstTimeUp + 150, firstTimeUp + 150, firstTimeUp + 150, firstTimeUp + 150}
 
 void autostack(int cone, int reset, bool blocking) {
 	autostack_state.lift_height = heights[cone];
@@ -169,9 +169,9 @@ void autostack(int cone, int reset, bool blocking) {
 			startTask(stago_reset);
 		}
 	} else {
-		b_lift(127);
-		wait1Msec(200);
-		b_lift(0);
+		//b_lift(127);
+		//wait1Msec(200);
+		//b_lift(0);
 		b_cone_intake(0);
 		abortAutostack();
 	}
