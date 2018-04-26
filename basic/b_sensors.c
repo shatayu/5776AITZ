@@ -51,6 +51,10 @@ int sget_mogo(int value) {
 
 int sget_trigger() {
 	int raw = SensorValue[stackTrigger];
+
+	if (raw) {
+			writeDebugStreamLine("button pressed");
+	}
 	return raw;
 }
 

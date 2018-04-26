@@ -141,12 +141,10 @@ task subsystemControl() {
 		} else if(vexRT[Btn7R]) {
 			stopTask(nb_vbar_PID_task);
 			b_vbar(100);
-		}else if(!nb_vbar_running()){
-				stopTask(nb_vbar_PID_task);//just in casr
-				if (sget_vbar(SENSOR) < 2000) b_vbar(-15);
-				if (sget_vbar(SENSOR) > 3400) b_vbar(15);
+		} else if (!nb_vbar_running()){
+			if (sget_vbar(SENSOR) <= 2800) b_vbar(-10);
+			if (sget_vbar(SENSOR) > 2800) b_vbar(10);
 		}
-
 
 		// cone intake (claw) code
 		if (vexRT[Btn6D]) {
