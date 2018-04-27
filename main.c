@@ -118,6 +118,7 @@ void pre_auton() {
 //	}
 //}
 task autonomous() {
+	writeDebugStreamLine("starting autonomous");
 	if (abs(selectedAuton) == 1) {
 		auton9(sgn(selectedAuton));
 	} else if (abs(selectedAuton) == 2) {
@@ -200,6 +201,7 @@ task subsystemControl() {
 }
 
 task usercontrol() {
+	nSchedulePriority = kHighPriority;
 	autostack_state.type = FIELD;
 	startTask(selector);
 
@@ -219,18 +221,19 @@ task usercontrol() {
 		// apply power
 		b_drive(leftPower, rightPower);
 
-		// abort autostack
-		if (vexRT[Btn8L] || vexRT[Btn7UXmtr2]) {
-			abortAutostack();
-			autostack_state.stacked = false;
-			startTask(subsystemControl);
-			//startTask(autostackControl);
-			b_cone_intake(0);
-		}
-
 		//datalogDataGroupStart();
 		//datalogAddValue(0,SensorValue[MainLiftPot]);
 		//datalogDataGroupEnd();
+
+		// abort autostack
+		if (vexRT[Btn8L] || vexRT[Btn7UXmtr2]) {
+			stopTask(autostack_control);
+			abortAutostack();
+			autostack_state.stacked = false;
+			startTask(subsystemControl);
+			startTask(autostack_control);
+			b_cone_intake(0);
+		}
 
 		wait1Msec(20);
 	}

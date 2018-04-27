@@ -2,17 +2,18 @@
 ////int rollerState = 1; // 0 := still, 1 := intaking, -1 != outtaking
 
 void abortAutostack() {
-	stopTask(nb_lift_PID_task);
-	stopTask(nb_lift_task);
-	stopTask(nb_vbar_task);
-	stopTask(nb_vbar_PID_task);
-	stopTask(nb_cone_intake_task);
 	stopTask(field_up);
 	stopTask(match_up);
 	stopTask(stago_up);
 	stopTask(match_reset);
 	stopTask(field_reset);
 	stopTask(stago_reset);
+	stopTask(nb_lift_PID_task);
+	stopTask(nb_lift_task);
+	stopTask(nb_vbar_task);
+	stopTask(nb_vbar_PID_task);
+	stopTask(nb_cone_intake_task);
+
 
 	b_lift(0);
 	b_vbar(0);
@@ -45,7 +46,7 @@ task autostack_control() {
 			}
 			startTask(subsystemControl);
 			writeDebugStreamLine("finished stacking");
-
+			wait1Msec(1);
 			// increment the appropriate internal counts
 			writeDebugStreamLine("The number of cones currently on the mogo is %d", autostack_state.mogo_cones);
 			if (autostack_state.mogo_cones < 12 && (autostack_state.type == FIELD || autostack_state.type == MATCH)) {
@@ -99,6 +100,7 @@ task autostack_control() {
 		} else if (vexRT[Btn8RXmtr2]) {
 			autostack_state.type = STAGO;
 		}
+
 
 		wait1Msec(20);
 	}
