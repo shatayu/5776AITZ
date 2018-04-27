@@ -32,7 +32,7 @@ bool detectMogo() {
 void mogoAndCones(bool correct) {
 // drive up to mogo
 	startTask(forwardAutonHelper);
-	wait1Msec(600);
+	wait1Msec(750);
 	// proceed with auton
 	//bl_drive(570, 127, 3000, false); // used to be 1185 127 3000
 
@@ -99,10 +99,6 @@ void mogoAndCones26(bool correct) {
 
 	// cone #3
 	startTask(field_reset);
-	if (correct) {
-		bl_drive_rotate(-sget_gyro(), 127, 1000);
-	}
-
 	// drive forward at partial power
 	// test distance
 	bl_drive(distance3, 127, 2100);

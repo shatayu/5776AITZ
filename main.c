@@ -88,6 +88,14 @@ task subsystemControl();
 
 #include "Vex_Competition_Includes.c"
 
+void restartAutostack() {
+	autostack_state.mogo_cones = 0;
+	autostack_state = FIELD;
+
+	stopTask(autostack_control);
+	startTask(autostack_control);
+}
+
 void pre_auton() {
 	clearDebugStream();
 	startTask(selector);
@@ -118,7 +126,13 @@ task autonomous() {
 }
 
 task subsystemControl() {
+	writeDebugStreamLine("subsystem init");
+
 	while (true) {
+		if (vexRT[Btn8LXmtr2]) {
+			restartAutostack();
+		}
+
 		// lift drive code
 		if (vexRT[Btn5U] && vexRT[Btn5D]) {
 			b_lift(0); // remove any stall torque downward
@@ -127,7 +141,7 @@ task subsystemControl() {
 			b_lift(-127); // lower lift
 			waitUntil(!vexRT[Btn5D]);
 			b_lift(-10); // keep lift down (lift is so light that without pressure it will rise due to contact)
-		} else if (vexRT[Btn5U] && sget_lift(SENSOR) < 1490) {
+		} else if (vexRT[Btn5U]) {
 			stopTask(nb_lift_PID_task);
 			b_lift(127); // raise lift
 			waitUntil(!vexRT[Btn5U]);
@@ -186,6 +200,7 @@ task subsystemControl() {
 }
 
 task usercontrol() {
+	autostack_state.type = FIELD;
 	startTask(selector);
 
 	// initialize code for lift, vbar, mogo, cone intake
