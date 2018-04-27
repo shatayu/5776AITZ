@@ -60,7 +60,7 @@ task autostack_control() {
 		if (vexRT[Btn6UXmtr2] && vexRT[Btn6DXmtr2]) { //reset cone #
 			waitUntil(!(vexRT[Btn6UXmtr2] && vexRT[Btn6DXmtr2]));
 			autostack_state.mogo_cones = 0;
-			playImmediateTone(5000, 10);
+			//playImmediateTone(5000, 10);
 		} else if (vexRT[Btn6UXmtr2]) {
 			if (autostack_state.mogo_cones < 12) {
 				waitUntil(!vexRT[Btn6UXmtr2]);
