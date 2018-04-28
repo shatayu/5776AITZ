@@ -98,7 +98,7 @@ void restartAutostack() {
 
 void pre_auton() {
 	clearDebugStream();
-	startTask(selector);
+	//startTask(selector);
 	bl_calibrate_gyro();
 	bStopTasksBetweenModes = true;
 	bLCDBacklight = true;
@@ -122,8 +122,9 @@ task autonomous() {
 	if (abs(selectedAuton) == 1) {
 		auton9(sgn(selectedAuton));
 	} else if (abs(selectedAuton) == 2) {
-		mogoAuton(sgn(selectedAuton));
+		mogoAuton(-1);
 	}
+	//auton9(-1);
 }
 
 task subsystemControl() {
@@ -201,7 +202,6 @@ task subsystemControl() {
 }
 
 task usercontrol() {
-	nSchedulePriority = kHighPriority;
 	autostack_state.type = FIELD;
 	startTask(selector);
 

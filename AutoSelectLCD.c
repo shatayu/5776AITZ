@@ -54,7 +54,7 @@ int writeSecondLCD(int line, string s) {
     return(1);
 }
 
-int selectedAuton = 2;
+int selectedAuton = -2;
 
 #define MAIN true
 #define SECOND false
@@ -112,5 +112,6 @@ task selector() {
 		} else {
 			displayLCDCenteredString(1, "N/A");
 		}
+		wait1Msec(20);
 	}
 }

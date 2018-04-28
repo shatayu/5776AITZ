@@ -19,8 +19,16 @@ void getCone() {
 	b_lift(-127);
 	b_vbar(-127);
 
-	clearTimer(T1);
-	waitUntil(sget_trigger() || time1[T1] > 600);
+	//clearTimer(T1);
+	//waitUntil(sget_trigger() || time1[T1] > 600);
+	int timer = 0;
+	while (true) {
+		if (sget_trigger() || timer > 500) {
+			break;
+		}
+		timer += 40;
+		wait1Msec(40);
+	}
 }
 
 bool detectMogo() {
