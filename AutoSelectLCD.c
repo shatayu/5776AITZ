@@ -98,20 +98,48 @@ task selector() {
 
 		// display auton name
 		if (abs(selectedAuton) >= 0 && abs(selectedAuton) <= NUM_AUTONS - 1) {
-			displayLCDCenteredString(0, autonNames[abs(selectedAuton)]);
+			//displayLCDCenteredString(0, autonNames[abs(selectedAuton)]);
+			displayLCD(MAIN, 0, autonNames[abs(selectedAuton)], true);
 		} else {
-			displayLCDCenteredString(0, "NO AUTON");
+			//displayLCDCenteredString(0, "NO AUTON");
+			string na = "NO AUTON";
+			displayLCD(MAIN, 0, na, true);
 		}
 
 
 		// display auton side
 		if (sgn(selectedAuton) == 1) {
 			displayLCDCenteredString(1, "RIGHT");
+			string r = "RIGHT";
+			//displayLCD(MAIN, 1, r, true);
 		} else if (sgn(selectedAuton) == -1) {
 			displayLCDCenteredString(1, "LEFT");
+			string l = "LEFT";
+			//displayLCD(MAIN, 1, l, true);
 		} else {
 			displayLCDCenteredString(1, "N/A");
+			string n = "N/A";
+			//displayLCD(MAIN, 1, n, true);
 		}
+
+		//// main LCD
+		//string primary = "MAIN: ";
+		//string mainBattery, PEXBattery;
+		////Display the Primary Robot battery voltage
+		////displayLCD(MAIN, 0, primary, false);
+		//sprintf(mainBattery, "%1.2f", nImmediateBatteryLevel/1000.0); //Build the value to be displayed
+		////displayLCDCenteredString(0, mainBattery);
+		//strcat(primary, mainBattery);
+		//displayLCD(SECOND, 0, primary, false);
+
+		//// display PEX voltage
+		//string PEXText = "P-EX: ";
+		//displayLCD(SECOND, 1, PEXText, false);
+		//wait1Msec(50);
+		//sprintf(PEXBattery, "%1.2f", ((float) SensorValue[PEX]/270.0));    //Build the value to be displayed
+		//strcat(PEXText, PEXBattery);
+		//displayLCD(SECOND, 1, PEXText, false);
+
 		wait1Msec(20);
 	}
 }
